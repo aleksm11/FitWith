@@ -1,0 +1,11 @@
+export { default as Navbar } from "./Navbar";
+export { default as HeroSection } from "./HeroSection";
+export { default as ProgramsSection } from "./ProgramsSection";
+export { default as TestimonialsSection } from "./TestimonialsSection";
+export { default as PricingSection } from "./PricingSection";
+export { default as WhyChooseUsSection } from "./WhyChooseUsSection";
+export { default as CtaSection } from "./CtaSection";
+export { default as Footer } from "./Footer";
+export * from "./about";
+export * from "./classes";
+export * from "./timetable";
