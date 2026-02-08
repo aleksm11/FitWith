@@ -1,71 +1,55 @@
-import { Button } from "@/components/shared";
-import Navbar from "./Navbar";
+"use client";
 
-const stats = [
-  {
-    number: "500+",
-    title: "Happy Members",
-    subtitle: "Our community is growing fast!",
-  },
-  {
-    number: "30+",
-    title: "Weekly Classes",
-    subtitle: "Pick from various workouts",
-  },
-  {
-    number: "10",
-    title: "Certified Trainers",
-    subtitle: "Guidance at every step.",
-  },
-  {
-    number: "99%",
-    title: "Customer Satisfaction",
-    subtitle: "We ensure your progress satisfaction",
-  },
-];
+import { useTranslations, useLocale } from "next-intl";
+import Button from "@/components/shared/Button";
 
 export default function HeroSection() {
-  return (
-    <section
-      className="relative w-full h-[800px] max-lg:h-auto max-lg:min-h-[600px] bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/assets/images/hero-numbers-bg.png')" }}
-    >
-      <div className="flex flex-col h-full px-[100px] max-xl:px-[60px] max-lg:px-[40px] max-sm:px-[20px] pt-[30px] max-lg:pb-[40px]">
-        {/* Navbar */}
-        <Navbar />
+  const t = useTranslations("Hero");
+  const locale = useLocale();
 
+  const stats = [
+    { value: t("stat1Value"), label: t("stat1Label") },
+    { value: t("stat2Value"), label: t("stat2Label") },
+    { value: t("stat3Value"), label: t("stat3Label") },
+  ];
+
+  return (
+    <section className="relative w-full min-h-[100vh] max-lg:min-h-[80vh] flex flex-col">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A] via-[#0A0A0A] to-[#111111]" />
+      <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[120px]" />
+
+      <div className="relative flex flex-col flex-1 max-w-[1280px] mx-auto w-full px-[40px] max-sm:px-[20px] pt-[160px] max-lg:pt-[120px] max-sm:pt-[100px] pb-[60px]">
         {/* Hero Content */}
-        <div className="flex flex-col mt-[109px] max-lg:mt-[60px] max-sm:mt-[40px]">
-          <div className="flex flex-col gap-[50px]">
-            <h1 className="font-[family-name:var(--font-sora)] font-bold text-[72px] leading-[82px] max-lg:text-[54px] max-lg:leading-[64px] max-sm:text-[36px] max-sm:leading-[46px] text-white w-[784px] max-xl:w-full">
-              ACHIEVE MORE THAN JUST FITNESS
-            </h1>
-            <p className="font-[family-name:var(--font-roboto)] text-[18px] leading-[28px] max-sm:text-[16px] max-sm:leading-[26px] text-white opacity-60 w-[536px] max-lg:w-full">
-              Combine strength, flexibility, and endurance in a community that
-              values well-rounded health and supportive growth.
-            </p>
-          </div>
+        <div className="flex flex-col gap-[32px] max-w-[700px]">
+          <h1 className="font-[family-name:var(--font-sora)] font-bold text-[64px] leading-[72px] max-lg:text-[48px] max-lg:leading-[56px] max-sm:text-[36px] max-sm:leading-[44px] text-white">
+            {t("title")}
+          </h1>
+          <p className="font-[family-name:var(--font-roboto)] text-[18px] leading-[28px] max-sm:text-[16px] max-sm:leading-[26px] text-white/60 max-w-[540px]">
+            {t("subtitle")}
+          </p>
 
           {/* CTA Buttons */}
-          <div className="flex gap-[18px] mt-[50px] max-sm:flex-col max-sm:gap-[12px]">
-            <Button>START NOW</Button>
-            <Button variant="outline">JOIN FREE TRIAL</Button>
+          <div className="flex gap-[16px] mt-[16px] max-sm:flex-col">
+            <Button as="link" href={`/${locale}/kontakt`} size="lg">
+              {t("cta1")}
+            </Button>
+            <Button as="link" href={`/${locale}/cene`} variant="outline" size="lg">
+              {t("cta2")}
+            </Button>
           </div>
         </div>
 
-        {/* Stats Bar - pushed to bottom */}
-        <div className="mt-auto">
-          <div className="backdrop-blur-[9px] bg-white/[0.03] border-[0.5px] border-white px-[40px] py-[44px] max-sm:px-[20px] max-sm:py-[30px] flex items-start justify-between w-full max-lg:flex-wrap max-lg:gap-[30px]">
+        {/* Stats Bar */}
+        <div className="mt-auto pt-[80px] max-sm:pt-[48px]">
+          <div className="bg-white/[0.03] border border-white/10 backdrop-blur-[18px] px-[48px] py-[36px] max-sm:px-[24px] max-sm:py-[24px] flex items-center justify-between max-lg:flex-wrap max-lg:gap-[32px]">
             {stats.map((stat) => (
-              <div key={stat.title} className="flex flex-col gap-[4px] max-lg:w-[calc(50%-15px)] max-sm:w-full">
-                <span className="font-[family-name:var(--font-sora)] font-bold text-[42px] leading-[52px] max-sm:text-[32px] max-sm:leading-[42px] text-white">
-                  {stat.number}
+              <div key={stat.label} className="flex flex-col gap-[4px] max-lg:w-[calc(50%-16px)] max-sm:w-full">
+                <span className="font-[family-name:var(--font-sora)] font-bold text-[42px] leading-[52px] max-sm:text-[32px] max-sm:leading-[42px] text-orange-500">
+                  {stat.value}
                 </span>
-                <span className="font-[family-name:var(--font-roboto)] font-semibold text-[16px] leading-[26px] text-white">
-                  {stat.title}
-                </span>
-                <span className="font-[family-name:var(--font-roboto)] text-[16px] leading-[26px] text-white opacity-60">
-                  {stat.subtitle}
+                <span className="font-[family-name:var(--font-roboto)] text-[16px] leading-[26px] text-white/60">
+                  {stat.label}
                 </span>
               </div>
             ))}

@@ -1,73 +1,88 @@
-import Image from "next/image";
 import Button from "./Button";
 
 type PricingCardProps = {
   planName: string;
   price: string;
-  period?: string;
-  frequency: string;
+  period: string;
   features: string[];
-  ctaText?: string;
+  ctaText: string;
+  ctaHref: string;
+  highlighted?: boolean;
+  badge?: string;
   className?: string;
 };
 
 export default function PricingCard({
   planName,
   price,
-  period = "/month",
-  frequency,
+  period,
   features,
-  ctaText = "GET STARTED",
+  ctaText,
+  ctaHref,
+  highlighted = false,
+  badge,
   className = "",
 }: PricingCardProps) {
   return (
     <div
-      className={`bg-white/[0.04] border-[0.5px] border-white flex flex-col gap-[40px] items-center py-[60px] w-[400px] max-xl:w-full max-lg:max-w-[400px] max-sm:py-[40px] max-sm:gap-[30px] ${className}`}
+      className={`relative flex flex-col items-center py-[48px] px-[32px] max-sm:py-[36px] max-sm:px-[24px] w-full max-w-[400px] border transition-all duration-300 ${
+        highlighted
+          ? "bg-white/[0.06] border-orange-500/50 shadow-[0_0_40px_rgba(249,115,22,0.1)]"
+          : "bg-white/[0.03] border-white/10 hover:border-white/20"
+      } ${className}`}
     >
-      {/* Plan name & price */}
-      <div className="flex flex-col gap-[24px] items-center px-[40px] text-center w-full">
-        <p className="font-[family-name:var(--font-roboto)] font-semibold text-[16px] leading-[26px] text-white w-full">
-          {planName}
-        </p>
-        <p className="text-[#F2FD84] w-full">
-          <span className="font-[family-name:var(--font-sora)] font-semibold text-[54px] leading-[64px]">
-            {price}
-          </span>
-          <span className="font-[family-name:var(--font-sora)] font-semibold text-[24px] leading-[34px]">
-            {period}
-          </span>
-        </p>
+      {badge && (
+        <div className="absolute -top-[14px] left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-500 to-amber-400 text-white text-[12px] font-[family-name:var(--font-sora)] font-semibold px-[16px] py-[4px] tracking-wider uppercase">
+          {badge}
+        </div>
+      )}
+
+      <p className="font-[family-name:var(--font-roboto)] font-semibold text-[16px] leading-[26px] text-white/80 uppercase tracking-[1.6px]">
+        {planName}
+      </p>
+
+      <div className="mt-6 flex items-baseline gap-1">
+        <span className="font-[family-name:var(--font-sora)] font-bold text-[54px] leading-[64px] max-sm:text-[42px] max-sm:leading-[52px] text-orange-500">
+          {price}
+        </span>
+        <span className="font-[family-name:var(--font-sora)] font-semibold text-[18px] leading-[28px] text-white/50">
+          /{period}
+        </span>
       </div>
 
-      {/* Frequency bar */}
-      <div className="bg-white/[0.06] flex items-center justify-center py-[18px] w-full">
-        <p className="font-[family-name:var(--font-roboto)] text-[16px] leading-[26px] text-white text-center tracking-[1.6px]">
-          {frequency}
-        </p>
-      </div>
-
-      {/* Features */}
-      <div className="flex flex-col gap-[24px] items-start px-[40px] w-full">
+      <div className="mt-8 flex flex-col gap-[16px] w-full">
         {features.map((feature) => (
-          <div key={feature} className="flex gap-[20px] items-center w-full">
-            <Image
-              src="/assets/icons/icon-checkmark.svg"
-              alt=""
-              width={16}
-              height={16}
-              className="shrink-0"
-            />
-            <p className="font-[family-name:var(--font-roboto)] text-[18px] leading-[28px] text-white opacity-60">
+          <div key={feature} className="flex gap-[12px] items-start">
+            <svg
+              className="w-[20px] h-[20px] mt-[4px] shrink-0 text-orange-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            <p className="font-[family-name:var(--font-roboto)] text-[16px] leading-[26px] text-white/70">
               {feature}
             </p>
           </div>
         ))}
       </div>
 
-      {/* CTA */}
-      <Button className="w-[320px] max-sm:w-[calc(100%-40px)] font-[family-name:var(--font-sora)] font-semibold text-[16px] leading-[26px] tracking-[0.24px] px-[32px] py-[18px] inline-flex items-center justify-center bg-[#F2FD84] text-[#222] shadow-[0_4px_18px_rgba(242,253,132,0.09)]">
-        {ctaText}
-      </Button>
+      <div className="mt-10 w-full">
+        <Button
+          as="link"
+          href={ctaHref}
+          variant={highlighted ? "primary" : "outline"}
+          className="w-full"
+        >
+          {ctaText}
+        </Button>
+      </div>
     </div>
   );
 }
