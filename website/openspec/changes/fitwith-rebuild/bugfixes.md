@@ -66,13 +66,14 @@
   - Add admin route: `/admin` — middleware already protects it, just need the role to be correct
   - Long-term: add a "promote to admin" button in admin panel (only visible to existing admins)
 
-## BUG-11: Subscription section wording + expiry date
-- **Issue**: "Član od" should be "Članarina važi do" and show subscription END date, not start date
+## BUG-11: Subscription section wording + expiry date + dynamic status
+- **Issue**: "Član od" should be "Članarina važi do" and show subscription END date, not start date. Status should be dynamic based on expiry.
 - **Fix**: 
   - Change label from "Član od" to "Članarina važi do" in translations
   - Display `subscription_end_date` instead of `created_at`
   - DB: add `subscription_end_date` column to `profiles` table if not present
   - Admin sets this when assigning subscription
+  - **Status logic**: if `today < subscription_end_date` → "Aktivna" (green), if `today >= subscription_end_date` → "Neaktivna" (red). No hardcoded status — always computed from date.
 
 ## BUG-12: "Vaš plan uključuje" should be admin-configurable per client
 - **Issue**: The plan features list (personalizovan plan treninga, ishrane, etc.) is hardcoded, but should be set by admin per client based on their subscription tier
