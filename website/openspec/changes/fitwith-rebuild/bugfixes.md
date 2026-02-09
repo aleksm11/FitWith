@@ -66,6 +66,22 @@
   - Add admin route: `/admin` — middleware already protects it, just need the role to be correct
   - Long-term: add a "promote to admin" button in admin panel (only visible to existing admins)
 
+## BUG-11: Subscription section wording + expiry date
+- **Issue**: "Član od" should be "Članarina važi do" and show subscription END date, not start date
+- **Fix**: 
+  - Change label from "Član od" to "Članarina važi do" in translations
+  - Display `subscription_end_date` instead of `created_at`
+  - DB: add `subscription_end_date` column to `profiles` table if not present
+  - Admin sets this when assigning subscription
+
+## BUG-12: "Vaš plan uključuje" should be admin-configurable per client
+- **Issue**: The plan features list (personalizovan plan treninga, ishrane, etc.) is hardcoded, but should be set by admin per client based on their subscription tier
+- **Fix**:
+  - Admin panel → user detail page: ability to select which features/perks each client's plan includes
+  - Store in DB (either per-tier defaults in `site_settings` or per-client overrides)
+  - Client portal reads from DB, not hardcoded list
+  - Empty state if admin hasn't assigned features yet
+
 ## Priority Order
 1. BUG-7 (logo FitWithAS) — quick fix
 2. BUG-4 (Auth.logout translation) — quick fix
@@ -75,5 +91,7 @@
 6. BUG-8 (admin access) — set Aleksa as admin after BUG-6
 7. BUG-9 (email instead of name in navbar) — tied to BUG-6
 8. BUG-5 (mock data → real Supabase data) — component rewrites + seed data
-9. BUG-10 (Safari layout broken) — viewport + CSS fixes
-10. BUG-2 (Google/Apple OAuth) — waiting for credentials from Aleksa
+9. BUG-10 (Safari slow load) — performance check + viewport audit
+10. BUG-11 (subscription wording + expiry) — translation + DB column
+11. BUG-12 (plan features admin-configurable) — admin UI + DB
+12. BUG-2 (Google/Apple OAuth) — waiting for credentials from Aleksa
