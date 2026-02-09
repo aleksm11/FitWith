@@ -38,10 +38,23 @@
 - **Issue**: After login, navbar should show user's full name but profile query may fail if `profiles` table row doesn't exist yet for new users
 - **Fix**: Create a Supabase trigger/function that auto-creates a `profiles` row on user signup. Fallback to email if no profile name exists.
 
+## BUG-7: Logo should be "FitWithAS" not "FitWith"
+- **Issue**: Logo in navbar shows "FitWith" but should be "FitWithAS"
+- **Fix**: Update Navbar.tsx logo — `Fit<orange>With</orange><orange>AS</orange>` (or style AS separately if needed)
+
+## BUG-8: No way to access admin panel / become admin
+- **Issue**: New users are always role "client", no UI or mechanism to become admin
+- **Fix**:
+  - After BUG-6 (profile auto-creation trigger), manually set Aleksa's account role to "admin" in Supabase SQL: `UPDATE profiles SET role = 'admin' WHERE email = '...'`
+  - Add admin route: `/admin` — middleware already protects it, just need the role to be correct
+  - Long-term: add a "promote to admin" button in admin panel (only visible to existing admins)
+
 ## Priority Order
-1. BUG-4 (Auth.logout translation) — quick fix
-2. BUG-1 (verification URL) — Supabase config change
-3. BUG-3 (login without verification) — Supabase config + client check
-4. BUG-6 (profile auto-creation) — DB trigger
-5. BUG-5 (mock data) — component rewrites
-6. BUG-2 (OAuth) — needs decision from Aleksa
+1. BUG-7 (logo FitWithAS) — quick fix
+2. BUG-4 (Auth.logout translation) — quick fix
+3. BUG-1 (verification URL) — Supabase config change
+4. BUG-3 (login without verification) — Supabase config + client check
+5. BUG-6 (profile auto-creation) — DB trigger
+6. BUG-8 (admin access) — set Aleksa as admin after BUG-6
+7. BUG-5 (mock data → real Supabase data) — component rewrites + seed data
+8. BUG-2 (Google/Apple OAuth) — waiting for credentials from Aleksa
