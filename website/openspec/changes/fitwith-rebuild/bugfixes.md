@@ -151,7 +151,7 @@
   - Option A: Fully public (good for SEO)
   - Option B: Partially public — show names + thumbnails + descriptions, lock videos for paying clients only
   - Option C: Fully locked behind login
-- **Aleksa's decision**: TBD
+- **Decision**: Keep fully public for now. Revisit with Aleksandar later.
 
 ## BUG-23: Questionnaire nag popup — force clients to fill it
 - **Issue**: Clients forget to fill out their questionnaire/report
