@@ -139,6 +139,20 @@
 - **Issue**: Blog listing doesn't sort by date (newest first)
 - **Fix**: Sort blog posts by `published_at DESC` in the query. Both on homepage preview and blog listing page.
 
+## BUG-24: Email notification when admin assigns training/nutrition plan
+- **Issue**: Clients don't know when their plan is ready
+- **Fix**: When admin creates/assigns a training plan or nutrition plan to a client, send an email notification to the client: "Tvoj novi plan treninga/ishrane je spreman! Prijavi se da ga pogledaš."
+- Implementation: Supabase Edge Function or DB trigger on training_plans/nutrition_plans insert → send email via Supabase Auth or Resend/SendGrid
+- For now: plan it, implement email provider later (need to pick one)
+
+## BUG-25: Exercise library — paywall decision
+- **Issue**: Should exercises (vežbe) be behind a paywall?
+- **Decision needed**: 
+  - Option A: Fully public (good for SEO)
+  - Option B: Partially public — show names + thumbnails + descriptions, lock videos for paying clients only
+  - Option C: Fully locked behind login
+- **Aleksa's decision**: TBD
+
 ## BUG-23: Questionnaire nag popup — force clients to fill it
 - **Issue**: Clients forget to fill out their questionnaire/report
 - **Fix**: When a logged-in client has NOT submitted their questionnaire:
