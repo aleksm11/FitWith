@@ -83,6 +83,16 @@
   - Client portal reads from DB, not hardcoded list
   - Empty state if admin hasn't assigned features yet
 
+## BUG-15: Social media links in footer need real URLs
+- **Fix**: 
+  - Instagram: https://www.instagram.com/fitwith.as
+  - TikTok: https://www.tiktok.com/@fitwith.as
+  - YouTube: remove or hide (no account yet)
+
+## BUG-16: Registration form needs full name field
+- **Issue**: Registration only asks email/password, no name collected
+- **Fix**: Add "Ime i prezime" (full name) field to registration form. Save to `profiles.full_name` on signup.
+
 ## BUG-13: Footer "Usluge" links not clickable
 - **Issue**: Footer services section (Online mentorstvo, Plan treninga, Plan ishrane) items are plain text, not links
 - **Fix**: Link them to the services/pricing page with anchor sections, e.g. `/saradnja#mentorstvo`, `/saradnja#trening`, `/saradnja#ishrana` (or just `/saradnja` if no anchors exist)
