@@ -50,14 +50,14 @@
   - Registration form should collect full name and save to profiles table
   - Fallback display should truncate properly on mobile
 
-## BUG-10: Safari mobile cuts off page / layout broken
-- **Issue**: Safari on iOS cuts off half the page, doesn't display properly
-- **Cause**: Likely viewport height issue — Safari's dynamic toolbar affects `vh` units
-- **Fix**: 
-  - Use `dvh` (dynamic viewport height) instead of `vh` throughout
-  - Check for `100vh` hero sections, mobile menu, or fixed positioning issues
-  - Test with `min-height: 100dvh` or `-webkit-fill-available` fallback
-  - Review if the mobile menu overlay (`fixed inset-0 top-[64px]`) causes scroll lock issues in Safari
+## BUG-10: Safari mobile — slow load / possible layout issues
+- **Issue**: Safari on iOS initially showed page cut off, but loaded correctly after a delay. Might be false alarm but check anyway.
+- **Fix**:
+  - Audit for `vh` usage — replace with `dvh` where needed (Safari dynamic toolbar)
+  - Check page load performance — large bundle? Unoptimized images? Slow SSR?
+  - Review if middleware (Supabase session refresh) adds latency on first load
+  - Test `min-height: 100dvh` or `-webkit-fill-available` fallback on hero/full-height sections
+  - Check if the mobile menu overlay causes scroll lock issues in Safari
 
 ## BUG-8: No way to access admin panel / become admin
 - **Issue**: New users are always role "client", no UI or mechanism to become admin
