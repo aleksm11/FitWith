@@ -23,10 +23,17 @@
 - **Cause**: Missing `Auth.logout` key in all 3 message files (sr.json, en.json, ru.json)
 - **Fix**: Add `"logout"` key under `"Auth"` section in all message files. Values: "Odjavi se" (sr), "Logout" (en), "Выйти" (ru). Also check if it should be under "Nav" namespace instead of "Auth".
 
-## BUG-5: Profile/portal uses mock data instead of real user data
-- **Issue**: After login, portal shows hardcoded mock data instead of the logged-in user's actual profile
-- **Cause**: Components still use mock/placeholder data arrays instead of querying Supabase with the authenticated user's ID
-- **Fix**: Update portal components (dashboard, profile, training, nutrition) to fetch real data from Supabase using the authenticated user's session. Show empty states when no data exists yet (e.g., "No training plan assigned yet").
+## BUG-5: Portal/dashboard uses mock data instead of real Supabase data
+- **Issue**: All portal pages show hardcoded mock data (subscription "Online mentorstvo", macros "2210 kcal", training "Grudi i triceps", etc.) instead of real user data
+- **Scope**: Affects ALL portal pages — dashboard, training plan, nutrition plan, profile
+- **Cause**: Components use hardcoded mock arrays/objects instead of querying Supabase
+- **Fix**:
+  - Dashboard: fetch user's real subscription tier from `profiles`, real training plan from `training_plans`/`training_days`/`training_exercises`, real nutrition data from `nutrition_plans`
+  - Training page: fetch actual assigned training plan or show "No training plan assigned yet — your coach will create one for you"
+  - Nutrition page: fetch actual nutrition plan or show empty state
+  - Profile page: fetch real profile data, allow editing real fields
+  - ALL mock data arrays must be removed and replaced with Supabase queries
+  - Show proper empty states everywhere when no data exists (new user has no plan yet)
 
 ## BUG-6: Navbar shows logged-in user's name incorrectly
 - **Issue**: After login, navbar should show user's full name but profile query may fail if `profiles` table row doesn't exist yet for new users
