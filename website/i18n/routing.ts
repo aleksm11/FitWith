@@ -51,6 +51,13 @@ export const routing = defineRouting({
       en: "/register",
       ru: "/registraciya",
     },
+    "/zaboravljena-lozinka": {
+      sr: "/zaboravljena-lozinka",
+      en: "/forgot-password",
+      ru: "/zabyli-parol",
+    },
+    "/portal": "/portal",
+    "/admin": "/admin",
   },
 });
 
