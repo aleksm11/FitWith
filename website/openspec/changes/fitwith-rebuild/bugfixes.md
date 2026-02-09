@@ -101,6 +101,26 @@
 - **Issue**: Footer logo says "FitWith" and copyright says "© 2026 FitWith" — should be "FitWithAS"
 - **Fix**: Update footer logo and copyright text (same as BUG-7 for navbar)
 
+## BUG-17: Desktop hero — too much empty space, layout issues
+- **Issue**: Huge gap between hero text ("YOUR PERSONAL FITNESS COACH") and the stats section (100+ happy clients). Hero takes too much vertical space on desktop.
+- **Fix**:
+  - Move hero text lower (more centered vertically, less top padding)
+  - Reduce hero section height — no need for full viewport height, compact it
+  - Stats bar should sit closer to hero, not floating far below
+  - Once real hero images are added, the right side won't be empty black
+
+## BUG-18: Stats section — add more stats
+- **Issue**: Only 3 stats (100+ happy clients, 4+ years, 1000+ plans). Could use more.
+- **Fix**: Add 1-2 more stats. Ideas: "500+ vežbi u biblioteci" (exercises in library), "3 jezika" (3 languages), "24/7 podrška" (support). Ask Aleksa which to add or pick best ones.
+
+## BUG-19: Transformations slideshow needs sliding animation
+- **Issue**: Transformations section has no slide animation
+- **Fix**: Add smooth sliding/fade transition animation to the auto-slideshow (CSS transition or lightweight carousel). Before/after cards should slide in from the side.
+
+## BUG-20: Blog should show newest posts first
+- **Issue**: Blog listing doesn't sort by date (newest first)
+- **Fix**: Sort blog posts by `published_at DESC` in the query. Both on homepage preview and blog listing page.
+
 ## Priority Order
 1. BUG-7 (logo FitWithAS) — quick fix
 2. BUG-4 (Auth.logout translation) — quick fix
