@@ -1,13 +1,6 @@
 export { default as Button } from "./Button";
-export { default as CategoryTab } from "./CategoryTab";
-export { default as StarRating } from "./StarRating";
-export { default as ServiceCard } from "./ServiceCard";
-export { default as ServiceCardAlt } from "./ServiceCardAlt";
-export { default as TestimonialCard } from "./TestimonialCard";
+export { default as SectionHeading } from "./SectionHeading";
 export { default as PricingCard } from "./PricingCard";
-export { default as ValueCard } from "./ValueCard";
-export { default as TeamCard } from "./TeamCard";
-export { default as BenefitCard } from "./BenefitCard";
-export { default as ScheduleCard } from "./ScheduleCard";
-export { default as PhotoFrame } from "./PhotoFrame";
+export { default as StarRating } from "./StarRating";
+export { default as TestimonialCard } from "./TestimonialCard";
 export { default as SocialIcons } from "./SocialIcons";

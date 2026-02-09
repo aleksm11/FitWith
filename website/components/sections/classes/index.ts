@@ -1,9 +1,0 @@
-export { default as ClassesHeroSection } from "./ClassesHeroSection";
-export { default as ClassesGridSection } from "./ClassesGridSection";
-export { default as ClassesCtaSection } from "./ClassesCtaSection";
-export { default as ClassDetailHeroSection } from "./ClassDetailHeroSection";
-export { default as ClassDetailAboutSection } from "./ClassDetailAboutSection";
-export { default as ClassDetailBenefitsSection } from "./ClassDetailBenefitsSection";
-export { default as ClassDetailGallerySection } from "./ClassDetailGallerySection";
-export { default as ClassDetailRelatedSection } from "./ClassDetailRelatedSection";
-export { default as ClassDetailCtaSection } from "./ClassDetailCtaSection";

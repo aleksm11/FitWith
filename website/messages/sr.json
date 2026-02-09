@@ -1,0 +1,221 @@
+{
+  "Metadata": {
+    "title": "FitWith — Tvoj lični fitnes trener",
+    "description": "Personalizovani planovi treninga i ishrane od sertifikovanog fitnes trenera Aleksandara Stojanovića. Online mentorstvo, individualni pristup, dokazani rezultati.",
+    "titleTemplate": "%s | FitWith"
+  },
+  "Nav": {
+    "home": "Početna",
+    "about": "O meni",
+    "services": "Saradnja",
+    "pricing": "Cene",
+    "exercises": "Vežbe",
+    "blog": "Blog",
+    "contact": "Kontakt",
+    "login": "Prijava",
+    "portal": "Portal",
+    "startNow": "Započni"
+  },
+  "Hero": {
+    "title": "TVOJ LIČNI FITNES TRENER",
+    "subtitle": "Personalizovani planovi treninga i ishrane prilagođeni tvojim ciljevima. Stručno vođenje, konstantna podrška i dokazani rezultati.",
+    "cta1": "Započni transformaciju",
+    "cta2": "Pogledaj pakete",
+    "stat1Value": "100+",
+    "stat1Label": "zadovoljnih klijenata",
+    "stat2Value": "4+",
+    "stat2Label": "godine iskustva",
+    "stat3Value": "1000+",
+    "stat3Label": "kreiranih planova"
+  },
+  "Services": {
+    "title": "Kako mogu da ti pomognem",
+    "subtitle": "Izaberi paket koji odgovara tvojim ciljevima i budžetu",
+    "tier1Title": "Online mentorstvo",
+    "tier1Desc": "Kompletno vođenje — plan treninga, plan ishrane, praćenje napretka, pristup biblioteci vežbi i stalna podrška putem poruka.",
+    "tier2Title": "Plan treninga",
+    "tier2Desc": "Individualno kreiran plan treninga prilagođen tvojim ciljevima, opremi i raspoloživom vremenu.",
+    "tier3Title": "Plan ishrane",
+    "tier3Desc": "Prilagođen plan ishrane prema tvojim ciljevima, preferencijama i zdravstvenom stanju."
+  },
+  "Transformations": {
+    "title": "Transformacije klijenata",
+    "subtitle": "Rezultati govore sami za sebe",
+    "viewAll": "Pogledaj sve transformacije",
+    "duration": "Period transformacije"
+  },
+  "Pricing": {
+    "title": "Cene paketa",
+    "subtitle": "Izaberi plan koji odgovara tvojim ciljevima",
+    "monthly": "mesečno",
+    "plan1Name": "Plan ishrane",
+    "plan1Price": "€40",
+    "plan1Features": [
+      "Personalizovan plan ishrane",
+      "Prilagođen tvojim ciljevima",
+      "Lista namirnica i obroka",
+      "Saveti za pripremu hrane",
+      "Jedna revizija mesečno"
+    ],
+    "plan2Name": "Plan treninga",
+    "plan2Price": "€50",
+    "plan2Features": [
+      "Individualan plan treninga",
+      "Video demonstracije vežbi",
+      "Prilagođen tvojoj opremi",
+      "Progresija i periodizacija",
+      "Jedna revizija mesečno"
+    ],
+    "plan3Name": "Online mentorstvo",
+    "plan3Price": "€80",
+    "plan3Features": [
+      "Plan treninga + plan ishrane",
+      "Nedeljno praćenje napretka",
+      "Pristup biblioteci vežbi",
+      "Direktna komunikacija sa trenerom",
+      "Prilagođavanje plana po potrebi",
+      "Podrška i motivacija 24/7"
+    ],
+    "plan3Badge": "Najpopularniji",
+    "ctaText": "Započni",
+    "faqTitle": "Česta pitanja",
+    "faq1Q": "Kako izgleda proces saradnje?",
+    "faq1A": "Nakon uplate, popunjavate inicijalni upitnik sa detaljnim informacijama o vašim ciljevima, iskustvu i preferencijama. Na osnovu toga kreiram personalizovan plan u roku od 48 sati.",
+    "faq2Q": "Da li mogu da promenim paket?",
+    "faq2A": "Naravno! Možete u svakom trenutku nadograditi paket ili promeniti tip saradnje. Razlika u ceni se obračunava proporcionalno.",
+    "faq3Q": "Koliko traje jedan ciklus?",
+    "faq3A": "Svaki plan je kreiran za period od mesec dana, sa mogućnošću produženja i prilagođavanja na osnovu vašeg napretka.",
+    "faq4Q": "Da li je potrebna oprema?",
+    "faq4A": "Plan treninga se prilagođava vašoj dostupnoj opremi — bilo da trenirate u teretani, kod kuće ili na otvorenom."
+  },
+  "WhyChoose": {
+    "title": "Zašto baš FitWith?",
+    "subtitle": "Sve što ti treba za uspešnu transformaciju",
+    "benefit1Title": "Personalizovan pristup",
+    "benefit1Desc": "Svaki plan je kreiran isključivo za tebe, na osnovu tvojih ciljeva, iskustva i mogućnosti.",
+    "benefit2Title": "Stalna podrška",
+    "benefit2Desc": "Direktna komunikacija sa trenerom putem poruka. Odgovor na sva tvoja pitanja u roku od 24h.",
+    "benefit3Title": "Biblioteka vežbi",
+    "benefit3Desc": "Pristup video biblioteci sa detaljnim demonstracijama svih vežbi iz tvog plana.",
+    "benefit4Title": "Dokazani rezultati",
+    "benefit4Desc": "Preko 100 zadovoljnih klijenata i vidljive transformacije u proseku već nakon 8 nedelja."
+  },
+  "Cta": {
+    "title": "Spreman si za promenu?",
+    "subtitle": "Napravi prvi korak ka svom cilju. Kontaktiraj me i zakaži besplatne konsultacije.",
+    "button": "Kontaktiraj me"
+  },
+  "About": {
+    "title": "O meni",
+    "heroTitle": "Aleksandar Stojanović",
+    "heroSubtitle": "Sertifikovani fitnes trener i nutritionista",
+    "bio1": "Rođen sam 1998. godine u Beogradu. Diplomirao sam na Fakultetu sporta i fizičkog vaspitanja (DIF) u Beogradu, gde sam stekao temeljna znanja iz oblasti treninga, fiziologije i sporta.",
+    "bio2": "Svoje znanje sam dodatno usavršio kod Dušana Petrovića, jednog od najcenjenijih stručnjaka za fitnes i kondicioni trening u Srbiji. Ova edukacija mi je omogućila da razvijam sveobuhvatan pristup treningu i ishrani.",
+    "bio3": "Sa više od 4 godine iskustva u radu sa klijentima, specijalizovao sam se za kreiranje personalizovanih planova treninga i ishrane koji daju merljive rezultate. Moj pristup je zasnovan na nauci, prilagođen individui i fokusiran na dugoročne promene životnih navika.",
+    "philosophyTitle": "Moj pristup",
+    "philosophyText": "Verujem da ne postoji univerzalni pristup fitnesu. Svaki klijent je jedinstven — sa sopstvenim ciljevima, ograničenjima i životnim stilom. Moj zadatak je da kreiram plan koji se uklapa u tvoj život, a ne obrnuto. Fokus nije samo na kratkoročnim rezultatima, već na izgradnji zdravih navika koje traju.",
+    "certTitle": "Sertifikati i edukacija",
+    "cert1": "Diplomirani na DIF Beograd",
+    "cert2": "Sertifikovan od strane Dušana Petrovića",
+    "cert3": "Kontinuirana edukacija iz oblasti ishrane i treninga",
+    "statsTitle": "U brojevima",
+    "ctaTitle": "Započni svoju transformaciju",
+    "ctaText": "Kontaktiraj me"
+  },
+  "ServicesPage": {
+    "title": "Saradnja",
+    "subtitle": "Izaberi model saradnje koji ti najviše odgovara",
+    "tier1Title": "Online mentorstvo",
+    "tier1Subtitle": "Kompletno vođenje ka tvom cilju",
+    "tier1Desc": "Online mentorstvo je najpopularniji model saradnje koji obuhvata sve što ti je potrebno za uspešnu transformaciju. Dobijaš personalizovan plan treninga i ishrane, redovno praćenje napretka, pristup kompletnoj biblioteci vežbi sa video demonstracijama, kao i stalnu podršku putem direktnih poruka.",
+    "tier1Features": [
+      "Personalizovan plan treninga",
+      "Personalizovan plan ishrane",
+      "Nedeljno praćenje napretka",
+      "Pristup biblioteci vežbi sa video snimcima",
+      "Direktna komunikacija sa trenerom",
+      "Prilagođavanje plana po potrebi",
+      "Motivaciona podrška"
+    ],
+    "tier2Title": "Plan treninga",
+    "tier2Subtitle": "Individualno kreiran program",
+    "tier2Desc": "Ako ti je potreban samo plan treninga, ovo je pravi izbor. Na osnovu tvojih ciljeva, dostupne opreme i raspoloživog vremena kreiram detaljan plan treninga sa progresijom, periodizacijom i video demonstracijama svih vežbi.",
+    "tier2Features": [
+      "Individualno kreiran plan treninga",
+      "Prilagođen tvojoj opremi i uslovima",
+      "Video demonstracije vežbi",
+      "Progresija i periodizacija",
+      "Jedna revizija plana mesečno"
+    ],
+    "tier3Title": "Plan ishrane",
+    "tier3Subtitle": "Ishrana prilagođena tvojim ciljevima",
+    "tier3Desc": "Personalizovan plan ishrane kreiran prema tvojim ciljevima, preferencijama u hrani, alergijama i zdravstvenom stanju. Dobićeš kompletan raspored obroka sa listom namirnica i uputstvima za pripremu.",
+    "tier3Features": [
+      "Personalizovan plan ishrane",
+      "Prilagođen tvojim preferencijama",
+      "Raspored obroka i lista namirnica",
+      "Saveti za pripremu hrane",
+      "Jedna revizija plana mesečno"
+    ],
+    "ctaTitle": "Nije ti jasno koji paket da izabereš?",
+    "ctaText": "Kontaktiraj me i pomoći ću ti da izabereš pravi model saradnje za tvoje ciljeve."
+  },
+  "Contact": {
+    "title": "Kontakt",
+    "subtitle": "Imaš pitanje? Slobodno mi se javi.",
+    "nameLabel": "Ime i prezime",
+    "namePlaceholder": "Tvoje ime i prezime",
+    "emailLabel": "Email adresa",
+    "emailPlaceholder": "tvoj@email.com",
+    "phoneLabel": "Broj telefona",
+    "phonePlaceholder": "+381 6X XXX XXXX",
+    "messageLabel": "Poruka",
+    "messagePlaceholder": "Opiši šta te zanima...",
+    "submit": "Pošalji poruku",
+    "sending": "Šalje se...",
+    "successTitle": "Poruka je poslata!",
+    "successText": "Hvala na poruci. Odgovoriću ti u najkraćem roku.",
+    "errorText": "Došlo je do greške. Pokušaj ponovo ili me kontaktiraj direktno.",
+    "infoTitle": "Kontakt informacije",
+    "email": "info@onlinetrener.rs",
+    "phone": "+381 63 XXX XXXX",
+    "instagram": "@onlinetrener.rs",
+    "responseTime": "Prosečno vreme odgovora: do 24h"
+  },
+  "Privacy": {
+    "title": "Politika privatnosti",
+    "lastUpdated": "Poslednje ažuriranje: februar 2025.",
+    "intro": "Vaša privatnost nam je veoma važna. Ova politika privatnosti objašnjava kako prikupljamo, koristimo i štitimo vaše lične podatke.",
+    "section1Title": "Podaci koje prikupljamo",
+    "section1Text": "Prikupljamo podatke koje nam dobrovoljno pružate putem kontakt forme, upitnika ili registracije: ime i prezime, email adresa, broj telefona, podaci o zdravstvenom stanju i ciljevima (putem upitnika), fotografije pre/posle transformacije (uz vašu saglasnost).",
+    "section2Title": "Kako koristimo vaše podatke",
+    "section2Text": "Vaše podatke koristimo isključivo za: kreiranje personalizovanih planova treninga i ishrane, komunikaciju u vezi sa vašim programom, poboljšanje naših usluga, slanje relevantnih informacija (uz vašu saglasnost).",
+    "section3Title": "Zaštita podataka",
+    "section3Text": "Preduzimamo tehničke i organizacione mere za zaštitu vaših podataka od neovlašćenog pristupa, gubitka ili zloupotrebe. Vaši podaci se čuvaju na sigurnim serverima sa enkripcijom.",
+    "section4Title": "Vaša prava",
+    "section4Text": "Imate pravo da: zatražite pristup vašim podacima, zatražite ispravku ili brisanje podataka, povučete saglasnost za obradu podataka, podnesete prigovor nadležnom organu.",
+    "section5Title": "Kontakt",
+    "section5Text": "Za sva pitanja u vezi sa privatnošću, kontaktirajte nas na info@onlinetrener.rs."
+  },
+  "Footer": {
+    "brand": "FitWith",
+    "tagline": "Tvoj lični fitnes trener",
+    "pagesTitle": "Stranice",
+    "servicesTitle": "Usluge",
+    "legalTitle": "Pravno",
+    "privacy": "Politika privatnosti",
+    "terms": "Uslovi korišćenja",
+    "copyright": "© {year} FitWith. Sva prava zadržana.",
+    "madeBy": "Dizajn i razvoj"
+  },
+  "Common": {
+    "readMore": "Saznaj više",
+    "learnMore": "Više informacija",
+    "getStarted": "Započni",
+    "viewAll": "Pogledaj sve",
+    "backToHome": "Nazad na početnu",
+    "loading": "Učitavanje...",
+    "error": "Greška",
+    "required": "Obavezno polje"
+  }
+}
