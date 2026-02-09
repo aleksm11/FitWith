@@ -3,8 +3,27 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
-import { createClient } from "@/lib/supabase/client";
+import { signUpWithEmail, signInWithGoogle, signInWithApple } from "@/lib/supabase/auth";
 import Button from "@/components/shared/Button";
+
+function GoogleIcon() {
+  return (
+    <svg className="w-5 h-5" viewBox="0 0 24 24">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+  );
+}
+
+function AppleIcon() {
+  return (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+    </svg>
+  );
+}
 
 export default function RegisterContent() {
   const t = useTranslations("Auth");
@@ -18,76 +37,32 @@ export default function RegisterContent() {
     setErrorMessage("");
 
     const formData = new FormData(e.currentTarget);
-    const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const confirmPassword = formData.get("confirmPassword") as string;
+    const fullName = formData.get("fullName") as string;
 
-    // Validation
-    if (password.length < 6) {
+    const { error } = await signUpWithEmail(email, password, fullName);
+    if (error) {
       setStatus("error");
-      setErrorMessage(t("passwordMinLength"));
+      setErrorMessage(error);
       return;
     }
 
-    if (password !== confirmPassword) {
-      setStatus("error");
-      setErrorMessage(t("passwordMismatch"));
-      return;
-    }
-
-    try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name,
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) {
-        setStatus("error");
-        if (error.message.includes("already registered")) {
-          setErrorMessage(t("emailInUse"));
-        } else {
-          setErrorMessage(t("genericError"));
-        }
-        return;
-      }
-
-      setStatus("success");
-    } catch {
-      setStatus("error");
-      setErrorMessage(t("genericError"));
-    }
+    setStatus("success");
   }
 
   if (status === "success") {
     return (
       <div className="w-full max-w-[440px] text-center">
-        <div className="bg-white/[0.03] border border-orange-500/30 p-[48px] max-sm:p-[32px]">
-          <svg
-            className="w-16 h-16 text-orange-500 mx-auto mb-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1.5}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
-            />
+        <div className="bg-white/[0.03] border border-green-500/20 p-[32px]">
+          <svg className="w-12 h-12 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h2 className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-white mb-3">
-            {t("registerTitle")}
+          <h2 className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-white mb-[8px]">
+            {t("checkEmail") || "Check your email"}
           </h2>
-          <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/60">
-            {t("registerSuccess")}
+          <p className="font-[family-name:var(--font-roboto)] text-[15px] text-white/60">
+            {t("confirmEmail") || "We sent you a confirmation link. Please check your inbox."}
           </p>
         </div>
       </div>
@@ -96,97 +71,97 @@ export default function RegisterContent() {
 
   return (
     <div className="w-full max-w-[440px]">
-      {/* Header */}
       <div className="text-center mb-[40px]">
         <h1 className="font-[family-name:var(--font-sora)] font-bold text-[32px] leading-[40px] max-sm:text-[24px] max-sm:leading-[32px] text-white mb-[8px]">
           {t("registerTitle")}
         </h1>
-        <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/50">
-          {t("registerSubtitle")}
-        </p>
       </div>
 
-      {/* Form */}
+      {/* Social Login Buttons */}
+      <div className="flex flex-col gap-[12px] mb-[24px]">
+        <button
+          type="button"
+          onClick={() => signInWithGoogle(`/${locale}/portal`)}
+          className="flex items-center justify-center gap-[12px] w-full bg-white/[0.03] border border-white/10 px-[16px] py-[14px] text-white font-[family-name:var(--font-roboto)] text-[15px] hover:bg-white/[0.06] hover:border-white/20 transition-all cursor-pointer"
+        >
+          <GoogleIcon />
+          {t("signInWithGoogle")}
+        </button>
+        <button
+          type="button"
+          onClick={() => signInWithApple(`/${locale}/portal`)}
+          className="flex items-center justify-center gap-[12px] w-full bg-white/[0.03] border border-white/10 px-[16px] py-[14px] text-white font-[family-name:var(--font-roboto)] text-[15px] hover:bg-white/[0.06] hover:border-white/20 transition-all cursor-pointer"
+        >
+          <AppleIcon />
+          {t("signInWithApple")}
+        </button>
+      </div>
+
+      <div className="flex items-center gap-[16px] mb-[24px]">
+        <div className="flex-1 h-px bg-white/10" />
+        <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40 uppercase">{t("or")}</span>
+        <div className="flex-1 h-px bg-white/10" />
+      </div>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-[20px]">
-        {/* Name */}
         <div className="flex flex-col gap-[8px]">
           <label className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70">
-            {t("nameLabel")}
+            {t("fullName")}
           </label>
           <input
             type="text"
-            name="name"
+            name="fullName"
             required
-            placeholder={t("namePlaceholder")}
+            placeholder="Aleksandar Stojanović"
             className="bg-white/[0.03] border border-white/10 px-[16px] py-[14px] text-white font-[family-name:var(--font-roboto)] text-[16px] placeholder:text-white/30 focus:border-orange-500/50 focus:outline-none transition-colors"
           />
         </div>
 
-        {/* Email */}
         <div className="flex flex-col gap-[8px]">
           <label className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70">
-            {t("emailLabel")}
+            {t("email")}
           </label>
           <input
             type="email"
             name="email"
             required
-            placeholder={t("emailPlaceholder")}
+            placeholder="email@example.com"
             className="bg-white/[0.03] border border-white/10 px-[16px] py-[14px] text-white font-[family-name:var(--font-roboto)] text-[16px] placeholder:text-white/30 focus:border-orange-500/50 focus:outline-none transition-colors"
           />
         </div>
 
-        {/* Password */}
         <div className="flex flex-col gap-[8px]">
           <label className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70">
-            {t("passwordLabel")}
+            {t("password")}
           </label>
           <input
             type="password"
             name="password"
             required
             minLength={6}
-            placeholder={t("passwordPlaceholder")}
+            placeholder="••••••••"
             className="bg-white/[0.03] border border-white/10 px-[16px] py-[14px] text-white font-[family-name:var(--font-roboto)] text-[16px] placeholder:text-white/30 focus:border-orange-500/50 focus:outline-none transition-colors"
           />
         </div>
 
-        {/* Confirm Password */}
-        <div className="flex flex-col gap-[8px]">
-          <label className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70">
-            {t("confirmPasswordLabel")}
-          </label>
-          <input
-            type="password"
-            name="confirmPassword"
-            required
-            minLength={6}
-            placeholder={t("confirmPasswordPlaceholder")}
-            className="bg-white/[0.03] border border-white/10 px-[16px] py-[14px] text-white font-[family-name:var(--font-roboto)] text-[16px] placeholder:text-white/30 focus:border-orange-500/50 focus:outline-none transition-colors"
-          />
-        </div>
-
-        {/* Error */}
         {status === "error" && (
           <p className="font-[family-name:var(--font-roboto)] text-[14px] text-red-400">
             {errorMessage}
           </p>
         )}
 
-        {/* Submit */}
         <Button type="submit" disabled={status === "loading"} className="w-full">
-          {status === "loading" ? t("registering") : t("registerButton")}
+          {status === "loading" ? t("loading") : t("registerTitle")}
         </Button>
       </form>
 
-      {/* Login link */}
       <p className="text-center mt-[32px] font-[family-name:var(--font-roboto)] text-[14px] text-white/50">
         {t("hasAccount")}{" "}
         <Link
           href={`/${locale}/prijava`}
           className="text-orange-500 hover:text-orange-400 transition-colors"
         >
-          {t("loginButton")}
+          {t("signIn")}
         </Link>
       </p>
     </div>
