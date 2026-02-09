@@ -123,9 +123,18 @@ export default function Navbar() {
             )}
           </div>
 
-          <Button as="link" href={`/${locale}/kontakt`} size="sm">
-            {t("startNow")}
-          </Button>
+          {/* Auth Buttons */}
+          <div className="flex items-center gap-[12px]">
+            <Link
+              href={`/${locale}/prijava`}
+              className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70 hover:text-white transition-colors"
+            >
+              {t("login")}
+            </Link>
+            <Button as="link" href={`/${locale}/registracija`} size="sm">
+              {t("register")}
+            </Button>
+          </div>
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -191,9 +200,15 @@ export default function Navbar() {
             ))}
           </div>
 
-          <Button as="link" href={`/${locale}/kontakt`} size="default" className="mt-4 self-start">
-            {t("startNow")}
-          </Button>
+          {/* Mobile Auth Buttons */}
+          <div className="flex gap-[12px] mt-4 pt-4 border-t border-white/10">
+            <Button as="link" href={`/${locale}/prijava`} variant="outline" size="default" className="flex-1">
+              {t("login")}
+            </Button>
+            <Button as="link" href={`/${locale}/registracija`} size="default" className="flex-1">
+              {t("register")}
+            </Button>
+          </div>
         </div>
       </div>
     </nav>
