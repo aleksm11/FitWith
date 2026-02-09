@@ -255,7 +255,17 @@
     "waitingApprovalDesc": "Your account is waiting for trainer approval. You will be notified when approved.",
     "resetPassword": "Reset password",
     "resetEmailSent": "Password reset email sent",
-    "backToLogin": "Back to login"
+    "backToLogin": "Back to login",
+    "forgotPasswordTitle": "Forgot password",
+    "forgotPasswordSubtitle": "Enter your email address and we'll send you a reset link.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "email@example.com",
+    "resetSuccess": "Check your inbox — we've sent you a password reset link.",
+    "genericError": "An error occurred. Please try again.",
+    "sending": "Sending...",
+    "resetButton": "Send reset link",
+    "checkEmail": "Check your email",
+    "confirmEmail": "We sent you a confirmation link. Please check your inbox."
   },
   "Portal": {
     "title": "Portal",

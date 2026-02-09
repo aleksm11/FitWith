@@ -2,10 +2,10 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 import {
   HeroSection,
-  ServicesPreview,
   TransformationsPreview,
+  ServicesPreview,
   PricingPreview,
-  WhyChooseSection,
+  BlogPreview,
   CtaSection,
 } from "@/components/sections";
 
@@ -69,10 +69,10 @@ export default async function HomePage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <HeroSection />
-      <ServicesPreview />
       <TransformationsPreview />
+      <ServicesPreview />
       <PricingPreview />
-      <WhyChooseSection />
+      <BlogPreview />
       <CtaSection />
     </>
   );

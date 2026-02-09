@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import Button from "@/components/shared/Button";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 const localeLabels: Record<string, string> = {
   sr: "SR",
@@ -20,11 +22,39 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [profileName, setProfileName] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user: u } }) => {
+      setUser(u);
+      if (u) {
+        supabase
+          .from("profiles")
+          .select("full_name, role")
+          .eq("user_id", u.id)
+          .single()
+          .then(({ data }) => {
+            if (data?.full_name) setProfileName(data.full_name);
+          });
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (!session?.user) {
+        setProfileName(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const closeMenus = useCallback(() => {
@@ -43,6 +73,14 @@ export default function Navbar() {
     const pathWithoutLocale = pathname.replace(/^\/(sr|en|ru)/, "");
     router.push(`/${newLocale}${pathWithoutLocale || "/"}`);
     setLangOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setUser(null);
+    setProfileName(null);
+    router.push(`/${locale}`);
   };
 
   const navLinks = [
@@ -123,18 +161,40 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Auth Buttons */}
-          <div className="flex items-center gap-[12px]">
-            <Link
-              href={`/${locale}/prijava`}
-              className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70 hover:text-white transition-colors"
-            >
-              {t("login")}
-            </Link>
-            <Button as="link" href={`/${locale}/registracija`} size="sm">
-              {t("register")}
-            </Button>
-          </div>
+          {/* Auth Buttons / User info */}
+          {user ? (
+            <div className="flex items-center gap-[12px]">
+              <Link
+                href={`/${locale}/portal`}
+                className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70 hover:text-white transition-colors flex items-center gap-[6px]"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+                {profileName || user.email?.split("@")[0]}
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="font-[family-name:var(--font-roboto)] text-[14px] text-white/40 hover:text-white transition-colors cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                </svg>
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-[12px]">
+              <Link
+                href={`/${locale}/prijava`}
+                className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70 hover:text-white transition-colors"
+              >
+                {t("login")}
+              </Link>
+              <Button as="link" href={`/${locale}/registracija`} size="sm">
+                {t("register")}
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -202,12 +262,30 @@ export default function Navbar() {
 
           {/* Mobile Auth Buttons */}
           <div className="flex gap-[12px] mt-4 pt-4 border-t border-white/10">
-            <Button as="link" href={`/${locale}/prijava`} variant="outline" size="default" className="flex-1">
-              {t("login")}
-            </Button>
-            <Button as="link" href={`/${locale}/registracija`} size="default" className="flex-1">
-              {t("register")}
-            </Button>
+            {user ? (
+              <>
+                <Button as="link" href={`/${locale}/portal`} variant="outline" size="default" className="flex-1">
+                  {profileName || t("portal")}
+                </Button>
+                <button
+                  onClick={handleSignOut}
+                  className="px-4 py-2 font-[family-name:var(--font-roboto)] text-[14px] text-white/50 hover:text-white border border-white/10 transition-colors cursor-pointer"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                  </svg>
+                </button>
+              </>
+            ) : (
+              <>
+                <Button as="link" href={`/${locale}/prijava`} variant="outline" size="default" className="flex-1">
+                  {t("login")}
+                </Button>
+                <Button as="link" href={`/${locale}/registracija`} size="default" className="flex-1">
+                  {t("register")}
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

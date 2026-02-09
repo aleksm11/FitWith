@@ -255,7 +255,17 @@
     "waitingApprovalDesc": "Vaš nalog čeka odobrenje od trenera. Bićete obavešteni kada budete odobreni.",
     "resetPassword": "Resetuj lozinku",
     "resetEmailSent": "Email za resetovanje je poslat",
-    "backToLogin": "Nazad na prijavu"
+    "backToLogin": "Nazad na prijavu",
+    "forgotPasswordTitle": "Zaboravljena lozinka",
+    "forgotPasswordSubtitle": "Unesite email adresu i poslaćemo vam link za resetovanje lozinke.",
+    "emailLabel": "Email adresa",
+    "emailPlaceholder": "email@example.com",
+    "resetSuccess": "Proverite inbox — poslali smo vam link za resetovanje lozinke.",
+    "genericError": "Došlo je do greške. Pokušajte ponovo.",
+    "sending": "Slanje...",
+    "resetButton": "Pošalji link za reset",
+    "checkEmail": "Proverite email",
+    "confirmEmail": "Poslali smo vam link za potvrdu. Proverite inbox."
   },
   "Portal": {
     "title": "Portal",
