@@ -124,7 +124,8 @@
   - https://www.figma.com/design/6w0YaIkX6w3Qh0u6Iin4bH/?node-id=1-854&m=dev
   - https://www.figma.com/design/6w0YaIkX6w3Qh0u6Iin4bH/?node-id=1-863&m=dev
 - Also add background shading/gradient effects from: https://www.figma.com/design/6w0YaIkX6w3Qh0u6Iin4bH/?node-id=1-838&m=dev
-- **Fix**: Use Claude Code's Figma MCP to inspect these components, then recreate the stripe elements + shading in CSS/SVG with orange (#f97316) color. Apply to hero images on both mobile and desktop. Stripes on edges of the photo frames + gradient/shadow effects behind.
+- SVG assets and reusable components from: https://www.figma.com/design/6w0YaIkX6w3Qh0u6Iin4bH/?node-id=1-896&m=dev (browse this node for useful SVGs/icons/decorative elements to use across the site)
+- **Fix**: Use Claude Code's Figma MCP to inspect these components, then recreate the stripe elements + shading in CSS/SVG with orange (#f97316) color. Apply to hero images on both mobile and desktop. Stripes on edges of the photo frames + gradient/shadow effects behind. Extract useful SVGs from node 1-896 for site-wide use.
 
 ## BUG-21: Simplify navbar — too many links
 - **Issue**: 8 nav links + lang + auth = too crowded on desktop
