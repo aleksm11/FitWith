@@ -257,6 +257,104 @@
     "dashboard": "Početna",
     "welcomeText": "Admin panel je u pripremi. Uskoro ćete ovde moći da upravljate korisnicima, treninzima, vežbama, blogom i ostalim sadržajem."
   },
+  "Exercises": {
+    "label": "Biblioteka vežbi",
+    "title": "Vežbe",
+    "subtitle": "Pregledaj kompletnu biblioteku vežbi sa detaljnim uputstvima i video demonstracijama.",
+    "allCategories": "Sve",
+    "category_grudi": "Grudi",
+    "category_ledja": "Leđa",
+    "category_noge": "Noge",
+    "category_ramena": "Ramena",
+    "category_ruke": "Ruke",
+    "category_stomak": "Stomak",
+    "category_korektivne": "Korektivne",
+    "category_napredne": "Napredne",
+    "backToExercises": "Nazad na vežbe",
+    "instructions": "Uputstvo za izvođenje",
+    "relatedExercises": "Slične vežbe",
+    "videoPlaceholder": "Video demonstracija uskoro",
+    "noExercises": "Nema vežbi u ovoj kategoriji.",
+    "ctaTitle": "Želiš personalizovan plan treninga?",
+    "ctaSubtitle": "Svaka vežba u tvom planu biće prilagođena tvojim ciljevima i mogućnostima.",
+    "muscleChest": "Grudi",
+    "muscleTriceps": "Triceps",
+    "muscleShoulders": "Ramena",
+    "muscleLats": "Leđni mišići",
+    "muscleBiceps": "Biceps",
+    "muscleRearDelts": "Zadnji delt",
+    "muscleQuads": "Kvadriceps",
+    "muscleGlutes": "Gluteus",
+    "muscleHamstrings": "Zadnja loža",
+    "muscleCore": "Core",
+    "muscleForearms": "Podlaktica",
+    "muscleUpperBack": "Gornji deo leđa",
+    "muscleRotatorCuff": "Rotatorna manžetna",
+    "benchPressName": "Bench press",
+    "benchPressDesc": "Osnovna vežba za razvoj grudnih mišića. Izvodi se na ravnoj klupi sa šipkom ili bučicama. Odlična za izgradnju snage i mase u gornjem delu tela.",
+    "benchPressInstructions": [
+      "Lezi na ravnu klupu, stopala čvrsto na podu. Uhvati šipku širinom nešto širom od ramena.",
+      "Skini šipku sa stalka i spusti je kontrolisano do sredine grudi, laktovi pod uglom od 45 stepeni.",
+      "Potisni šipku nagore do potpunog ispruženja ruku, izdišući pri tom.",
+      "Zadrži kratku pauzu na vrhu i ponovi pokret za željeni broj ponavljanja."
+    ],
+    "latPulldownName": "Lat pulldown",
+    "latPulldownDesc": "Vežba za leđne mišiće koja se izvodi na kablovski mašini. Idealna za razvoj širine leđa i jačanje gornjeg dela tela.",
+    "latPulldownInstructions": [
+      "Sedi na mašinu, kolena fiksirana ispod jastučića. Uhvati šipku širim hvatom.",
+      "Povuci šipku nadole ka gornjoj strani grudi, skupljajući lopatice.",
+      "Zadrži kontrakciju na sekundu u donjem položaju.",
+      "Kontrolisano vrati šipku u početni položaj, osećajući istezanje leđnih mišića."
+    ],
+    "squatName": "Čučanj (Squat)",
+    "squatDesc": "Fundamentalna vežba za noge i gluteus. Angažuje veliki broj mišićnih grupa i stimuliše rast snage i mišićne mase u celom telu.",
+    "squatInstructions": [
+      "Postavi šipku na gornji deo trapezijusa, stopala u širini ramena ili nešto šire.",
+      "Udahni, učvrsti core i počni spuštanje gurajući kukove unazad i savijajući kolena.",
+      "Spusti se dok butine ne budu paralelne sa podom ili dublje, zavisno od mobilnosti.",
+      "Potisni se nagore kroz pete do početnog položaja, izdišući na vrhu pokreta."
+    ],
+    "overheadPressName": "Overhead press",
+    "overheadPressDesc": "Vežba za razvoj ramena koja se izvodi stojeći ili sedeći. Gradi snagu i stabilnost celokupnog ramenog pojasa.",
+    "overheadPressInstructions": [
+      "Stani uspravno, stopala u širini ramena. Drži šipku na visini ramena, dlanovi prema napred.",
+      "Učvrsti core i potisni šipku vertikalno nagore, blago zabacujući glavu da šipka prođe.",
+      "Ispruži ruke potpuno na vrhu, šipka direktno iznad glave.",
+      "Kontrolisano spusti šipku nazad do visine ramena i ponovi."
+    ],
+    "bicepCurlName": "Biceps pregib",
+    "bicepCurlDesc": "Izolaciona vežba za biceps koja se izvodi sa bučicama ili šipkom. Efikasna za ciljani razvoj mišića nadlaktice.",
+    "bicepCurlInstructions": [
+      "Stani uspravno, drži bučice pored tela sa dlanovima okrenutim napred.",
+      "Savij laktove i podigni bučice ka ramenima, zadržavajući nadlaktice nepomično.",
+      "Na vrhu pokreta stisni biceps na sekundu.",
+      "Kontrolisano spusti bučice u početni položaj bez ljuljanja tela."
+    ],
+    "plankName": "Plank",
+    "plankDesc": "Izometrička vežba za stabilizaciju trupa. Jača duboke mišiće stomaka, leđa i kukova. Osnova svake dobre trening rutine.",
+    "plankInstructions": [
+      "Zauzmi poziciju kao za sklekove, ali osloni se na podlaktice umesto na dlanove.",
+      "Telo treba da bude u ravnoj liniji od glave do peta — ne podizati i ne spuštati kukove.",
+      "Aktiviraj core, stisni gluteuse i drži ramena iznad laktova.",
+      "Zadrži poziciju za željeno vreme, dišući ravnomerno."
+    ],
+    "bandPullApartName": "Band pull-apart",
+    "bandPullApartDesc": "Korektivna vežba sa elastičnom trakom za jačanje zadnjeg dela ramena i gornjeg dela leđa. Odlična za poboljšanje posture i prevenciju povreda.",
+    "bandPullApartInstructions": [
+      "Stani uspravno, drži elastičnu traku ispred sebe u širini ramena, ruke ispružene.",
+      "Razvuci traku u stranu povlačeći ruke jedna od druge, skupljajući lopatice.",
+      "Zadrži krajnji položaj 1-2 sekunde, osećajući kontrakciju u zadnjem deltu i romboidima.",
+      "Kontrolisano vrati ruke u početni položaj i ponovi."
+    ],
+    "muscleUpName": "Muscle-up",
+    "muscleUpDesc": "Napredna gimnastička vežba koja kombinuje zgib i dip u jednom pokretu. Zahteva visok nivo snage i koordinacije gornjeg dela tela.",
+    "muscleUpInstructions": [
+      "Uhvati šipku za zgibove false gripom (zglobovi preko šipke), ruke nešto šire od ramena.",
+      "Izvedeni zamah telom (kip) i eksplozivno se povuci nagore, vodeći grudi ka šipci.",
+      "Kada grudi dosegnu nivo šipke, brzo prebaci zglobove preko šipke i gurni se u dip poziciju.",
+      "Ispruži ruke potpuno na vrhu, a zatim se kontrolisano spusti nazad u vis."
+    ]
+  },
   "Common": {
     "readMore": "Saznaj više",
     "learnMore": "Više informacija",
