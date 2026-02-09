@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import {
   mockNutritionPlans,
@@ -8,6 +8,13 @@ import {
   type AdminNutritionPlan,
   type AdminMeal,
 } from "@/lib/admin/mock-data";
+import {
+  getNutritionPlans,
+  getUsers,
+  createNutritionPlan,
+  updateNutritionPlan,
+} from "@/lib/supabase/queries";
+import type { Profile, NutritionPlan } from "@/lib/supabase/types";
 
 const statusColors: Record<string, string> = {
   active: "bg-green-500/10 text-green-400",
@@ -15,11 +22,47 @@ const statusColors: Record<string, string> = {
   archived: "bg-white/5 text-white/40",
 };
 
+type ClientOption = { id: string; name: string };
+
+function supabasePlanToAdmin(
+  np: NutritionPlan & { profiles: { full_name: string; email: string } }
+): AdminNutritionPlan {
+  const d = np.data as {
+    name?: string;
+    calories?: number;
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    meals?: AdminMeal[];
+  };
+  return {
+    id: np.id,
+    name: d.name || "Plan ishrane",
+    clientName: np.profiles?.full_name || "",
+    clientId: np.client_id,
+    calories: d.calories || 0,
+    protein: d.protein || 0,
+    carbs: d.carbs || 0,
+    fat: d.fat || 0,
+    status: np.is_active ? "active" : "draft",
+    createdAt: new Date(np.created_at).toLocaleDateString("sr-Latn"),
+    meals: (d.meals || []).map((m, i) => ({
+      id: m.id || `m${i}`,
+      name: m.name || "",
+      foods: m.foods || [],
+      totalCalories: m.totalCalories || 0,
+    })),
+  };
+}
+
 export default function NutritionContent() {
   const t = useTranslations("Admin");
-  const [plans, setPlans] = useState(mockNutritionPlans);
+  const [plans, setPlans] = useState<AdminNutritionPlan[]>(mockNutritionPlans);
   const [selectedPlan, setSelectedPlan] = useState<AdminNutritionPlan | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [clients, setClients] = useState<ClientOption[]>(
+    mockUsers.filter((u) => u.role === "client").map((u) => ({ id: u.id, name: u.fullName }))
+  );
   const [newPlan, setNewPlan] = useState({
     name: "",
     clientId: "",
@@ -28,8 +71,26 @@ export default function NutritionContent() {
     carbs: 250,
     fat: 65,
   });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const clients = mockUsers.filter((u) => u.role === "client");
+  useEffect(() => {
+    Promise.all([getNutritionPlans(), getUsers()])
+      .then(([npData, usersData]) => {
+        if (npData && npData.length > 0) {
+          setPlans(npData.map(supabasePlanToAdmin));
+        }
+        if (usersData && usersData.length > 0) {
+          setClients(
+            usersData
+              .filter((u: Profile) => u.role === "client")
+              .map((u: Profile) => ({ id: u.id, name: u.full_name || u.email || "—" }))
+          );
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   function handleCreatePlan() {
     setIsCreating(true);
@@ -38,23 +99,58 @@ export default function NutritionContent() {
   }
 
   function handleSavePlan() {
-    const client = clients.find((c) => c.id === newPlan.clientId);
-    const plan: AdminNutritionPlan = {
-      id: `np${Date.now()}`,
-      name: newPlan.name,
-      clientName: client?.fullName || "",
-      clientId: newPlan.clientId,
-      calories: newPlan.calories,
-      protein: newPlan.protein,
-      carbs: newPlan.carbs,
-      fat: newPlan.fat,
-      status: "draft",
-      createdAt: new Date().toISOString().split("T")[0],
-      meals: [],
-    };
-    setPlans([plan, ...plans]);
-    setIsCreating(false);
-    setSelectedPlan(plan);
+    if (!newPlan.clientId || !newPlan.name) return;
+    setSaving(true);
+
+    createNutritionPlan({
+      client_id: newPlan.clientId,
+      data: {
+        name: newPlan.name,
+        calories: newPlan.calories,
+        protein: newPlan.protein,
+        carbs: newPlan.carbs,
+        fat: newPlan.fat,
+        meals: [],
+      },
+    })
+      .then((result) => {
+        const client = clients.find((c) => c.id === newPlan.clientId);
+        const plan: AdminNutritionPlan = {
+          id: result.id,
+          name: newPlan.name,
+          clientName: client?.name || "",
+          clientId: newPlan.clientId,
+          calories: newPlan.calories,
+          protein: newPlan.protein,
+          carbs: newPlan.carbs,
+          fat: newPlan.fat,
+          status: "draft",
+          createdAt: new Date().toLocaleDateString("sr-Latn"),
+          meals: [],
+        };
+        setPlans([plan, ...plans]);
+        setIsCreating(false);
+        setSelectedPlan(plan);
+      })
+      .catch(() => {
+        const plan: AdminNutritionPlan = {
+          id: `np${Date.now()}`,
+          name: newPlan.name,
+          clientName: clients.find((c) => c.id === newPlan.clientId)?.name || "",
+          clientId: newPlan.clientId,
+          calories: newPlan.calories,
+          protein: newPlan.protein,
+          carbs: newPlan.carbs,
+          fat: newPlan.fat,
+          status: "draft",
+          createdAt: new Date().toLocaleDateString("sr-Latn"),
+          meals: [],
+        };
+        setPlans([plan, ...plans]);
+        setIsCreating(false);
+        setSelectedPlan(plan);
+      })
+      .finally(() => setSaving(false));
   }
 
   function handleAddMeal() {
@@ -71,6 +167,7 @@ export default function NutritionContent() {
     };
     setSelectedPlan(updated);
     setPlans(plans.map((p) => (p.id === updated.id ? updated : p)));
+    savePlanData(updated);
   }
 
   function handleMealNameChange(mealId: string, name: string) {
@@ -110,6 +207,27 @@ export default function NutritionContent() {
     };
     setSelectedPlan(updated);
     setPlans(plans.map((p) => (p.id === updated.id ? updated : p)));
+  }
+
+  function savePlanData(plan: AdminNutritionPlan) {
+    updateNutritionPlan(plan.id, {
+      data: {
+        name: plan.name,
+        calories: plan.calories,
+        protein: plan.protein,
+        carbs: plan.carbs,
+        fat: plan.fat,
+        meals: plan.meals,
+      },
+    } as Partial<NutritionPlan>).catch(() => {});
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-[80px]">
+        <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   return (
@@ -157,7 +275,7 @@ export default function NutritionContent() {
               >
                 <option value="" className="bg-[#1A1A1A]">{t("selectClient")}</option>
                 {clients.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-[#1A1A1A]">{c.fullName}</option>
+                  <option key={c.id} value={c.id} className="bg-[#1A1A1A]">{c.name}</option>
                 ))}
               </select>
             </div>
@@ -199,8 +317,12 @@ export default function NutritionContent() {
             </div>
           </div>
           <div className="flex gap-[12px] mt-[20px]">
-            <button onClick={handleSavePlan} className="bg-orange-500 text-white px-[20px] py-[10px] font-[family-name:var(--font-roboto)] text-[14px] hover:bg-orange-400 transition-colors">
-              {t("save")}
+            <button
+              onClick={handleSavePlan}
+              disabled={saving}
+              className="bg-orange-500 text-white px-[20px] py-[10px] font-[family-name:var(--font-roboto)] text-[14px] hover:bg-orange-400 transition-colors disabled:opacity-50"
+            >
+              {saving ? "..." : t("save")}
             </button>
             <button onClick={() => setIsCreating(false)} className="border border-white/20 text-white/70 px-[20px] py-[10px] font-[family-name:var(--font-roboto)] text-[14px] hover:border-white/40 transition-colors">
               {t("cancel")}

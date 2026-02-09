@@ -1,20 +1,66 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useLocale } from "next-intl";
+import { getAdminStats, getUsers } from "@/lib/supabase/queries";
 import { dashboardStats, recentSignups } from "@/lib/admin/mock-data";
 
-const statCards = [
-  { key: "totalClients", value: dashboardStats.totalClients, color: "text-orange-400", href: "/admin/korisnici" },
-  { key: "activePlans", value: dashboardStats.activePlans, color: "text-green-400", href: "/admin/treninzi" },
-  { key: "pendingMessages", value: dashboardStats.pendingMessages, color: "text-yellow-400", href: "/admin/poruke" },
-  { key: "totalExercises", value: dashboardStats.totalExercises, color: "text-blue-400", href: "/admin/vezbe" },
-];
+type Stats = { totalClients: number; activePlans: number; pendingMessages: number; totalExercises: number };
+type Signup = { name: string; email: string; date: string; tier: string };
 
 export default function AdminContent() {
   const t = useTranslations("Admin");
   const locale = useLocale();
+  const [stats, setStats] = useState<Stats>({
+    totalClients: dashboardStats.totalClients,
+    activePlans: dashboardStats.activePlans,
+    pendingMessages: dashboardStats.pendingMessages,
+    totalExercises: dashboardStats.totalExercises,
+  });
+  const [signups, setSignups] = useState<Signup[]>(recentSignups);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([getAdminStats(), getUsers()])
+      .then(([adminStats, users]) => {
+        if (adminStats) {
+          setStats({
+            totalClients: adminStats.totalClients,
+            activePlans: adminStats.activePlans,
+            pendingMessages: adminStats.pendingMessages,
+            totalExercises: adminStats.totalExercises,
+          });
+        }
+        if (users && users.length > 0) {
+          const recent = users.slice(0, 5).map((u) => ({
+            name: u.full_name || u.email || "—",
+            email: u.email || "",
+            date: new Date(u.created_at).toLocaleDateString("sr-Latn"),
+            tier: u.subscription_tier,
+          }));
+          setSignups(recent);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const statCards = [
+    { key: "totalClients", value: stats.totalClients, color: "text-orange-400", href: "/admin/korisnici" },
+    { key: "activePlans", value: stats.activePlans, color: "text-green-400", href: "/admin/treninzi" },
+    { key: "pendingMessages", value: stats.pendingMessages, color: "text-yellow-400", href: "/admin/poruke" },
+    { key: "totalExercises", value: stats.totalExercises, color: "text-blue-400", href: "/admin/vezbe" },
+  ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-[80px]">
+        <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -25,7 +71,6 @@ export default function AdminContent() {
         {t("welcomeText")}
       </p>
 
-      {/* Stats grid */}
       <div className="grid grid-cols-4 max-xl:grid-cols-2 max-sm:grid-cols-1 gap-[16px] mb-[32px]">
         {statCards.map((stat) => (
           <Link
@@ -43,7 +88,6 @@ export default function AdminContent() {
         ))}
       </div>
 
-      {/* Recent signups */}
       <div className="bg-white/[0.03] border border-white/10 p-[24px]">
         <div className="flex items-center justify-between mb-[20px]">
           <h2 className="font-[family-name:var(--font-sora)] font-bold text-[20px] text-white">
@@ -58,16 +102,16 @@ export default function AdminContent() {
         </div>
 
         <div className="space-y-0">
-          {recentSignups.map((signup, i) => (
+          {signups.map((signup, i) => (
             <div
               key={i}
               className={`flex items-center justify-between py-[12px] ${
-                i < recentSignups.length - 1 ? "border-b border-white/5" : ""
+                i < signups.length - 1 ? "border-b border-white/5" : ""
               }`}
             >
               <div className="flex items-center gap-[12px]">
                 <div className="w-[36px] h-[36px] bg-orange-500/10 flex items-center justify-center text-orange-400 font-[family-name:var(--font-sora)] font-bold text-[14px]">
-                  {signup.name.split(" ").map((n) => n[0]).join("")}
+                  {signup.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                 </div>
                 <div>
                   <p className="font-[family-name:var(--font-roboto)] text-[14px] text-white">

@@ -1,12 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { mockQuestionnaires } from "@/lib/admin/mock-data";
+import { mockQuestionnaires, type AdminQuestionnaire } from "@/lib/admin/mock-data";
+import { getQuestionnaires } from "@/lib/supabase/queries";
 
 export default function QuestionnairesContent() {
   const t = useTranslations("Admin");
-  const [questionnaires, setQuestionnaires] = useState(mockQuestionnaires);
+  const [questionnaires, setQuestionnaires] = useState<AdminQuestionnaire[]>(mockQuestionnaires);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getQuestionnaires()
+      .then((data) => {
+        if (data && data.length > 0) {
+          setQuestionnaires(
+            data.map((q) => {
+              const qData = q.data as Record<string, string | undefined>;
+              return {
+                id: q.id,
+                clientName: qData.full_name || qData.name || "—",
+                clientEmail: qData.email || "",
+                submittedAt: new Date(q.submitted_at).toLocaleDateString("sr-Latn"),
+                isReviewed: qData.is_reviewed === "true",
+                goal: qData.goal || "—",
+              };
+            })
+          );
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   function handleToggleReviewed(id: string) {
     setQuestionnaires(
@@ -15,6 +40,14 @@ export default function QuestionnairesContent() {
   }
 
   const unreviewedCount = questionnaires.filter((q) => !q.isReviewed).length;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-[80px]">
+        <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div>

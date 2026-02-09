@@ -1,15 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import {
   mockTrainingPlans,
-  mockExercises,
+  mockExercises as mockExList,
   mockUsers,
   type AdminTrainingPlan,
   type AdminTrainingDay,
   type AdminTrainingExercise,
 } from "@/lib/admin/mock-data";
+import {
+  getTrainingPlans,
+  getUsers,
+  getExercises,
+  createTrainingPlan,
+  createTrainingDay,
+  createTrainingExercise,
+} from "@/lib/supabase/queries";
+import type { Profile, Exercise, ExerciseCategory } from "@/lib/supabase/types";
 
 const statusColors: Record<string, string> = {
   active: "bg-green-500/10 text-green-400",
@@ -17,19 +26,78 @@ const statusColors: Record<string, string> = {
   archived: "bg-white/5 text-white/40",
 };
 
+type ClientOption = { id: string; name: string };
+type ExerciseOption = { id: string; name: string };
+
 export default function TrainingContent() {
   const t = useTranslations("Admin");
-  const [plans, setPlans] = useState(mockTrainingPlans);
+  const [plans, setPlans] = useState<AdminTrainingPlan[]>(mockTrainingPlans);
   const [selectedPlan, setSelectedPlan] = useState<AdminTrainingPlan | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [clients, setClients] = useState<ClientOption[]>(
+    mockUsers.filter((u) => u.role === "client").map((u) => ({ id: u.id, name: u.fullName }))
+  );
+  const [exerciseOptions, setExerciseOptions] = useState<ExerciseOption[]>(
+    mockExList.map((e) => ({ id: e.id, name: e.name }))
+  );
   const [newPlan, setNewPlan] = useState({
     name: "",
     clientId: "",
     daysPerWeek: 3,
     goal: "",
   });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const clients = mockUsers.filter((u) => u.role === "client");
+  useEffect(() => {
+    Promise.all([getTrainingPlans(), getUsers(), getExercises()])
+      .then(([tpData, usersData, exData]) => {
+        if (tpData && tpData.length > 0) {
+          setPlans(
+            tpData.map((tp) => ({
+              id: tp.id,
+              name: tp.name,
+              clientName: tp.profiles?.full_name || "",
+              clientId: tp.client_id,
+              daysPerWeek: tp.training_days?.length || 0,
+              goal: "",
+              status: tp.is_active ? "active" : "draft",
+              createdAt: new Date(tp.created_at).toLocaleDateString("sr-Latn"),
+              days: (tp.training_days || []).map((d) => ({
+                id: d.id,
+                dayName: d.day_name_sr || `Dan ${d.day_number}`,
+                focus: d.notes || "",
+                exercises: (d.training_exercises || []).map((ex) => ({
+                  exerciseId: ex.exercise_id || "",
+                  exerciseName: ex.exercise_name || "",
+                  sets: ex.sets || 3,
+                  reps: ex.reps || "10-12",
+                  restSeconds: ex.rest_seconds || 60,
+                  notes: ex.notes || "",
+                })),
+              })),
+            }))
+          );
+        }
+        if (usersData && usersData.length > 0) {
+          setClients(
+            usersData
+              .filter((u: Profile) => u.role === "client")
+              .map((u: Profile) => ({ id: u.id, name: u.full_name || u.email || "—" }))
+          );
+        }
+        if (exData && exData.length > 0) {
+          setExerciseOptions(
+            exData.map((e: Exercise & { exercise_categories: ExerciseCategory | null }) => ({
+              id: e.id,
+              name: e.name_sr,
+            }))
+          );
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   function handleCreatePlan() {
     setIsCreating(true);
@@ -38,41 +106,97 @@ export default function TrainingContent() {
   }
 
   function handleSavePlan() {
-    const client = clients.find((c) => c.id === newPlan.clientId);
-    const plan: AdminTrainingPlan = {
-      id: `tp${Date.now()}`,
+    if (!newPlan.clientId || !newPlan.name) return;
+    setSaving(true);
+
+    createTrainingPlan({
+      client_id: newPlan.clientId,
       name: newPlan.name,
-      clientName: client?.fullName || "",
-      clientId: newPlan.clientId,
-      daysPerWeek: newPlan.daysPerWeek,
-      goal: newPlan.goal,
-      status: "draft",
-      createdAt: new Date().toISOString().split("T")[0],
-      days: [],
-    };
-    setPlans([plan, ...plans]);
-    setIsCreating(false);
-    setSelectedPlan(plan);
+    })
+      .then((result) => {
+        const client = clients.find((c) => c.id === newPlan.clientId);
+        const plan: AdminTrainingPlan = {
+          id: result.id,
+          name: result.name,
+          clientName: client?.name || "",
+          clientId: newPlan.clientId,
+          daysPerWeek: newPlan.daysPerWeek,
+          goal: newPlan.goal,
+          status: "draft",
+          createdAt: new Date().toLocaleDateString("sr-Latn"),
+          days: [],
+        };
+        setPlans([plan, ...plans]);
+        setIsCreating(false);
+        setSelectedPlan(plan);
+      })
+      .catch(() => {
+        // Fallback to local
+        const plan: AdminTrainingPlan = {
+          id: `tp${Date.now()}`,
+          name: newPlan.name,
+          clientName: clients.find((c) => c.id === newPlan.clientId)?.name || "",
+          clientId: newPlan.clientId,
+          daysPerWeek: newPlan.daysPerWeek,
+          goal: newPlan.goal,
+          status: "draft",
+          createdAt: new Date().toLocaleDateString("sr-Latn"),
+          days: [],
+        };
+        setPlans([plan, ...plans]);
+        setIsCreating(false);
+        setSelectedPlan(plan);
+      })
+      .finally(() => setSaving(false));
   }
 
   function handleAddDay() {
     if (!selectedPlan) return;
-    const newDay: AdminTrainingDay = {
-      id: `td${Date.now()}`,
-      dayName: `Dan ${selectedPlan.days.length + 1}`,
-      focus: "",
-      exercises: [],
-    };
-    const updated = {
-      ...selectedPlan,
-      days: [...selectedPlan.days, newDay],
-    };
-    setSelectedPlan(updated);
-    setPlans(plans.map((p) => (p.id === updated.id ? updated : p)));
+    const dayNumber = selectedPlan.days.length + 1;
+
+    createTrainingDay({
+      plan_id: selectedPlan.id,
+      day_number: dayNumber,
+      day_name_sr: `Dan ${dayNumber}`,
+      sort_order: dayNumber,
+    })
+      .then((result) => {
+        const newDay: AdminTrainingDay = {
+          id: result.id,
+          dayName: result.day_name_sr || `Dan ${dayNumber}`,
+          focus: "",
+          exercises: [],
+        };
+        const updated = { ...selectedPlan, days: [...selectedPlan.days, newDay] };
+        setSelectedPlan(updated);
+        setPlans(plans.map((p) => (p.id === updated.id ? updated : p)));
+      })
+      .catch(() => {
+        const newDay: AdminTrainingDay = {
+          id: `td${Date.now()}`,
+          dayName: `Dan ${dayNumber}`,
+          focus: "",
+          exercises: [],
+        };
+        const updated = { ...selectedPlan, days: [...selectedPlan.days, newDay] };
+        setSelectedPlan(updated);
+        setPlans(plans.map((p) => (p.id === updated.id ? updated : p)));
+      });
   }
 
   function handleAddExercise(dayId: string) {
     if (!selectedPlan) return;
+
+    createTrainingExercise({
+      day_id: dayId,
+      sets: 3,
+      reps: "10-12",
+      rest_seconds: 60,
+      sort_order: (selectedPlan.days.find((d) => d.id === dayId)?.exercises.length || 0) + 1,
+    })
+      .then(() => {})
+      .catch(() => {});
+
     const newExercise: AdminTrainingExercise = {
       exerciseId: "",
       exerciseName: "",
@@ -100,7 +224,7 @@ export default function TrainingContent() {
         const exercises = d.exercises.map((ex, i) => {
           if (i !== exIndex) return ex;
           if (field === "exerciseId") {
-            const found = mockExercises.find((e) => e.id === value);
+            const found = exerciseOptions.find((e) => e.id === value);
             return { ...ex, exerciseId: value as string, exerciseName: found?.name || "" };
           }
           return { ...ex, [field]: value };
@@ -122,6 +246,14 @@ export default function TrainingContent() {
     };
     setSelectedPlan(updated);
     setPlans(plans.map((p) => (p.id === updated.id ? updated : p)));
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-[80px]">
+        <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   return (
@@ -169,7 +301,7 @@ export default function TrainingContent() {
               >
                 <option value="" className="bg-[#1A1A1A]">{t("selectClient")}</option>
                 {clients.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-[#1A1A1A]">{c.fullName}</option>
+                  <option key={c.id} value={c.id} className="bg-[#1A1A1A]">{c.name}</option>
                 ))}
               </select>
             </div>
@@ -195,8 +327,12 @@ export default function TrainingContent() {
             </div>
           </div>
           <div className="flex gap-[12px] mt-[20px]">
-            <button onClick={handleSavePlan} className="bg-orange-500 text-white px-[20px] py-[10px] font-[family-name:var(--font-roboto)] text-[14px] hover:bg-orange-400 transition-colors">
-              {t("save")}
+            <button
+              onClick={handleSavePlan}
+              disabled={saving}
+              className="bg-orange-500 text-white px-[20px] py-[10px] font-[family-name:var(--font-roboto)] text-[14px] hover:bg-orange-400 transition-colors disabled:opacity-50"
+            >
+              {saving ? "..." : t("save")}
             </button>
             <button onClick={() => setIsCreating(false)} className="border border-white/20 text-white/70 px-[20px] py-[10px] font-[family-name:var(--font-roboto)] text-[14px] hover:border-white/40 transition-colors">
               {t("cancel")}
@@ -219,7 +355,7 @@ export default function TrainingContent() {
               <div>
                 <h3 className="font-[family-name:var(--font-sora)] font-bold text-[16px] text-white">{plan.name}</h3>
                 <p className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40 mt-[4px]">
-                  {plan.clientName} &middot; {plan.daysPerWeek} dana/nedelja &middot; {plan.goal}
+                  {plan.clientName} &middot; {plan.daysPerWeek} dana/nedelja {plan.goal && <>·&nbsp;{plan.goal}</>}
                 </p>
               </div>
               <div className="flex items-center gap-[12px]">
@@ -299,7 +435,7 @@ export default function TrainingContent() {
                             className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[6px] text-[13px] text-white font-[family-name:var(--font-roboto)] focus:outline-none focus:border-orange-500/50"
                           >
                             <option value="" className="bg-[#1A1A1A]">{t("selectExercise")}</option>
-                            {mockExercises.map((e) => (
+                            {exerciseOptions.map((e) => (
                               <option key={e.id} value={e.id} className="bg-[#1A1A1A]">{e.name}</option>
                             ))}
                           </select>

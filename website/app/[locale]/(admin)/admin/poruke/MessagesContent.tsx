@@ -1,14 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { mockMessages, type ContactMessage } from "@/lib/admin/mock-data";
+import { mockMessages } from "@/lib/admin/mock-data";
+import { getContactMessages, markMessageRead } from "@/lib/supabase/queries";
+
+type DisplayMessage = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+};
 
 export default function MessagesContent() {
   const t = useTranslations("Admin");
-  const [messages, setMessages] = useState(mockMessages);
-  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [messages, setMessages] = useState<DisplayMessage[]>(
+    mockMessages.map((m) => ({ ...m }))
+  );
+  const [selectedMessage, setSelectedMessage] = useState<DisplayMessage | null>(null);
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getContactMessages()
+      .then((data) => {
+        if (data && data.length > 0) {
+          setMessages(
+            data.map((m) => ({
+              id: m.id,
+              name: m.name,
+              email: m.email,
+              phone: m.phone || "",
+              message: m.message,
+              isRead: m.is_read,
+              createdAt: m.created_at,
+            }))
+          );
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtered = messages.filter((msg) => {
     if (filter === "unread") return !msg.isRead;
@@ -19,17 +54,26 @@ export default function MessagesContent() {
   const unreadCount = messages.filter((m) => !m.isRead).length;
 
   function handleToggleRead(id: string) {
+    const msg = messages.find((m) => m.id === id);
+    if (!msg) return;
+    const newIsRead = !msg.isRead;
+    markMessageRead(id, newIsRead).catch(() => {});
     setMessages(
-      messages.map((m) => (m.id === id ? { ...m, isRead: !m.isRead } : m))
+      messages.map((m) => (m.id === id ? { ...m, isRead: newIsRead } : m))
     );
     if (selectedMessage?.id === id) {
-      setSelectedMessage({ ...selectedMessage, isRead: !selectedMessage.isRead });
+      setSelectedMessage({ ...selectedMessage, isRead: newIsRead });
     }
   }
 
-  function handleSelect(msg: ContactMessage) {
-    setSelectedMessage(selectedMessage?.id === msg.id ? null : msg);
+  function handleSelect(msg: DisplayMessage) {
+    if (selectedMessage?.id === msg.id) {
+      setSelectedMessage(null);
+      return;
+    }
+    setSelectedMessage(msg);
     if (!msg.isRead) {
+      markMessageRead(msg.id, true).catch(() => {});
       setMessages(messages.map((m) => (m.id === msg.id ? { ...m, isRead: true } : m)));
     }
   }
@@ -43,6 +87,14 @@ export default function MessagesContent() {
       hour: "2-digit",
       minute: "2-digit",
     });
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-[80px]">
+        <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   return (
