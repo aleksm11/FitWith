@@ -4,13 +4,13 @@ import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import SectionHeading from "@/components/shared/SectionHeading";
 import Button from "@/components/shared/Button";
-import { blogPosts } from "@/lib/blog/data";
+import { getSortedBlogPosts } from "@/lib/blog/data";
 
 export default function BlogPreview() {
   const t = useTranslations("Blog");
   const locale = useLocale();
 
-  const latest = blogPosts.slice(0, 3);
+  const latest = getSortedBlogPosts().slice(0, 3);
 
   return (
     <section className="py-[120px] max-sm:py-[80px] bg-[#111111]">

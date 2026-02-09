@@ -28,7 +28,9 @@
     "stat2Value": "4+",
     "stat2Label": "godine iskustva",
     "stat3Value": "1000+",
-    "stat3Label": "kreiranih planova"
+    "stat3Label": "kreiranih planova",
+    "stat4Value": "500+",
+    "stat4Label": "vežbi u biblioteci"
   },
   "Services": {
     "title": "Kako mogu da ti pomognem",
@@ -230,10 +232,13 @@
     "tagline": "Tvoj lični fitnes trener",
     "pagesTitle": "Stranice",
     "servicesTitle": "Usluge",
+    "service1": "Online mentorstvo",
+    "service2": "Plan treninga",
+    "service3": "Plan ishrane",
     "legalTitle": "Pravno",
     "privacy": "Politika privatnosti",
     "terms": "Uslovi korišćenja",
-    "copyright": "© {year} FitWith. Sva prava zadržana.",
+    "copyright": "© {year} FitWithAS. Sva prava zadržana.",
     "madeBy": "Dizajn i razvoj"
   },
   "Auth": {
@@ -265,7 +270,8 @@
     "sending": "Slanje...",
     "resetButton": "Pošalji link za reset",
     "checkEmail": "Proverite email",
-    "confirmEmail": "Poslali smo vam link za potvrdu. Proverite inbox."
+    "confirmEmail": "Poslali smo vam link za potvrdu. Proverite inbox.",
+    "logout": "Odjavi se"
   },
   "Portal": {
     "title": "Portal",

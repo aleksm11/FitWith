@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
-import { blogPosts, blogTags } from "@/lib/blog/data";
+import { getSortedBlogPosts, blogTags } from "@/lib/blog/data";
 
 const POSTS_PER_PAGE = 6;
 
@@ -29,8 +29,10 @@ export default function BlogListContent() {
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
+  const sortedPosts = useMemo(() => getSortedBlogPosts(), []);
+
   const filtered = useMemo(() => {
-    return blogPosts.filter((post) => {
+    return sortedPosts.filter((post) => {
       const title = t(post.titleKey).toLowerCase();
       const excerpt = t(post.excerptKey).toLowerCase();
       const matchesSearch =

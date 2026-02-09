@@ -28,7 +28,9 @@
     "stat2Value": "4+",
     "stat2Label": "years of experience",
     "stat3Value": "1000+",
-    "stat3Label": "plans created"
+    "stat3Label": "plans created",
+    "stat4Value": "500+",
+    "stat4Label": "exercises in library"
   },
   "Services": {
     "title": "How I can help you",
@@ -230,10 +232,13 @@
     "tagline": "Your personal fitness coach",
     "pagesTitle": "Pages",
     "servicesTitle": "Services",
+    "service1": "Online Mentoring",
+    "service2": "Training Plan",
+    "service3": "Nutrition Plan",
     "legalTitle": "Legal",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "copyright": "© {year} FitWith. All rights reserved.",
+    "copyright": "© {year} FitWithAS. All rights reserved.",
     "madeBy": "Design & Development"
   },
   "Auth": {
@@ -265,7 +270,8 @@
     "sending": "Sending...",
     "resetButton": "Send reset link",
     "checkEmail": "Check your email",
-    "confirmEmail": "We sent you a confirmation link. Please check your inbox."
+    "confirmEmail": "We sent you a confirmation link. Please check your inbox.",
+    "logout": "Logout"
   },
   "Portal": {
     "title": "Portal",

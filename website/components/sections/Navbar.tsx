@@ -108,7 +108,7 @@ export default function Navbar() {
           href={`/${locale}`}
           className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-white hover:text-orange-400 transition-colors"
         >
-          Fit<span className="text-orange-500">With</span>
+          Fit<span className="text-orange-500">With</span><span className="text-orange-500">AS</span>
         </Link>
 
         {/* Desktop Nav */}

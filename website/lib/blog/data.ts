@@ -69,6 +69,10 @@ export const blogPosts: BlogPost[] = [
   },
 ];
 
+export function getSortedBlogPosts(): BlogPost[] {
+  return [...blogPosts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
 export function getBlogPostBySlug(slug: string): BlogPost | undefined {
   return blogPosts.find((p) => p.slug === slug);
 }

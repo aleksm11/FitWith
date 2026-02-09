@@ -11,6 +11,7 @@ export default function HeroSection() {
     { value: t("stat1Value"), label: t("stat1Label") },
     { value: t("stat2Value"), label: t("stat2Label") },
     { value: t("stat3Value"), label: t("stat3Label") },
+    { value: t("stat4Value"), label: t("stat4Label") },
   ];
 
   return (
