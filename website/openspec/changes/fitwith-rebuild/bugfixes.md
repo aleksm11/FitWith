@@ -83,6 +83,14 @@
   - Client portal reads from DB, not hardcoded list
   - Empty state if admin hasn't assigned features yet
 
+## BUG-13: Footer "Usluge" links not clickable
+- **Issue**: Footer services section (Online mentorstvo, Plan treninga, Plan ishrane) items are plain text, not links
+- **Fix**: Link them to the services/pricing page with anchor sections, e.g. `/saradnja#mentorstvo`, `/saradnja#trening`, `/saradnja#ishrana` (or just `/saradnja` if no anchors exist)
+
+## BUG-14: Footer shows "FitWith" not "FitWithAS" + copyright
+- **Issue**: Footer logo says "FitWith" and copyright says "© 2026 FitWith" — should be "FitWithAS"
+- **Fix**: Update footer logo and copyright text (same as BUG-7 for navbar)
+
 ## Priority Order
 1. BUG-7 (logo FitWithAS) — quick fix
 2. BUG-4 (Auth.logout translation) — quick fix
