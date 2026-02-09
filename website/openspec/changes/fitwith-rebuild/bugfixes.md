@@ -139,6 +139,15 @@
 - **Issue**: Blog listing doesn't sort by date (newest first)
 - **Fix**: Sort blog posts by `published_at DESC` in the query. Both on homepage preview and blog listing page.
 
+## BUG-23: Questionnaire nag popup — force clients to fill it
+- **Issue**: Clients forget to fill out their questionnaire/report
+- **Fix**: When a logged-in client has NOT submitted their questionnaire:
+  - On login/page load: show a friendly popup modal: "Zdravo! Molimo te popuni inicijalni upitnik kako bismo mogli da ti pripremimo plan." (or similar)
+  - Two buttons: "Popuni sada" (goes to questionnaire) and "Podseti me kasnije" (dismisses for 1 hour)
+  - "Podseti me kasnije" stores a timestamp in localStorage. After 1 hour, popup appears again on next page load.
+  - Once questionnaire is submitted (check `questionnaires` table for user's entry), stop showing the popup permanently.
+  - Keep it friendly, not aggressive — but persistent until they do it.
+
 ## Priority Order
 1. BUG-7 (logo FitWithAS) — quick fix
 2. BUG-4 (Auth.logout translation) — quick fix
