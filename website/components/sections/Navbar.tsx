@@ -197,10 +197,37 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile Auth + Menu Toggle */}
+        <div className="lg:hidden flex items-center gap-[12px]">
+          {user ? (
+            <Link
+              href={`/${locale}/portal`}
+              className="font-[family-name:var(--font-roboto)] text-[13px] text-white/70 hover:text-white transition-colors flex items-center gap-[4px]"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+              <span className="max-w-[80px] truncate">{profileName || user.email?.split("@")[0]}</span>
+            </Link>
+          ) : (
+            <>
+              <Link
+                href={`/${locale}/prijava`}
+                className="font-[family-name:var(--font-roboto)] text-[13px] text-white/70 hover:text-white transition-colors"
+              >
+                {t("login")}
+              </Link>
+              <Link
+                href={`/${locale}/registracija`}
+                className="font-[family-name:var(--font-roboto)] text-[13px] bg-orange-500 hover:bg-orange-600 text-white px-[12px] py-[6px] transition-colors"
+              >
+                {t("register")}
+              </Link>
+            </>
+          )}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden flex flex-col gap-[5px] cursor-pointer p-2"
+          className="flex flex-col gap-[5px] cursor-pointer p-2"
           aria-label="Toggle menu"
         >
           <span
@@ -219,6 +246,7 @@ export default function Navbar() {
             }`}
           />
         </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
