@@ -1,5 +1,6 @@
 import Link from "next/link";
 import LogoutButton from "@/components/shared/LogoutButton";
+import PortalNav from "@/components/portal/PortalNav";
 
 export default function PortalLayout({
   children,
@@ -23,10 +24,20 @@ export default function PortalLayout({
         <LogoutButton />
       </header>
 
-      {/* Portal content */}
-      <main className="max-w-[1280px] mx-auto px-[40px] max-sm:px-[20px] py-[40px]">
-        {children}
-      </main>
+      {/* Sidebar + content */}
+      <div className="flex max-lg:flex-col">
+        {/* Sidebar */}
+        <aside className="w-[240px] max-lg:w-full shrink-0 border-r max-lg:border-r-0 max-lg:border-b border-white/10 py-[24px] max-lg:py-[16px] px-[16px] max-lg:px-[40px] max-sm:px-[20px]">
+          <PortalNav />
+        </aside>
+
+        {/* Main content */}
+        <main className="flex-1 min-w-0 px-[40px] max-sm:px-[20px] py-[40px]">
+          <div className="max-w-[1040px]">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
