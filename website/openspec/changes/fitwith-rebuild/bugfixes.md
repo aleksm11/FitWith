@@ -111,7 +111,7 @@
 
 ## BUG-18: Stats section — add more stats
 - **Issue**: Only 3 stats (100+ happy clients, 4+ years, 1000+ plans). Could use more.
-- **Fix**: Add 1-2 more stats. Ideas: "500+ vežbi u biblioteci" (exercises in library), "3 jezika" (3 languages), "24/7 podrška" (support). Ask Aleksa which to add or pick best ones.
+- **Fix**: Add "500+ vežbi" (exercises in library) as 4th stat.
 
 ## BUG-19: Transformations slideshow needs sliding animation
 - **Issue**: Transformations section has no slide animation
