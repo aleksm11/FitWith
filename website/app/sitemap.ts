@@ -16,6 +16,7 @@ const pages = [
   "/vezbe",
   "/blog",
   "/transformacije",
+  "/upitnik",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
