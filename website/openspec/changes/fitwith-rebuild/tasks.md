@@ -1,14 +1,19 @@
 # Tasks — FitWith Rebuild
 
+## Phase 0: Infrastructure Setup (via Claude Code MCPs)
+- [ ] 0.1 Verify Claude Code has working Supabase MCP and Vercel MCP
+- [ ] 0.2 Create Supabase project "FitWithAS" — region: EU (Frankfurt), configure auth (email/password), enable RLS, set up storage buckets
+- [ ] 0.3 Create Vercel project "FitWithAS" — personal account, link GitHub repo, configure env vars, deploy
+- [ ] 0.4 Validate: login/register flow works on deployed preview URL
+
 ## Phase 1: Foundation & Public Pages
-- [ ] 1.1 Create Supabase project, configure auth (email/password), enable RLS
-- [ ] 1.2 Create database schema (all tables from proposal)
-- [ ] 1.3 Write RLS policies (public, client, admin)
-- [ ] 1.4 Set up Supabase Storage buckets (exercises, transformations, blog, avatars)
+- [ ] 1.1 Create database schema (all tables from proposal)
+- [ ] 1.2 Write RLS policies (public, client, admin)
+- [ ] 1.3 Set up Supabase Storage buckets (exercises, transformations, blog, avatars)
 - [ ] 1.5 Install and configure next-intl (SR/EN/RU), create message files
 - [ ] 1.6 Refactor design system — adapt current dark theme for personal coaching brand
-- [ ] 1.7 Build shared components: Navbar (with language switcher), Footer, Button, Card
-- [ ] 1.8 Homepage — hero, services preview, transformations carousel, pricing cards, blog preview, CTA
+- [ ] 1.7 Build shared components: Navbar (with language switcher, Login/Register buttons top-right; show client full name when logged in), Footer, Button, Card
+- [ ] 1.8 Homepage — hero (responsive background: landscape mock for desktop ≥1024px, portrait mock for mobile; "YOUR PERSONAL FITNESS COACH" text overlay) → transformations auto-slideshow (before/after, mock placeholder images) → "How can I help you" → services preview → pricing cards → blog preview → CTA
 - [ ] 1.9 About page — coach bio, certifications, stats (copy content from onlinetrener.rs)
 - [ ] 1.10 Services page — 3 tiers with detailed descriptions
 - [ ] 1.11 Pricing page — comparison table, CTA buttons
@@ -57,5 +62,4 @@
 - [ ] 6.2 Full SEO audit — structured data (JSON-LD), hreflang, performance
 - [ ] 6.3 Image optimization — next/image, lazy loading, WebP
 - [ ] 6.4 Cross-browser testing (Chrome, Safari, Firefox, mobile)
-- [ ] 6.5 DNS cutover plan — document steps to switch from WordPress to Vercel
-- [ ] 6.6 Final review with Aleksa and Aleksandar
+- [ ] 6.5 Final review with Aleksa and Aleksandar
