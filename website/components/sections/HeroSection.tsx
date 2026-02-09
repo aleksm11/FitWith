@@ -14,7 +14,7 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="relative w-full min-h-[100vh] max-lg:min-h-[80vh] flex flex-col">
+    <section className="relative w-full min-h-[100dvh] max-lg:min-h-[80dvh] flex flex-col">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A] via-[#0A0A0A] to-[#111111]" />
       <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[120px]" />
