@@ -50,6 +50,7 @@ export default function Navbar() {
     { href: `/${locale}/o-meni`, label: t("about") },
     { href: `/${locale}/saradnja`, label: t("services") },
     { href: `/${locale}/cene`, label: t("pricing") },
+    { href: `/${locale}/vezbe`, label: t("exercises") },
     { href: `/${locale}/blog`, label: t("blog") },
     { href: `/${locale}/transformacije`, label: t("transformations") },
     { href: `/${locale}/kontakt`, label: t("contact") },
