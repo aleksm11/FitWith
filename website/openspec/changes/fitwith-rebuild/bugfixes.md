@@ -117,6 +117,14 @@
 - **Issue**: Transformations section has no slide animation
 - **Fix**: Add smooth sliding/fade transition animation to the auto-slideshow (CSS transition or lightweight carousel). Before/after cards should slide in from the side.
 
+## BUG-22: Hero profile pictures — add decorative orange stripes on edges
+- **Issue**: Hero photos look plain, need decorative accents
+- **Reference**: Figma FitFlex design components — stripe decorations on picture edges
+  - https://www.figma.com/design/6w0YaIkX6w3Qh0u6Iin4bH/?node-id=1-845&m=dev
+  - https://www.figma.com/design/6w0YaIkX6w3Qh0u6Iin4bH/?node-id=1-854&m=dev
+  - https://www.figma.com/design/6w0YaIkX6w3Qh0u6Iin4bH/?node-id=1-863&m=dev
+- **Fix**: Use Claude Code's Figma MCP to inspect these components, then recreate the stripe elements in CSS/SVG with orange (#f97316) color. Apply to hero images on both mobile and desktop. Stripes on edges of the photo frames.
+
 ## BUG-21: Simplify navbar — too many links
 - **Issue**: 8 nav links + lang + auth = too crowded on desktop
 - **Keep in navbar**: Početna, O meni, Saradnja, Vežbe, Blog, Kontakt (6 links)
