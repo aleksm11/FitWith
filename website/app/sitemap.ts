@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { exercises } from "@/lib/exercises/data";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://onlinetrener.rs";
 
@@ -11,6 +12,7 @@ const pages = [
   "/cene",
   "/kontakt",
   "/politika-privatnosti",
+  "/vezbe",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -26,6 +28,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
         alternates: {
           languages: Object.fromEntries(
             locales.map((l) => [l, `${BASE_URL}/${l}${page}`])
+          ),
+        },
+      });
+    }
+  }
+
+  // Exercise detail pages
+  for (const exercise of exercises) {
+    for (const locale of locales) {
+      entries.push({
+        url: `${BASE_URL}/${locale}/vezbe/${exercise.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly",
+        priority: 0.6,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((l) => [l, `${BASE_URL}/${l}/vezbe/${exercise.slug}`])
           ),
         },
       });

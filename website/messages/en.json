@@ -257,6 +257,104 @@
     "dashboard": "Dashboard",
     "welcomeText": "The admin panel is under construction. Soon you'll be able to manage users, training plans, exercises, blog posts, and other content here."
   },
+  "Exercises": {
+    "label": "Exercise Library",
+    "title": "Exercises",
+    "subtitle": "Browse the complete exercise library with detailed instructions and video demonstrations.",
+    "allCategories": "All",
+    "category_grudi": "Chest",
+    "category_ledja": "Back",
+    "category_noge": "Legs",
+    "category_ramena": "Shoulders",
+    "category_ruke": "Arms",
+    "category_stomak": "Core",
+    "category_korektivne": "Corrective",
+    "category_napredne": "Advanced",
+    "backToExercises": "Back to exercises",
+    "instructions": "How to perform",
+    "relatedExercises": "Related exercises",
+    "videoPlaceholder": "Video demonstration coming soon",
+    "noExercises": "No exercises in this category.",
+    "ctaTitle": "Want a personalized training plan?",
+    "ctaSubtitle": "Every exercise in your plan will be tailored to your goals and capabilities.",
+    "muscleChest": "Chest",
+    "muscleTriceps": "Triceps",
+    "muscleShoulders": "Shoulders",
+    "muscleLats": "Lats",
+    "muscleBiceps": "Biceps",
+    "muscleRearDelts": "Rear delts",
+    "muscleQuads": "Quads",
+    "muscleGlutes": "Glutes",
+    "muscleHamstrings": "Hamstrings",
+    "muscleCore": "Core",
+    "muscleForearms": "Forearms",
+    "muscleUpperBack": "Upper back",
+    "muscleRotatorCuff": "Rotator cuff",
+    "benchPressName": "Bench Press",
+    "benchPressDesc": "A fundamental exercise for developing the chest muscles. Performed on a flat bench with a barbell or dumbbells. Excellent for building upper body strength and mass.",
+    "benchPressInstructions": [
+      "Lie on a flat bench with feet firmly on the floor. Grip the bar slightly wider than shoulder width.",
+      "Unrack the bar and lower it in a controlled manner to the middle of your chest, elbows at a 45-degree angle.",
+      "Press the bar upward to full arm extension, exhaling as you push.",
+      "Hold briefly at the top and repeat for the desired number of reps."
+    ],
+    "latPulldownName": "Lat Pulldown",
+    "latPulldownDesc": "A back exercise performed on a cable machine. Ideal for developing back width and strengthening the upper body.",
+    "latPulldownInstructions": [
+      "Sit at the machine with knees secured under the pads. Grip the bar with a wide overhand grip.",
+      "Pull the bar down toward the top of your chest, squeezing your shoulder blades together.",
+      "Hold the contraction for a second at the bottom position.",
+      "Return the bar to the starting position in a controlled manner, feeling the stretch in your lats."
+    ],
+    "squatName": "Squat",
+    "squatDesc": "A fundamental exercise for legs and glutes. Engages a large number of muscle groups and stimulates strength and muscle growth throughout the entire body.",
+    "squatInstructions": [
+      "Place the bar on your upper traps, feet shoulder-width apart or slightly wider.",
+      "Inhale, brace your core, and begin descending by pushing your hips back and bending your knees.",
+      "Lower yourself until your thighs are parallel to the floor or deeper, depending on mobility.",
+      "Drive up through your heels to the starting position, exhaling at the top of the movement."
+    ],
+    "overheadPressName": "Overhead Press",
+    "overheadPressDesc": "A shoulder development exercise performed standing or seated. Builds strength and stability of the entire shoulder girdle.",
+    "overheadPressInstructions": [
+      "Stand upright, feet shoulder-width apart. Hold the bar at shoulder height, palms facing forward.",
+      "Brace your core and press the bar vertically upward, tilting your head slightly to let the bar pass.",
+      "Extend your arms fully at the top, bar directly overhead.",
+      "Lower the bar back to shoulder height in a controlled manner and repeat."
+    ],
+    "bicepCurlName": "Bicep Curl",
+    "bicepCurlDesc": "An isolation exercise for the biceps performed with dumbbells or a barbell. Effective for targeted development of the upper arm muscles.",
+    "bicepCurlInstructions": [
+      "Stand upright, hold dumbbells at your sides with palms facing forward.",
+      "Bend your elbows and curl the dumbbells toward your shoulders, keeping your upper arms stationary.",
+      "At the top of the movement, squeeze the biceps for a second.",
+      "Lower the dumbbells back to the starting position in a controlled manner without swinging your body."
+    ],
+    "plankName": "Plank",
+    "plankDesc": "An isometric core stabilization exercise. Strengthens deep abdominal, back, and hip muscles. A foundation of every good training routine.",
+    "plankInstructions": [
+      "Get into a push-up position but rest on your forearms instead of your hands.",
+      "Your body should form a straight line from head to heels — don't raise or drop your hips.",
+      "Engage your core, squeeze your glutes, and keep your shoulders above your elbows.",
+      "Hold the position for the desired time, breathing evenly."
+    ],
+    "bandPullApartName": "Band Pull-Apart",
+    "bandPullApartDesc": "A corrective exercise with a resistance band for strengthening the rear shoulder and upper back. Great for improving posture and preventing injuries.",
+    "bandPullApartInstructions": [
+      "Stand upright, hold a resistance band in front of you at shoulder width, arms extended.",
+      "Pull the band apart by moving your hands away from each other, squeezing your shoulder blades.",
+      "Hold the end position for 1-2 seconds, feeling the contraction in your rear delts and rhomboids.",
+      "Return your hands to the starting position in a controlled manner and repeat."
+    ],
+    "muscleUpName": "Muscle-Up",
+    "muscleUpDesc": "An advanced calisthenics exercise combining a pull-up and dip in one movement. Requires a high level of upper body strength and coordination.",
+    "muscleUpInstructions": [
+      "Grip the pull-up bar with a false grip (wrists over the bar), hands slightly wider than shoulder width.",
+      "Perform a kip swing and explosively pull yourself upward, driving your chest toward the bar.",
+      "When your chest reaches bar level, quickly transition your wrists over the bar into a dip position.",
+      "Extend your arms fully at the top, then lower yourself back to a dead hang in a controlled manner."
+    ]
+  },
   "Common": {
     "readMore": "Read more",
     "learnMore": "Learn more",
