@@ -117,6 +117,14 @@
 - **Issue**: Transformations section has no slide animation
 - **Fix**: Add smooth sliding/fade transition animation to the auto-slideshow (CSS transition or lightweight carousel). Before/after cards should slide in from the side.
 
+## BUG-21: Simplify navbar — too many links
+- **Issue**: 8 nav links + lang + auth = too crowded on desktop
+- **Keep in navbar**: Početna, O meni, Saradnja, Vežbe, Blog, Kontakt (6 links)
+- **Remove from navbar**: 
+  - Cene — merge pricing into Saradnja page (services + pricing together)
+  - Transformacije — visible on homepage slideshow, keep as footer-only link
+- **Also update mobile hamburger menu** to match
+
 ## BUG-20: Blog should show newest posts first
 - **Issue**: Blog listing doesn't sort by date (newest first)
 - **Fix**: Sort blog posts by `published_at DESC` in the query. Both on homepage preview and blog listing page.
