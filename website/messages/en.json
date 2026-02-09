@@ -487,7 +487,8 @@
     "exercisesTitle": "Exercise Management",
     "trainingTitle": "Training Plans",
     "nutritionTitle": "Nutrition Plans",
-    "usersTitle": "User Management"
+    "usersTitle": "User Management",
+    "settingsTitle": "Site Settings"
   },
   "Exercises": {
     "label": "Exercise Library",

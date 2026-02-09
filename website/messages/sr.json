@@ -487,7 +487,8 @@
     "exercisesTitle": "Upravljanje vežbama",
     "trainingTitle": "Planovi treninga",
     "nutritionTitle": "Planovi ishrane",
-    "usersTitle": "Upravljanje korisnicima"
+    "usersTitle": "Upravljanje korisnicima",
+    "settingsTitle": "Podešavanja sajta"
   },
   "Exercises": {
     "label": "Biblioteka vežbi",

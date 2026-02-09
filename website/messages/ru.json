@@ -487,7 +487,8 @@
     "exercisesTitle": "Управление упражнениями",
     "trainingTitle": "Планы тренировок",
     "nutritionTitle": "Планы питания",
-    "usersTitle": "Управление пользователями"
+    "usersTitle": "Управление пользователями",
+    "settingsTitle": "Настройки сайта"
   },
   "Exercises": {
     "label": "Библиотека упражнений",
