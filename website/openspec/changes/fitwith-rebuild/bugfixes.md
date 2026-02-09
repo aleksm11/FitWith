@@ -7,11 +7,10 @@
 
 ## BUG-2: Google and Apple login not working
 - **Issue**: OAuth providers (Google, Apple) buttons exist but aren't configured
-- **Fix Options**:
-  - A) Configure Google OAuth in Supabase (needs Google Cloud Console OAuth client ID + secret)
-  - B) Configure Apple Sign-In (needs Apple Developer account + Service ID)
-  - C) Remove the buttons for now if we don't have the credentials yet
-- **Decision needed**: Does Aleksandar have Google Cloud / Apple Developer accounts? Or remove OAuth for now and keep email/password only?
+- **Decision**: Keep them. Need to configure:
+  - Google OAuth: Create OAuth client in Google Cloud Console, add client ID + secret to Supabase Auth providers
+  - Apple Sign-In: Create Service ID in Apple Developer account, configure in Supabase
+- **Action needed from Aleksa**: Provide Google Cloud Console + Apple Developer account access, or credentials
 
 ## BUG-3: Can login without email verification
 - **Issue**: User can sign in even though email isn't verified
@@ -29,7 +28,7 @@
 - **Cause**: Components use hardcoded mock arrays/objects instead of querying Supabase
 - **Fix**:
   - Dashboard: fetch user's real subscription tier from `profiles`, real training plan from `training_plans`/`training_days`/`training_exercises`, real nutrition data from `nutrition_plans`
-  - Training page: fetch actual assigned training plan or show "No training plan assigned yet — your coach will create one for you"
+  - Training page: fetch actual assigned training plan or show empty state. NOTE: the current mock training data structure (e.g. "Grudi i triceps", 5 exercises with sets/reps) is good — seed it as real data in the DB so the "today's training" section works with real queries
   - Nutrition page: fetch actual nutrition plan or show empty state
   - Profile page: fetch real profile data, allow editing real fields
   - ALL mock data arrays must be removed and replaced with Supabase queries
