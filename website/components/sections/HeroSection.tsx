@@ -35,7 +35,7 @@ export default function HeroSection() {
             <Button as="link" href={`/${locale}/kontakt`} size="lg">
               {t("cta1")}
             </Button>
-            <Button as="link" href={`/${locale}/cene`} variant="outline" size="lg">
+            <Button as="link" href={`/${locale}/saradnja#cene`} variant="outline" size="lg">
               {t("cta2")}
             </Button>
           </div>

@@ -13,7 +13,9 @@ export default function Footer() {
     { href: `/${locale}`, label: tNav("home") },
     { href: `/${locale}/o-meni`, label: tNav("about") },
     { href: `/${locale}/saradnja`, label: tNav("services") },
-    { href: `/${locale}/cene`, label: tNav("pricing") },
+    { href: `/${locale}/vezbe`, label: tNav("exercises") },
+    { href: `/${locale}/blog`, label: tNav("blog") },
+    { href: `/${locale}/transformacije`, label: tNav("transformations") },
     { href: `/${locale}/kontakt`, label: tNav("contact") },
   ];
 
