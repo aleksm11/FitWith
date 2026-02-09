@@ -42,6 +42,23 @@
 - **Issue**: Logo in navbar shows "FitWith" but should be "FitWithAS"
 - **Fix**: Update Navbar.tsx logo — `Fit<orange>With</orange><orange>AS</orange>` (or style AS separately if needed)
 
+## BUG-9: Logged-in navbar shows email instead of full name
+- **Issue**: After login, top-right shows email address (e.g. "aleksa.ma123@gmail.com") instead of full name
+- **Cause**: Profile row doesn't exist yet for the user (BUG-6), so `profileName` is null and it falls back to `user.email.split("@")[0]` — but on mobile it seems to show the full email
+- **Fix**: 
+  - Depends on BUG-6 (auto-create profile with full_name from registration)
+  - Registration form should collect full name and save to profiles table
+  - Fallback display should truncate properly on mobile
+
+## BUG-10: Safari mobile cuts off page / layout broken
+- **Issue**: Safari on iOS cuts off half the page, doesn't display properly
+- **Cause**: Likely viewport height issue — Safari's dynamic toolbar affects `vh` units
+- **Fix**: 
+  - Use `dvh` (dynamic viewport height) instead of `vh` throughout
+  - Check for `100vh` hero sections, mobile menu, or fixed positioning issues
+  - Test with `min-height: 100dvh` or `-webkit-fill-available` fallback
+  - Review if the mobile menu overlay (`fixed inset-0 top-[64px]`) causes scroll lock issues in Safari
+
 ## BUG-8: No way to access admin panel / become admin
 - **Issue**: New users are always role "client", no UI or mechanism to become admin
 - **Fix**:
@@ -56,5 +73,7 @@
 4. BUG-3 (login without verification) — Supabase config + client check
 5. BUG-6 (profile auto-creation) — DB trigger
 6. BUG-8 (admin access) — set Aleksa as admin after BUG-6
-7. BUG-5 (mock data → real Supabase data) — component rewrites + seed data
-8. BUG-2 (Google/Apple OAuth) — waiting for credentials from Aleksa
+7. BUG-9 (email instead of name in navbar) — tied to BUG-6
+8. BUG-5 (mock data → real Supabase data) — component rewrites + seed data
+9. BUG-10 (Safari layout broken) — viewport + CSS fixes
+10. BUG-2 (Google/Apple OAuth) — waiting for credentials from Aleksa
