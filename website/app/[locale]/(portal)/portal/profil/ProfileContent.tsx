@@ -1,27 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { getMyProfile, updateMyProfile } from "@/lib/supabase/queries";
+import type { Profile } from "@/lib/supabase/types";
 import { mockProfile } from "@/lib/portal/mock-data";
 
 export default function ProfileContent() {
   const t = useTranslations("Portal");
 
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
   const [fullName, setFullName] = useState(mockProfile.fullName);
   const [email, setEmail] = useState(mockProfile.email);
   const [phone, setPhone] = useState(mockProfile.phone);
+  const [tier, setTier] = useState(mockProfile.subscriptionTier);
+  const [active, setActive] = useState(mockProfile.subscriptionActive);
+  const [memberSince, setMemberSince] = useState(mockProfile.memberSince);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  function handleSave(e: React.FormEvent) {
+  useEffect(() => {
+    getMyProfile()
+      .then((data) => {
+        if (data) {
+          setProfile(data);
+          setFullName(data.full_name || "");
+          setEmail(data.email || "");
+          setPhone(data.phone || "");
+          setTier(data.subscription_tier);
+          setActive(data.subscription_active);
+          setMemberSince(data.created_at);
+        }
+      })
+      .catch(() => {
+        // Use mock data on error
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    // Mock save — simulate network delay
-    setTimeout(() => {
-      setSaving(false);
+    try {
+      if (profile) {
+        await updateMyProfile({ full_name: fullName, phone });
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    }, 800);
+    } catch {
+      // silent
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-[80px]">
+        <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   return (
@@ -41,7 +80,6 @@ export default function ProfileContent() {
           </h2>
 
           <form onSubmit={handleSave} className="space-y-[20px]">
-            {/* Name */}
             <div>
               <label className="block font-[family-name:var(--font-roboto)] text-[13px] text-white/50 mb-[6px]">
                 {t("nameLabel")}
@@ -54,7 +92,6 @@ export default function ProfileContent() {
               />
             </div>
 
-            {/* Email */}
             <div>
               <label className="block font-[family-name:var(--font-roboto)] text-[13px] text-white/50 mb-[6px]">
                 {t("emailLabel")}
@@ -62,12 +99,11 @@ export default function ProfileContent() {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/[0.03] border border-white/10 px-[16px] py-[12px] font-[family-name:var(--font-roboto)] text-[15px] text-white placeholder-white/30 focus:border-orange-500/50 focus:outline-none transition-colors"
+                disabled
+                className="w-full bg-white/[0.03] border border-white/10 px-[16px] py-[12px] font-[family-name:var(--font-roboto)] text-[15px] text-white/50 placeholder-white/30 focus:border-orange-500/50 focus:outline-none transition-colors cursor-not-allowed"
               />
             </div>
 
-            {/* Phone */}
             <div>
               <label className="block font-[family-name:var(--font-roboto)] text-[13px] text-white/50 mb-[6px]">
                 {t("phoneLabel")}
@@ -80,7 +116,6 @@ export default function ProfileContent() {
               />
             </div>
 
-            {/* Save button */}
             <div className="pt-[8px]">
               <button
                 type="submit"
@@ -101,7 +136,6 @@ export default function ProfileContent() {
 
         {/* Subscription info sidebar */}
         <div className="space-y-[16px]">
-          {/* Subscription card */}
           <div className="bg-white/[0.03] border border-white/10 p-[24px]">
             <h3 className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white mb-[16px]">
               {t("subscriptionLabel")}
@@ -113,7 +147,7 @@ export default function ProfileContent() {
                   {t("planLabel")}
                 </span>
                 <span className="font-[family-name:var(--font-sora)] font-semibold text-[14px] text-white">
-                  {t(`tier_${mockProfile.subscriptionTier}`)}
+                  {t(`tier_${tier}`)}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -121,11 +155,11 @@ export default function ProfileContent() {
                   {t("statusLabel")}
                 </span>
                 <span className={`font-[family-name:var(--font-roboto)] text-[13px] px-[10px] py-[3px] ${
-                  mockProfile.subscriptionActive
+                  active
                     ? "text-green-400 bg-green-400/10"
                     : "text-red-400 bg-red-400/10"
                 }`}>
-                  {mockProfile.subscriptionActive ? t("active") : t("inactive")}
+                  {active ? t("active") : t("inactive")}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -133,13 +167,12 @@ export default function ProfileContent() {
                   {t("memberSince")}
                 </span>
                 <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/70">
-                  {new Date(mockProfile.memberSince).toLocaleDateString()}
+                  {new Date(memberSince).toLocaleDateString()}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Subscription features */}
           <div className="bg-orange-500/5 border border-orange-500/20 p-[24px]">
             <h3 className="font-[family-name:var(--font-sora)] font-semibold text-[14px] text-orange-400 mb-[12px]">
               {t("yourPlanIncludes")}

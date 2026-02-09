@@ -324,6 +324,7 @@
     "exercise_lateralRaise": "Lateral Raise",
     "exercise_bandPullApart": "Band Pull-Apart",
     "exercise_tricepDips": "Tricep Dips",
+    "dayLabel": "Day",
     "trainingSubtitle": "Your weekly training plan with details for each day.",
     "exerciseLabel": "Exercise",
     "setsLabel": "Sets",
