@@ -441,7 +441,9 @@
     "confirmDelete": "Da li ste sigurni?",
     "cancel": "Otkaži",
     "save": "Sačuvaj",
-    "create": "Kreiraj"
+    "create": "Kreiraj",
+    "weeklyReportTitle": "Vreme za nedeljni izveštaj",
+    "weeklyReportMessage": "Prošlo je 7 dana od vašeg poslednjeg izveštaja o napretku. Popunite kratak upitnik kako bi vaš trener mogao da prilagodi plan."
   },
   "Admin": {
     "title": "Admin panel",

@@ -211,6 +211,18 @@ export async function submitQuestionnaire(data: Record<string, unknown>) {
     .from("questionnaires")
     .insert({ user_id: user.id, data });
   if (error) throw error;
+  // Update last_report_at on profile
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("user_id", user.id)
+    .single();
+  if (profile) {
+    await supabase
+      .from("profiles")
+      .update({ last_report_at: new Date().toISOString() })
+      .eq("id", profile.id);
+  }
 }
 
 // ============================================================

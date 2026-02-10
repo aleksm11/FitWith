@@ -441,7 +441,9 @@
     "confirmDelete": "Are you sure?",
     "cancel": "Cancel",
     "save": "Save",
-    "create": "Create"
+    "create": "Create",
+    "weeklyReportTitle": "Time for your weekly report",
+    "weeklyReportMessage": "It's been 7 days since your last progress report. Fill out a quick questionnaire so your coach can adjust your plan."
   },
   "Admin": {
     "title": "Admin Panel",
