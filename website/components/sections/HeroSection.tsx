@@ -7,6 +7,12 @@ export default function HeroSection() {
   const t = useTranslations("Hero");
   const locale = useLocale();
 
+  // Split title: first word hollow, rest solid
+  const titleText = t("title");
+  const firstSpace = titleText.indexOf(" ");
+  const titleFirst = firstSpace > 0 ? titleText.slice(0, firstSpace) : "";
+  const titleRest = firstSpace > 0 ? titleText.slice(firstSpace) : titleText;
+
   const stats = [
     { value: t("stat1Value"), label: t("stat1Label") },
     { value: t("stat2Value"), label: t("stat2Label") },
@@ -50,8 +56,9 @@ export default function HeroSection() {
                 <div className="w-[50px] h-[3px] bg-orange-500" />
               </div>
 
-              <h1 className="font-[family-name:var(--font-sora)] font-bold text-[52px] leading-[60px] xl:text-[60px] xl:leading-[68px] text-white">
-                {t("title")}
+              <h1 className="font-[family-name:var(--font-sora)] font-bold text-[52px] leading-[60px] xl:text-[60px] xl:leading-[68px]">
+                <span className="text-transparent [-webkit-text-stroke:2px_white] [text-stroke:2px_white]">{titleFirst}</span>
+                <span className="text-white">{titleRest}</span>
               </h1>
               <p className="font-[family-name:var(--font-roboto)] text-[18px] leading-[28px] text-white/80 max-w-[460px] mt-[16px]">
                 {t("subtitle")}
@@ -91,8 +98,9 @@ export default function HeroSection() {
         {/* Text at bottom */}
         <div className="absolute bottom-[12px] left-0 right-0 z-10 px-[20px] sm:px-[40px]">
           <div className="flex flex-col gap-[8px]">
-            <h1 className="font-[family-name:var(--font-sora)] font-bold text-[26px] leading-[32px] sm:text-[34px] sm:leading-[40px] text-white drop-shadow-lg">
-              {t("title")}
+            <h1 className="font-[family-name:var(--font-sora)] font-bold text-[26px] leading-[32px] sm:text-[34px] sm:leading-[40px] drop-shadow-lg">
+              <span className="text-transparent [-webkit-text-stroke:1.5px_white] [text-stroke:1.5px_white]">{titleFirst}</span>
+              <span className="text-white">{titleRest}</span>
             </h1>
             <p className="font-[family-name:var(--font-roboto)] text-[14px] leading-[21px] sm:text-[16px] sm:leading-[24px] text-white/80 max-w-[460px] drop-shadow-md">
               {t("subtitle")}
