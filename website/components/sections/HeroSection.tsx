@@ -17,7 +17,7 @@ export default function HeroSection() {
   return (
     <section className="relative w-full flex flex-col">
       {/* ===== HERO IMAGE AREA ===== */}
-      <div className="relative w-full h-[100dvh] max-lg:h-[85dvh]">
+      <div className="relative w-full h-[110dvh] max-lg:h-[100dvh]">
         {/* Desktop Image */}
         <picture>
           <source media="(min-width: 1024px)" srcSet="/assets/hero-desktop.jpg" />
@@ -28,8 +28,8 @@ export default function HeroSection() {
           />
         </picture>
 
-        {/* Dark gradient — bottom (for text readability, only bottom 35%) */}
-        <div className="absolute bottom-0 left-0 right-0 h-[35%] bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/80 to-transparent" />
+        {/* Dark gradient — bottom (for text readability, only bottom 25%) */}
+        <div className="absolute bottom-0 left-0 right-0 h-[25%] bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/80 to-transparent" />
         
         {/* Dark gradient — top (for navbar readability) */}
         <div className="absolute top-0 left-0 right-0 h-[120px] bg-gradient-to-b from-[#0A0A0A]/80 to-transparent" />
@@ -57,7 +57,7 @@ export default function HeroSection() {
         <div className="absolute bottom-[8px] max-sm:bottom-[4px] left-0 right-0 z-10 px-[40px] max-sm:px-[20px]">
           <div className="max-w-[1280px] mx-auto">
             <div className="flex flex-col gap-[12px] max-sm:gap-[8px] max-w-[700px] lg:max-w-[50%]">
-              <h1 className="font-[family-name:var(--font-sora)] font-bold text-[48px] leading-[54px] max-lg:text-[38px] max-lg:leading-[44px] max-sm:text-[28px] max-sm:leading-[34px] text-white drop-shadow-lg">
+              <h1 className="font-[family-name:var(--font-sora)] font-bold text-[42px] leading-[48px] max-lg:text-[34px] max-lg:leading-[40px] max-sm:text-[26px] max-sm:leading-[32px] text-white drop-shadow-lg">
                 {t("title")}
               </h1>
               <p className="font-[family-name:var(--font-roboto)] text-[16px] leading-[24px] max-sm:text-[14px] max-sm:leading-[21px] text-white/80 max-w-[460px] drop-shadow-md">
