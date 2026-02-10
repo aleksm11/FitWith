@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { getMyProfile, getMyTrainingPlan, getMyNutritionPlan } from "@/lib/supabase/queries";
 import { localizedField } from "@/lib/supabase/types";
 import type { Locale } from "@/lib/supabase/types";
+import { getCurrentDayOfWeekBelgrade, getWeekdayName } from "@/lib/utils/timezone";
 
 type DashboardData = {
   profileName: string;
@@ -50,7 +51,7 @@ export default function PortalContent() {
           totalFat = nutritionPlan.fats_g || 0;
         }
 
-        // Training
+        // Training - use Belgrade timezone to detect today
         let todayFocus = "";
         let todayExercises: { name: string; slug: string; sets: number; reps: string }[] = [];
         let isRestDay = true;
@@ -58,15 +59,14 @@ export default function PortalContent() {
         const hasTrainingPlan = !!(trainingPlan && trainingPlan.training_days.length > 0);
 
         if (hasTrainingPlan) {
-          const dayIndex = new Date().getDay();
-          const mapped = dayIndex === 0 ? 6 : dayIndex - 1;
-          const sorted = [...trainingPlan.training_days].sort((a, b) => a.sort_order - b.sort_order);
-          const today = sorted[mapped] || sorted[0];
+          const todayDayOfWeek = getCurrentDayOfWeekBelgrade(); // 1=Monday...7=Sunday
+          const today = trainingPlan.training_days.find((d) => d.day_of_week === todayDayOfWeek);
 
           if (today) {
             const exs = today.training_exercises?.sort((a, b) => a.sort_order - b.sort_order) || [];
             isRestDay = exs.length === 0;
-            todayFocus = today.notes || localizedField(today as unknown as Record<string, unknown>, "day_name", locale);
+            const weekdayName = getWeekdayName(todayDayOfWeek, locale as "sr" | "en" | "ru");
+            todayFocus = today.notes ? `${weekdayName} — ${today.notes}` : weekdayName;
             todayExercises = exs.map((ex) => ({
               name: ex.exercises
                 ? localizedField(ex.exercises as unknown as Record<string, unknown>, "name", locale)
@@ -75,15 +75,20 @@ export default function PortalContent() {
               sets: ex.sets || 0,
               reps: ex.reps || "",
             }));
+          } else {
+            // No plan for today
+            isRestDay = true;
           }
 
           // Find next workout day
           if (isRestDay) {
-            for (let i = 1; i <= sorted.length; i++) {
-              const nextDay = sorted[(mapped + i) % sorted.length];
+            for (let offset = 1; offset <= 7; offset++) {
+              const nextDayOfWeek = ((todayDayOfWeek - 1 + offset) % 7) + 1;
+              const nextDay = trainingPlan.training_days.find((d) => d.day_of_week === nextDayOfWeek);
               if (nextDay && (nextDay.training_exercises?.length || 0) > 0) {
+                const nextWeekdayName = getWeekdayName(nextDayOfWeek, locale as "sr" | "en" | "ru");
                 nextWorkout = {
-                  label: localizedField(nextDay as unknown as Record<string, unknown>, "day_name", locale),
+                  label: nextDay.notes ? `${nextWeekdayName} — ${nextDay.notes}` : nextWeekdayName,
                   focus: nextDay.notes || "",
                   count: nextDay.training_exercises.length,
                 };
@@ -153,168 +158,197 @@ export default function PortalContent() {
         {t("dashboardSubtitle")}
       </p>
 
-      {/* Status cards */}
-      <div className="grid grid-cols-3 gap-[16px] max-lg:grid-cols-1 mb-[32px]">
-        {/* Subscription */}
-        <div className="bg-white/[0.03] border border-white/10 p-[24px]">
-          <p className="font-[family-name:var(--font-roboto)] text-[12px] uppercase tracking-[1.5px] text-white/40 mb-[8px]">
-            {t("subscriptionLabel")}
-          </p>
-          <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white">
-            {t(`tier_${data.tier}`)}
-          </p>
-          {data.subscriptionEndDate ? (
-            <span className={`inline-block mt-[8px] font-[family-name:var(--font-roboto)] text-[12px] px-[10px] py-[3px] ${
-              isActive
-                ? "text-green-400 bg-green-400/10"
-                : "text-red-400 bg-red-400/10"
-            }`}>
-              {isActive ? t("active") : t("inactive")}
-            </span>
-          ) : (
-            <span className="inline-block mt-[8px] font-[family-name:var(--font-roboto)] text-[12px] px-[10px] py-[3px] text-white/40 bg-white/5">
-              {t("noSubscription")}
-            </span>
-          )}
-        </div>
-
-        {/* Today's macros */}
-        <div className="bg-white/[0.03] border border-white/10 p-[24px]">
-          <p className="font-[family-name:var(--font-roboto)] text-[12px] uppercase tracking-[1.5px] text-white/40 mb-[8px]">
-            {t("todaysMacros")}
-          </p>
-          {data.hasNutritionPlan ? (
-            <>
-              <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white">
-                {data.totalCalories} kcal
-              </p>
-              <div className="flex gap-[16px] mt-[8px]">
-                <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-                  P: {data.totalProtein}g
-                </span>
-                <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-                  C: {data.totalCarbs}g
-                </span>
-                <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-                  F: {data.totalFat}g
-                </span>
-              </div>
-            </>
-          ) : (
-            <p className="font-[family-name:var(--font-roboto)] text-[14px] text-white/30 mt-[4px]">
-              {t("noNutritionPlan")}
-            </p>
-          )}
-        </div>
-
-        {/* Training status */}
-        <div className="bg-white/[0.03] border border-white/10 p-[24px]">
-          <p className="font-[family-name:var(--font-roboto)] text-[12px] uppercase tracking-[1.5px] text-white/40 mb-[8px]">
+      {/* R3-4: New layout - Today's Training → Today's Nutrition → Pretplata */}
+      
+      {/* 1. TODAY'S TRAINING */}
+      <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px] mb-[24px]">
+        <div className="flex items-center justify-between mb-[20px]">
+          <h2 className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-white">
             {t("todaysTraining")}
-          </p>
-          {data.hasTrainingPlan ? (
-            data.isRestDay ? (
-              <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white/60">
-                {t("restDay")}
-              </p>
-            ) : (
-              <>
-                <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white">
-                  {data.todayFocus}
-                </p>
-                <p className="mt-[8px] font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-                  {data.todayExercises.length} {t("exercisesCount")}
-                </p>
-              </>
-            )
-          ) : (
-            <p className="font-[family-name:var(--font-roboto)] text-[14px] text-white/30 mt-[4px]">
-              {t("noTrainingPlan")}
-            </p>
+          </h2>
+          {data.hasTrainingPlan && !data.isRestDay && (
+            <Link
+              href={`/${locale}/portal/trening`}
+              className="font-[family-name:var(--font-roboto)] text-[14px] text-orange-500 hover:text-orange-400 transition-colors whitespace-nowrap"
+            >
+              {t("viewFullPlan")}
+            </Link>
           )}
         </div>
-      </div>
 
-      {/* Today's workout detail */}
-      {data.hasTrainingPlan ? (
-        <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px] mb-[24px]">
-          <div className="flex items-center justify-between mb-[24px]">
-            <h2 className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-white">
-              {data.isRestDay ? t("restDayTitle") : t("todaysWorkout")}
-            </h2>
-            {!data.isRestDay && (
-              <Link
-                href={`/${locale}/portal/trening`}
-                className="font-[family-name:var(--font-roboto)] text-[14px] text-orange-500 hover:text-orange-400 transition-colors"
-              >
-                {t("viewFullPlan")}
-              </Link>
-            )}
+        {!data.hasTrainingPlan ? (
+          <div className="py-[24px] text-center">
+            <svg className="w-10 h-10 text-white/10 mx-auto mb-[12px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <p className="font-[family-name:var(--font-roboto)] text-[15px] text-white/40">
+              {t("noTrainingPlanToday")}
+            </p>
           </div>
-
-          {data.isRestDay ? (
-            <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/50 leading-[26px]">
+        ) : data.isRestDay ? (
+          <div className="py-[12px]">
+            <p className="font-[family-name:var(--font-sora)] font-semibold text-[18px] text-white/60 mb-[8px]">
+              {t("restDay")}
+            </p>
+            <p className="font-[family-name:var(--font-roboto)] text-[14px] text-white/40">
               {t("restDayMessage")}
             </p>
-          ) : (
-            <div className="space-y-[12px]">
+            {data.nextWorkout && (
+              <div className="mt-[16px] pt-[16px] border-t border-white/5">
+                <p className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40 mb-[6px]">
+                  {t("nextWorkout")}:
+                </p>
+                <p className="font-[family-name:var(--font-roboto)] text-[15px] text-white">
+                  {data.nextWorkout.label}
+                </p>
+                <p className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40 mt-[4px]">
+                  {data.nextWorkout.count} {t("exercisesCount")}
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div>
+            <h3 className="font-[family-name:var(--font-sora)] font-semibold text-[18px] text-white mb-[16px]">
+              {data.todayFocus}
+            </h3>
+            <p className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40 mb-[16px]">
+              {data.todayExercises.length} vežbi
+            </p>
+            <div className="space-y-[10px]">
               {data.todayExercises.map((ex, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between py-[12px] border-b border-white/5 last:border-0"
+                  className="flex items-center justify-between py-[10px] border-b border-white/5 last:border-0"
                 >
-                  <div className="flex items-center gap-[12px]">
-                    <span className="font-[family-name:var(--font-sora)] font-semibold text-[14px] text-orange-500 w-[24px]">
+                  <div className="flex items-center gap-[10px] flex-1 min-w-0">
+                    <span className="font-[family-name:var(--font-sora)] font-semibold text-[13px] text-orange-500 w-[20px] flex-shrink-0">
                       {i + 1}
                     </span>
                     {ex.slug ? (
                       <Link
                         href={`/${locale}/vezbe/${ex.slug}`}
-                        className="font-[family-name:var(--font-roboto)] text-[15px] text-white hover:text-orange-400 transition-colors"
+                        className="font-[family-name:var(--font-roboto)] text-[14px] text-white hover:text-orange-400 transition-colors truncate"
                       >
                         {ex.name}
                       </Link>
                     ) : (
-                      <span className="font-[family-name:var(--font-roboto)] text-[15px] text-white">
+                      <span className="font-[family-name:var(--font-roboto)] text-[14px] text-white truncate">
                         {ex.name}
                       </span>
                     )}
                   </div>
-                  <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40">
+                  <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40 flex-shrink-0 ml-[12px] whitespace-nowrap">
                     {ex.sets} x {ex.reps}
                   </span>
                 </div>
               ))}
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* 2. TODAY'S NUTRITION */}
+      <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px] mb-[24px]">
+        <div className="flex items-center justify-between mb-[20px]">
+          <h2 className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-white">
+            {t("todaysNutrition")}
+          </h2>
+          {data.hasNutritionPlan && (
+            <Link
+              href={`/${locale}/portal/ishrana`}
+              className="font-[family-name:var(--font-roboto)] text-[14px] text-orange-500 hover:text-orange-400 transition-colors whitespace-nowrap"
+            >
+              {t("viewFullPlan")}
+            </Link>
           )}
         </div>
-      ) : (
-        <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px] mb-[24px]">
-          <div className="py-[32px] text-center">
-            <svg className="w-12 h-12 text-white/10 mx-auto mb-[16px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+
+        {!data.hasNutritionPlan ? (
+          <div className="py-[24px] text-center">
+            <svg className="w-10 h-10 text-white/10 mx-auto mb-[12px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/40">
-              {t("noPlanYet")}
+            <p className="font-[family-name:var(--font-roboto)] text-[15px] text-white/40">
+              {t("noNutritionPlanToday")}
             </p>
           </div>
-        </div>
-      )}
+        ) : (
+          <div>
+            <div className="grid grid-cols-4 gap-[12px] mb-[16px]">
+              <div className="bg-white/[0.02] p-[12px] border border-white/5">
+                <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
+                  Kalorije
+                </p>
+                <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
+                  {data.totalCalories}
+                </p>
+              </div>
+              <div className="bg-white/[0.02] p-[12px] border border-white/5">
+                <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
+                  Proteini
+                </p>
+                <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
+                  {data.totalProtein}g
+                </p>
+              </div>
+              <div className="bg-white/[0.02] p-[12px] border border-white/5">
+                <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
+                  Ugljenih.
+                </p>
+                <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
+                  {data.totalCarbs}g
+                </p>
+              </div>
+              <div className="bg-white/[0.02] p-[12px] border border-white/5">
+                <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
+                  Masti
+                </p>
+                <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
+                  {data.totalFat}g
+                </p>
+              </div>
+            </div>
+            <p className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40">
+              {t("nutritionPlanActive")}
+            </p>
+          </div>
+        )}
+      </div>
 
-      {/* Next workout */}
-      {data.nextWorkout && data.isRestDay && (
-        <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px]">
-          <h2 className="font-[family-name:var(--font-sora)] font-bold text-[20px] text-white mb-[12px]">
-            {t("nextWorkout")}
-          </h2>
-          <p className="font-[family-name:var(--font-roboto)] text-[15px] text-white/60">
-            {data.nextWorkout.label} — {data.nextWorkout.focus}
-          </p>
-          <p className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40 mt-[4px]">
-            {data.nextWorkout.count} {t("exercisesCount")}
-          </p>
+      {/* 3. PRETPLATA (SUBSCRIPTION) */}
+      <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px]">
+        <h2 className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-white mb-[20px]">
+          {t("subscriptionLabel")}
+        </h2>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white mb-[8px]">
+              {t(`tier_${data.tier}`)}
+            </p>
+            {data.subscriptionEndDate && (
+              <p className="font-[family-name:var(--font-roboto)] text-[13px] text-white/50">
+                {isActive ? t("activeUntil") : t("expiredOn")} {new Date(data.subscriptionEndDate).toLocaleDateString(locale)}
+              </p>
+            )}
+          </div>
+          <div>
+            {data.subscriptionEndDate ? (
+              <span className={`inline-block font-[family-name:var(--font-roboto)] text-[12px] px-[12px] py-[6px] ${
+                isActive
+                  ? "text-green-400 bg-green-400/10"
+                  : "text-red-400 bg-red-400/10"
+              }`}>
+                {isActive ? t("active") : t("inactive")}
+              </span>
+            ) : (
+              <span className="inline-block font-[family-name:var(--font-roboto)] text-[12px] px-[12px] py-[6px] text-white/40 bg-white/5">
+                {t("noSubscription")}
+              </span>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

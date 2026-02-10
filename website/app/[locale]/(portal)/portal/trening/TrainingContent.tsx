@@ -8,10 +8,12 @@ import { createClient } from "@/lib/supabase/client";
 import { localizedField } from "@/lib/supabase/types";
 import type { Locale } from "@/lib/supabase/types";
 import WorkoutPlanEditor from "@/components/portal/WorkoutPlanEditor";
+import { getCurrentDayOfWeekBelgrade, getWeekdayName } from "@/lib/utils/timezone";
 
 type SupabaseDay = {
   id: string;
   day_number: number;
+  day_of_week: number | null; // 1=Monday...7=Sunday
   day_name_sr: string | null;
   day_name_en: string | null;
   day_name_ru: string | null;
@@ -49,12 +51,16 @@ type DisplayDay = {
   }[];
 };
 
-function normalizeSupabaseDay(day: SupabaseDay, locale: Locale, t: (key: string) => string): DisplayDay {
-  const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const;
-  const name = localizedField(day as unknown as Record<string, unknown>, "day_name", locale);
+function normalizeSupabaseDay(day: SupabaseDay, locale: Locale): DisplayDay {
+  // R3-2: Format title as "Ponedeljak — Donji deo tela"
+  const dayOfWeek = day.day_of_week || day.day_number;
+  const weekdayName = getWeekdayName(dayOfWeek, locale as "sr" | "en" | "ru");
+  const muscleGroup = day.notes || "";
+  const label = muscleGroup ? `${weekdayName} — ${muscleGroup}` : weekdayName;
+  
   return {
-    label: name || t(`day_${dayKeys[day.day_number - 1] || "monday"}`),
-    focus: day.notes || "",
+    label,
+    focus: muscleGroup,
     exercises: day.training_exercises
       .sort((a, b) => a.sort_order - b.sort_order)
       .map((ex) => ({
@@ -117,11 +123,17 @@ export default function TrainingContent() {
     getMyTrainingPlan()
       .then((plan) => {
         if (plan && plan.training_days.length > 0) {
-          const sorted = [...plan.training_days].sort((a, b) => a.sort_order - b.sort_order);
-          const normalizedDays = sorted.map((d) => normalizeSupabaseDay(d as unknown as SupabaseDay, locale, t));
+          // R3-1: Sort by day_of_week (fallback to sort_order or day_number)
+          const sorted = [...plan.training_days].sort((a, b) => {
+            const aDow = a.day_of_week || a.day_number || a.sort_order;
+            const bDow = b.day_of_week || b.day_number || b.sort_order;
+            return aDow - bDow;
+          });
+          const normalizedDays = sorted.map((d) => normalizeSupabaseDay(d as unknown as SupabaseDay, locale));
           const labels = sorted.map((d) => {
-            const name = localizedField(d as unknown as Record<string, unknown>, "day_name", locale);
-            return name || `${t("dayLabel")} ${d.day_number}`;
+            const dayOfWeek = d.day_of_week || d.day_number;
+            const weekdayName = getWeekdayName(dayOfWeek, locale as "sr" | "en" | "ru");
+            return d.notes ? `${weekdayName} — ${d.notes}` : weekdayName;
           });
           setDays(normalizedDays);
           setDayLabels(labels);
@@ -135,21 +147,25 @@ export default function TrainingContent() {
     getMyTrainingPlan()
       .then((plan) => {
         if (plan && plan.training_days.length > 0) {
-          const sorted = [...plan.training_days].sort((a, b) => a.sort_order - b.sort_order);
-          const normalizedDays = sorted.map((d) => normalizeSupabaseDay(d as unknown as SupabaseDay, locale, t));
+          // R3-1: Sort by day_of_week (fallback to sort_order or day_number)
+          const sorted = [...plan.training_days].sort((a, b) => {
+            const aDow = a.day_of_week || a.day_number || a.sort_order;
+            const bDow = b.day_of_week || b.day_number || b.sort_order;
+            return aDow - bDow;
+          });
+          const normalizedDays = sorted.map((d) => normalizeSupabaseDay(d as unknown as SupabaseDay, locale));
           const labels = sorted.map((d) => {
-            const name = localizedField(d as unknown as Record<string, unknown>, "day_name", locale);
-            return name || `${t("dayLabel")} ${d.day_number}`;
+            const dayOfWeek = d.day_of_week || d.day_number;
+            const weekdayName = getWeekdayName(dayOfWeek, locale as "sr" | "en" | "ru");
+            return d.notes ? `${weekdayName} — ${d.notes}` : weekdayName;
           });
           setDays(normalizedDays);
           setDayLabels(labels);
           setHasPlan(true);
-          // Set active day to today
-          const todayIndex = (() => {
-            const d = new Date().getDay();
-            return d === 0 ? 6 : d - 1;
-          })();
-          setActiveDay(Math.min(todayIndex, sorted.length - 1));
+          // R3-1: Set active day to today using Belgrade timezone
+          const todayDayOfWeek = getCurrentDayOfWeekBelgrade();
+          const todayIndex = sorted.findIndex((d) => (d.day_of_week || d.day_number) === todayDayOfWeek);
+          setActiveDay(todayIndex >= 0 ? todayIndex : 0);
         }
       })
       .catch(() => {})
@@ -259,8 +275,8 @@ export default function TrainingContent() {
             )}
           </div>
           {!isRestDay && (
-            <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40">
-              {day.exercises.length} {t("exercisesCount")}
+            <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40 whitespace-nowrap flex-shrink-0 ml-[12px]">
+              {day.exercises.length} vežbi
             </span>
           )}
         </div>

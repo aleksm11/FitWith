@@ -84,6 +84,7 @@ export interface TrainingDay {
   id: string;
   plan_id: string;
   day_number: number;
+  day_of_week: number | null; // 1=Monday...7=Sunday (R3-1)
   day_name_sr: string | null;
   day_name_en: string | null;
   day_name_ru: string | null;
