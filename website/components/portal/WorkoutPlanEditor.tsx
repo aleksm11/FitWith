@@ -12,6 +12,7 @@ import {
   deleteTrainingPlan,
   searchExercises,
   getPlanTemplates,
+  getPlanTemplate,
 } from "@/lib/supabase/queries";
 import { localizedField } from "@/lib/supabase/types";
 import type { Locale, TrainingPlan, TrainingDay, TrainingExercise, Exercise, PlanTemplate } from "@/lib/supabase/types";
@@ -78,7 +79,39 @@ export default function WorkoutPlanEditor({ clientId, plans, onRefresh }: Props)
     if (!newPlanName.trim()) return;
     setSaving(true);
     try {
-      await createTrainingPlan({ client_id: clientId, name: newPlanName });
+      const plan = await createTrainingPlan({ client_id: clientId, name: newPlanName });
+
+      // If template selected, populate days and exercises from template data
+      if (selectedTemplateId && plan?.id) {
+        const template = await getPlanTemplate(selectedTemplateId);
+        const data = template?.data as { days?: { name: string; exercises: { exercise_id: string | null; name: string; sets: number; reps: string; rest_seconds: number }[] }[] } | null;
+        if (data?.days) {
+          for (let di = 0; di < data.days.length; di++) {
+            const dayData = data.days[di];
+            const day = await createTrainingDay({
+              plan_id: plan.id,
+              day_number: di + 1,
+              day_name_sr: dayData.name,
+              sort_order: di + 1,
+            });
+            if (day?.id && dayData.exercises) {
+              for (let ei = 0; ei < dayData.exercises.length; ei++) {
+                const ex = dayData.exercises[ei];
+                await createTrainingExercise({
+                  day_id: day.id,
+                  exercise_id: ex.exercise_id || undefined,
+                  exercise_name: ex.name,
+                  sets: ex.sets,
+                  reps: ex.reps,
+                  rest_seconds: ex.rest_seconds,
+                  sort_order: ei + 1,
+                });
+              }
+            }
+          }
+        }
+      }
+
       setNewPlanName("");
       setSelectedTemplateId("");
       setCreating(false);

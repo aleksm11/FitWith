@@ -10,6 +10,7 @@ import {
   updateNutritionPlanMeal,
   deleteNutritionPlanMeal,
   getPlanTemplates,
+  getPlanTemplate,
 } from "@/lib/supabase/queries";
 import type { NutritionPlan, NutritionPlanMeal, PlanTemplate } from "@/lib/supabase/types";
 
@@ -57,7 +58,7 @@ export default function NutritionPlanEditor({ clientId, plans, onRefresh }: Prop
     if (!newPlan.name.trim()) return;
     setSaving(true);
     try {
-      await createNutritionPlan({
+      const plan = await createNutritionPlan({
         client_id: clientId,
         name: newPlan.name,
         daily_calories: newPlan.daily_calories,
@@ -65,7 +66,27 @@ export default function NutritionPlanEditor({ clientId, plans, onRefresh }: Prop
         carbs_g: newPlan.carbs_g,
         fats_g: newPlan.fats_g,
       });
+
+      // If template selected, populate meals from template data
+      if (selectedTemplateId && plan?.id) {
+        const template = await getPlanTemplate(selectedTemplateId);
+        const data = template?.data as { meals?: { name: string; time_suggestion?: string; foods?: { name: string; amount: string }[] }[] } | null;
+        if (data?.meals) {
+          for (let mi = 0; mi < data.meals.length; mi++) {
+            const mealData = data.meals[mi];
+            await createNutritionPlanMeal({
+              plan_id: plan.id,
+              meal_number: mi + 1,
+              name: mealData.name,
+              time_suggestion: mealData.time_suggestion || undefined,
+              sort_order: mi + 1,
+            });
+          }
+        }
+      }
+
       setCreating(false);
+      setSelectedTemplateId("");
       setNewPlan({ name: "", daily_calories: 2000, protein_g: 150, carbs_g: 250, fats_g: 70 });
       onRefresh();
     } catch {
