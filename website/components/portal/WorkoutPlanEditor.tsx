@@ -206,13 +206,13 @@ export default function WorkoutPlanEditor({ clientId, plans, onRefresh }: Props)
               ))}
             </select>
           )}
-          <div className="flex items-center gap-[12px]">
+          <div className="flex flex-wrap items-center gap-[12px]">
             <input
               type="text"
               value={newPlanName}
               onChange={(e) => setNewPlanName(e.target.value)}
               placeholder={t("newPlanName")}
-              className="flex-1 bg-white/[0.03] border border-white/10 px-[14px] py-[10px] font-[family-name:var(--font-roboto)] text-[14px] text-white placeholder-white/30 focus:border-orange-500/50 focus:outline-none"
+              className="flex-1 min-w-0 bg-white/[0.03] border border-white/10 px-[14px] py-[10px] font-[family-name:var(--font-roboto)] text-[14px] text-white placeholder-white/30 focus:border-orange-500/50 focus:outline-none"
               onKeyDown={(e) => e.key === "Enter" && handleCreatePlan()}
             />
             <button
@@ -433,7 +433,7 @@ export default function WorkoutPlanEditor({ clientId, plans, onRefresh }: Props)
                   value={newDayName}
                   onChange={(e) => setNewDayName(e.target.value)}
                   placeholder={t("dayNamePlaceholder")}
-                  className="flex-1 min-w-[150px] bg-white/[0.03] border border-white/10 px-[12px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white placeholder-white/30 focus:border-orange-500/50 focus:outline-none"
+                  className="flex-1 min-w-0 bg-white/[0.03] border border-white/10 px-[12px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white placeholder-white/30 focus:border-orange-500/50 focus:outline-none"
                   onKeyDown={(e) => e.key === "Enter" && handleAddDay(plan.id)}
                 />
                 <div className="flex items-center gap-[8px]">

@@ -1,18 +1,18 @@
 "use client";
 
 import { useRef, useCallback, useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
 import { getMyProfile } from "@/lib/supabase/queries";
 
 const SWIPE_THRESHOLD = 60;
 
 export default function SwipePortalWrapper({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const navigating = useRef(false);
 
   useEffect(() => {
     getMyProfile().then((p) => {
@@ -20,7 +20,12 @@ export default function SwipePortalWrapper({ children }: { children: React.React
     });
   }, []);
 
-  // Build ordered tab paths based on role
+  // Reset navigating flag on pathname change
+  useEffect(() => {
+    navigating.current = false;
+  }, [pathname]);
+
+  // Build ordered tab paths based on role (only user-facing tabs for swipe)
   const tabs = [
     `/${locale}/portal`,
     `/${locale}/portal/trening`,
@@ -29,9 +34,11 @@ export default function SwipePortalWrapper({ children }: { children: React.React
     ...(isAdmin ? [`/${locale}/portal/klijenti`] : []),
   ];
 
-  const currentIndex = tabs.findIndex((t) =>
-    t === `/${locale}/portal` ? pathname === t : pathname.startsWith(t)
-  );
+  const getCurrentIndex = useCallback(() => {
+    return tabs.findIndex((t) =>
+      t === `/${locale}/portal` ? pathname === t : pathname.startsWith(t)
+    );
+  }, [tabs, pathname, locale]);
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
     const touch = e.touches[0];
@@ -40,7 +47,7 @@ export default function SwipePortalWrapper({ children }: { children: React.React
 
   const handleTouchEnd = useCallback(
     (e: TouchEvent) => {
-      if (!touchStart.current) return;
+      if (!touchStart.current || navigating.current) return;
       const touch = e.changedTouches[0];
       const dx = touch.clientX - touchStart.current.x;
       const dy = touch.clientY - touchStart.current.y;
@@ -49,15 +56,18 @@ export default function SwipePortalWrapper({ children }: { children: React.React
       // Only horizontal swipes (ignore vertical scrolling)
       if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dy) > Math.abs(dx)) return;
 
-      if (dx < 0 && currentIndex < tabs.length - 1) {
-        // Swipe left → next tab
-        router.push(tabs[currentIndex + 1]);
-      } else if (dx > 0 && currentIndex > 0) {
-        // Swipe right → previous tab
-        router.push(tabs[currentIndex - 1]);
+      const idx = getCurrentIndex();
+      if (idx === -1) return;
+
+      if (dx < 0 && idx < tabs.length - 1) {
+        navigating.current = true;
+        window.location.href = tabs[idx + 1];
+      } else if (dx > 0 && idx > 0) {
+        navigating.current = true;
+        window.location.href = tabs[idx - 1];
       }
     },
-    [currentIndex, tabs, router]
+    [getCurrentIndex, tabs]
   );
 
   useEffect(() => {
