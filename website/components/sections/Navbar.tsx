@@ -113,7 +113,9 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden lg:flex items-center gap-[32px]">
+        <div className="hidden lg:flex items-center flex-1">
+          {/* Nav links — closer to logo */}
+          <div className="flex items-center gap-[28px] ml-[40px]">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -127,7 +129,10 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+          </div>
 
+          {/* Right side — language + auth */}
+          <div className="flex items-center gap-[24px] ml-auto">
           {/* Language Switcher */}
           <div className="relative">
             <button
@@ -196,6 +201,7 @@ export default function Navbar() {
               </Button>
             </div>
           )}
+          </div>
         </div>
 
         {/* Mobile Auth + Menu Toggle */}
