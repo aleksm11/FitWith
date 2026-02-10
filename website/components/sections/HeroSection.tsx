@@ -17,9 +17,9 @@ export default function HeroSection() {
   return (
     <section className="relative w-full flex flex-col">
       {/* ===== DESKTOP HERO — two columns ===== */}
-      <div className="hidden lg:flex relative w-full min-h-[100dvh] bg-[#0A0A0A]">
+      <div className="hidden lg:flex relative w-full min-h-[75dvh] bg-[#0A0A0A]">
         {/* Left column — text */}
-        <div className="flex flex-col justify-center w-[50%] xl:w-[55%] px-[40px] xl:px-[80px] py-[120px]">
+        <div className="flex flex-col justify-center w-[45%] xl:w-[50%] px-[40px] xl:px-[80px] py-[100px]">
           <div className="max-w-[550px]">
             {/* Decorative stripes */}
             <div className="flex flex-col gap-[6px] mb-[32px]">
@@ -45,11 +45,11 @@ export default function HeroSection() {
         </div>
 
         {/* Right column — image */}
-        <div className="relative w-[50%] xl:w-[45%]">
+        <div className="relative w-[55%] xl:w-[50%]">
           <img
             src="/assets/hero-desktop.jpg"
             alt="Aleksandar Stojanović — Personal Fitness Coach"
-            className="absolute inset-0 w-full h-full object-cover object-top"
+            className="absolute inset-0 w-full h-full object-cover object-[center_15%]"
           />
           {/* Fade left edge into background */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0A] via-transparent to-transparent w-[30%]" />
