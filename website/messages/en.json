@@ -16,7 +16,8 @@
     "login": "Login",
     "portal": "Portal",
     "startNow": "Get Started",
-    "register": "Register"
+    "register": "Register",
+    "logout": "Logout"
   },
   "Hero": {
     "title": "YOUR PERSONAL FITNESS COACH",
@@ -443,7 +444,9 @@
     "save": "Save",
     "create": "Create",
     "weeklyReportTitle": "Time for your weekly report",
-    "weeklyReportMessage": "It's been 7 days since your last progress report. Fill out a quick questionnaire so your coach can adjust your plan."
+    "weeklyReportMessage": "It's been 7 days since your last progress report. Fill out a quick questionnaire so your coach can adjust your plan.",
+    "createTrainingPlan": "Create training plan",
+    "createNutritionPlan": "Create nutrition plan"
   },
   "Admin": {
     "title": "Admin Panel",

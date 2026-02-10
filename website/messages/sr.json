@@ -16,7 +16,8 @@
     "login": "Prijava",
     "portal": "Portal",
     "startNow": "Započni",
-    "register": "Registracija"
+    "register": "Registracija",
+    "logout": "Odjavi se"
   },
   "Hero": {
     "title": "TVOJ LIČNI FITNES TRENER",
@@ -443,7 +444,9 @@
     "save": "Sačuvaj",
     "create": "Kreiraj",
     "weeklyReportTitle": "Vreme za nedeljni izveštaj",
-    "weeklyReportMessage": "Prošlo je 7 dana od vašeg poslednjeg izveštaja o napretku. Popunite kratak upitnik kako bi vaš trener mogao da prilagodi plan."
+    "weeklyReportMessage": "Prošlo je 7 dana od vašeg poslednjeg izveštaja o napretku. Popunite kratak upitnik kako bi vaš trener mogao da prilagodi plan.",
+    "createTrainingPlan": "Kreiraj plan treninga",
+    "createNutritionPlan": "Kreiraj plan ishrane"
   },
   "Admin": {
     "title": "Admin panel",
