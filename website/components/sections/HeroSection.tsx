@@ -28,8 +28,8 @@ export default function HeroSection() {
           />
         </picture>
 
-        {/* Dark gradient — bottom (for text readability) */}
-        <div className="absolute bottom-0 left-0 right-0 h-[60%] bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/70 to-transparent" />
+        {/* Dark gradient — bottom (for text readability, only bottom 35%) */}
+        <div className="absolute bottom-0 left-0 right-0 h-[35%] bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/80 to-transparent" />
         
         {/* Dark gradient — top (for navbar readability) */}
         <div className="absolute top-0 left-0 right-0 h-[120px] bg-gradient-to-b from-[#0A0A0A]/80 to-transparent" />
@@ -42,7 +42,7 @@ export default function HeroSection() {
         </div>
 
         {/* Bottom-right corner stripes (horizontal) */}
-        <div className="absolute bottom-[35%] lg:bottom-[30%] right-[20px] lg:right-[40px] z-10 flex flex-col items-end gap-[6px]">
+        <div className="absolute bottom-[22%] lg:bottom-[25%] right-[20px] lg:right-[40px] z-10 flex flex-col items-end gap-[6px]">
           <div className="w-[50px] lg:w-[80px] h-[3px] bg-orange-500" />
           <div className="w-[30px] lg:w-[50px] h-[3px] bg-orange-500" />
         </div>
@@ -53,19 +53,19 @@ export default function HeroSection() {
         {/* Right edge vertical accent */}
         <div className="hidden lg:block absolute right-[40px] top-[15%] h-[150px] w-[3px] bg-gradient-to-b from-transparent via-orange-500 to-transparent z-10" />
 
-        {/* ===== HERO TEXT — positioned at bottom ===== */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 px-[40px] max-sm:px-[20px] pb-[40px] max-sm:pb-[24px]">
+        {/* ===== HERO TEXT — positioned at very bottom, over hips area ===== */}
+        <div className="absolute bottom-[8px] max-sm:bottom-[4px] left-0 right-0 z-10 px-[40px] max-sm:px-[20px]">
           <div className="max-w-[1280px] mx-auto">
-            <div className="flex flex-col gap-[20px] max-w-[700px] lg:max-w-[50%]">
-              <h1 className="font-[family-name:var(--font-sora)] font-bold text-[56px] leading-[64px] max-lg:text-[44px] max-lg:leading-[52px] max-sm:text-[32px] max-sm:leading-[40px] text-white drop-shadow-lg">
+            <div className="flex flex-col gap-[12px] max-sm:gap-[8px] max-w-[700px] lg:max-w-[50%]">
+              <h1 className="font-[family-name:var(--font-sora)] font-bold text-[48px] leading-[54px] max-lg:text-[38px] max-lg:leading-[44px] max-sm:text-[28px] max-sm:leading-[34px] text-white drop-shadow-lg">
                 {t("title")}
               </h1>
-              <p className="font-[family-name:var(--font-roboto)] text-[17px] leading-[27px] max-sm:text-[15px] max-sm:leading-[24px] text-white/80 max-w-[500px] drop-shadow-md">
+              <p className="font-[family-name:var(--font-roboto)] text-[16px] leading-[24px] max-sm:text-[14px] max-sm:leading-[21px] text-white/80 max-w-[460px] drop-shadow-md">
                 {t("subtitle")}
               </p>
 
               {/* CTA Buttons */}
-              <div className="flex gap-[16px] mt-[8px] max-sm:flex-col">
+              <div className="flex gap-[12px] mt-[4px] max-sm:flex-col">
                 <Button as="link" href={`/${locale}/kontakt`} size="lg">
                   {t("cta1")}
                 </Button>
