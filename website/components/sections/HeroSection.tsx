@@ -53,33 +53,37 @@ export default function HeroSection() {
         {/* Right edge vertical accent */}
         <div className="hidden lg:block absolute right-[40px] top-[15%] h-[150px] w-[3px] bg-gradient-to-b from-transparent via-orange-500 to-transparent z-10" />
 
-        {/* ===== HERO TEXT — absolute bottom for precise control ===== */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 px-[40px] max-sm:px-[20px]">
+        {/* ===== HERO TEXT — only heading + subtitle on the image ===== */}
+        <div className="absolute bottom-[20px] max-sm:bottom-[12px] left-0 right-0 z-10 px-[40px] max-sm:px-[20px]">
           <div className="max-w-[1280px] mx-auto">
-            <div className="flex flex-col gap-[12px] max-sm:gap-[8px] max-w-[700px] lg:max-w-[50%]">
+            <div className="flex flex-col gap-[8px] max-w-[700px] lg:max-w-[50%]">
               <h1 className="font-[family-name:var(--font-sora)] font-bold text-[42px] leading-[48px] max-lg:text-[34px] max-lg:leading-[40px] max-sm:text-[26px] max-sm:leading-[32px] text-white drop-shadow-lg">
                 {t("title")}
               </h1>
               <p className="font-[family-name:var(--font-roboto)] text-[16px] leading-[24px] max-sm:text-[14px] max-sm:leading-[21px] text-white/80 max-w-[460px] drop-shadow-md">
                 {t("subtitle")}
               </p>
-
-              {/* CTA Buttons */}
-              <div className="flex gap-[12px] mt-[4px] max-sm:flex-col">
-                <Button as="link" href={`/${locale}/kontakt`} size="lg">
-                  {t("cta1")}
-                </Button>
-                <Button as="link" href={`/${locale}/saradnja#cene`} variant="outline" size="lg">
-                  {t("cta2")}
-                </Button>
-              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ===== STATS BAR — below hero ===== */}
-      <div className="relative bg-[#0A0A0A] px-[40px] max-sm:px-[20px] py-[12px] pt-[24px] max-lg:pt-[32px]">
+      {/* ===== CTA BUTTONS — between hero and stats ===== */}
+      <div className="relative bg-[#0A0A0A] px-[40px] max-sm:px-[20px] pt-[24px] pb-[12px]">
+        <div className="max-w-[1280px] mx-auto">
+          <div className="flex gap-[12px] max-sm:flex-col max-w-[700px] lg:max-w-[50%]">
+            <Button as="link" href={`/${locale}/kontakt`} size="lg">
+              {t("cta1")}
+            </Button>
+            <Button as="link" href={`/${locale}/saradnja#cene`} variant="outline" size="lg">
+              {t("cta2")}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* ===== STATS BAR — below CTA ===== */}
+      <div className="relative bg-[#0A0A0A] px-[40px] max-sm:px-[20px] py-[12px] pt-[16px]">
         <div className="max-w-[1280px] mx-auto">
           <div className="bg-white/[0.03] border border-white/10 backdrop-blur-[18px] px-[48px] py-[36px] max-sm:px-[24px] max-sm:py-[24px] flex items-center justify-between max-lg:flex-wrap max-lg:gap-[32px]">
             {stats.map((stat) => (
