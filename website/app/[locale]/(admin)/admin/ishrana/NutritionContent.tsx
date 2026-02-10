@@ -27,31 +27,18 @@ type ClientOption = { id: string; name: string };
 function supabasePlanToAdmin(
   np: NutritionPlan & { profiles: { full_name: string; email: string } }
 ): AdminNutritionPlan {
-  const d = np.data as {
-    name?: string;
-    calories?: number;
-    protein?: number;
-    carbs?: number;
-    fat?: number;
-    meals?: AdminMeal[];
-  };
   return {
     id: np.id,
-    name: d.name || "Plan ishrane",
+    name: np.name || "Plan ishrane",
     clientName: np.profiles?.full_name || "",
     clientId: np.client_id,
-    calories: d.calories || 0,
-    protein: d.protein || 0,
-    carbs: d.carbs || 0,
-    fat: d.fat || 0,
-    status: np.is_active ? "active" : "draft",
+    calories: np.daily_calories || 0,
+    protein: np.protein_g || 0,
+    carbs: np.carbs_g || 0,
+    fat: np.fats_g || 0,
+    status: np.status === "active" ? "active" : np.status === "archived" ? "archived" : "draft",
     createdAt: new Date(np.created_at).toLocaleDateString("sr-Latn"),
-    meals: (d.meals || []).map((m, i) => ({
-      id: m.id || `m${i}`,
-      name: m.name || "",
-      foods: m.foods || [],
-      totalCalories: m.totalCalories || 0,
-    })),
+    meals: [],
   };
 }
 
@@ -104,14 +91,11 @@ export default function NutritionContent() {
 
     createNutritionPlan({
       client_id: newPlan.clientId,
-      data: {
-        name: newPlan.name,
-        calories: newPlan.calories,
-        protein: newPlan.protein,
-        carbs: newPlan.carbs,
-        fat: newPlan.fat,
-        meals: [],
-      },
+      name: newPlan.name,
+      daily_calories: newPlan.calories,
+      protein_g: newPlan.protein,
+      carbs_g: newPlan.carbs,
+      fats_g: newPlan.fat,
     })
       .then((result) => {
         const client = clients.find((c) => c.id === newPlan.clientId);
@@ -211,15 +195,12 @@ export default function NutritionContent() {
 
   function savePlanData(plan: AdminNutritionPlan) {
     updateNutritionPlan(plan.id, {
-      data: {
-        name: plan.name,
-        calories: plan.calories,
-        protein: plan.protein,
-        carbs: plan.carbs,
-        fat: plan.fat,
-        meals: plan.meals,
-      },
-    } as Partial<NutritionPlan>).catch(() => {});
+      name: plan.name,
+      daily_calories: plan.calories,
+      protein_g: plan.protein,
+      carbs_g: plan.carbs,
+      fats_g: plan.fat,
+    }).catch(() => {});
   }
 
   if (loading) {

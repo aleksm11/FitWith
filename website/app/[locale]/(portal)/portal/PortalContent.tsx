@@ -42,13 +42,12 @@ export default function PortalContent() {
         let totalProtein = 0;
         let totalCarbs = 0;
         let totalFat = 0;
-        const hasNutritionPlan = !!nutritionPlan?.data;
-        if (nutritionPlan?.data) {
-          const np = nutritionPlan.data as { totalCalories?: number; totalProtein?: number; totalCarbs?: number; totalFat?: number };
-          totalCalories = np.totalCalories || 0;
-          totalProtein = np.totalProtein || 0;
-          totalCarbs = np.totalCarbs || 0;
-          totalFat = np.totalFat || 0;
+        const hasNutritionPlan = !!nutritionPlan?.daily_calories;
+        if (nutritionPlan) {
+          totalCalories = nutritionPlan.daily_calories || 0;
+          totalProtein = nutritionPlan.protein_g || 0;
+          totalCarbs = nutritionPlan.carbs_g || 0;
+          totalFat = nutritionPlan.fats_g || 0;
         }
 
         // Training

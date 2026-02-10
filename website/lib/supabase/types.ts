@@ -3,6 +3,9 @@
 export type UserRole = "pending" | "client" | "admin";
 export type SubscriptionTier = "mentoring" | "training" | "nutrition" | "none";
 export type Locale = "sr" | "en" | "ru";
+export type PlanTemplateType = "workout" | "nutrition";
+export type PlanStatus = "draft" | "active" | "completed" | "archived";
+export type Difficulty = "beginner" | "intermediate" | "advanced";
 
 // ============================================================
 // PROFILES
@@ -107,15 +110,138 @@ export interface TrainingPlanFull extends TrainingPlan {
 }
 
 // ============================================================
+// PLAN TEMPLATES
+// ============================================================
+export interface PlanTemplate {
+  id: string;
+  name: string;
+  type: PlanTemplateType;
+  description: string | null;
+  duration_weeks: number;
+  difficulty: Difficulty | null;
+  goal: string | null;
+  data: Record<string, unknown>;
+  tags: string[];
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// ============================================================
+// WORKOUT PLANS
+// ============================================================
+export interface WorkoutPlan {
+  id: string;
+  client_id: string;
+  template_id: string | null;
+  name: string;
+  description: string | null;
+  status: PlanStatus;
+  start_date: string | null;
+  end_date: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WorkoutPlanWeek {
+  id: string;
+  plan_id: string;
+  week_number: number;
+  name: string | null;
+  deload: boolean;
+  notes: string | null;
+}
+
+export interface WorkoutPlanDay {
+  id: string;
+  week_id: string;
+  day_number: number;
+  name: string | null;
+  focus: string | null;
+  notes: string | null;
+  sort_order: number;
+}
+
+export interface WorkoutPlanExercise {
+  id: string;
+  day_id: string;
+  exercise_id: string | null;
+  exercise_name: string | null;
+  sets: number | null;
+  reps: string | null;
+  weight: string | null;
+  rest_seconds: number | null;
+  tempo: string | null;
+  superset_group: number | null;
+  notes: string | null;
+  sort_order: number;
+}
+
+export interface WorkoutPlanDayWithExercises extends WorkoutPlanDay {
+  exercises: (WorkoutPlanExercise & { exercise?: Exercise | null })[];
+}
+
+export interface WorkoutPlanWeekWithDays extends WorkoutPlanWeek {
+  days: WorkoutPlanDayWithExercises[];
+}
+
+export interface WorkoutPlanFull extends WorkoutPlan {
+  weeks: WorkoutPlanWeekWithDays[];
+  template?: PlanTemplate | null;
+}
+
+// ============================================================
 // NUTRITION PLANS
 // ============================================================
 export interface NutritionPlan {
   id: string;
   client_id: string;
-  data: Record<string, unknown>;
-  is_active: boolean;
+  template_id: string | null;
+  name: string;
+  goal: string | null;
+  daily_calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fats_g: number | null;
+  meals_per_day: number;
+  notes: string | null;
+  status: PlanStatus;
+  start_date: string | null;
+  end_date: string | null;
+  created_by: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface NutritionFood {
+  name: string;
+  amount: number;
+  unit: string;
+  calories?: number;
+  protein?: number;
+  carbs?: number;
+  fats?: number;
+}
+
+export interface NutritionPlanMeal {
+  id: string;
+  plan_id: string;
+  meal_number: number;
+  name: string | null;
+  time_suggestion: string | null;
+  foods: NutritionFood[];
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fats_g: number | null;
+  notes: string | null;
+  sort_order: number;
+}
+
+export interface NutritionPlanFull extends NutritionPlan {
+  meals: NutritionPlanMeal[];
+  template?: PlanTemplate | null;
 }
 
 // ============================================================

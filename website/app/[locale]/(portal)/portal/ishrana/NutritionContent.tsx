@@ -29,11 +29,14 @@ export default function NutritionContent() {
   useEffect(() => {
     getMyNutritionPlan()
       .then((data) => {
-        if (data?.data) {
-          const parsed = data.data as unknown as NutritionData;
-          if (parsed.meals && parsed.totalCalories) {
-            setPlan(parsed);
-          }
+        if (data?.daily_calories) {
+          setPlan({
+            totalCalories: data.daily_calories || 0,
+            totalProtein: data.protein_g || 0,
+            totalCarbs: data.carbs_g || 0,
+            totalFat: data.fats_g || 0,
+            meals: [],
+          });
         }
       })
       .catch(() => {})

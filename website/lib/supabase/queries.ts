@@ -161,7 +161,7 @@ export async function getMyNutritionPlan() {
     .from("nutrition_plans")
     .select("*")
     .eq("client_id", profile.id)
-    .eq("is_active", true)
+    .eq("status", "active")
     .limit(1)
     .single();
   if (error) return null;
@@ -488,7 +488,11 @@ export async function getNutritionPlans() {
 
 export async function createNutritionPlan(plan: {
   client_id: string;
-  data: Record<string, unknown>;
+  name: string;
+  daily_calories?: number;
+  protein_g?: number;
+  carbs_g?: number;
+  fats_g?: number;
 }) {
   const supabase = createClient();
   const { data: result, error } = await supabase.from("nutrition_plans").insert(plan).select().single();

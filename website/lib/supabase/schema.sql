@@ -115,15 +115,125 @@ CREATE TABLE training_exercises (
 );
 
 -- ============================================================
--- NUTRITION PLANS
+-- PLAN TEMPLATES (reusable workout/nutrition templates)
+-- ============================================================
+CREATE TABLE plan_templates (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('workout', 'nutrition')),
+  description TEXT,
+  duration_weeks INTEGER DEFAULT 4,
+  difficulty TEXT CHECK (difficulty IN ('beginner', 'intermediate', 'advanced')),
+  goal TEXT, -- e.g. 'muscle_gain', 'fat_loss', 'strength', 'maintenance'
+  data JSONB NOT NULL DEFAULT '{}', -- full template structure
+  tags TEXT[] DEFAULT '{}',
+  created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================
+-- WORKOUT PLANS (assigned to clients)
+-- ============================================================
+CREATE TABLE workout_plans (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  client_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  template_id UUID REFERENCES plan_templates(id) ON DELETE SET NULL,
+  name TEXT NOT NULL,
+  description TEXT,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('draft', 'active', 'completed', 'archived')),
+  start_date DATE,
+  end_date DATE,
+  created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================
+-- WORKOUT PLAN WEEKS
+-- ============================================================
+CREATE TABLE workout_plan_weeks (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  plan_id UUID REFERENCES workout_plans(id) ON DELETE CASCADE NOT NULL,
+  week_number INTEGER NOT NULL,
+  name TEXT, -- e.g. "Adaptation Week"
+  deload BOOLEAN DEFAULT FALSE,
+  notes TEXT,
+  UNIQUE(plan_id, week_number)
+);
+
+-- ============================================================
+-- WORKOUT PLAN DAYS
+-- ============================================================
+CREATE TABLE workout_plan_days (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  week_id UUID REFERENCES workout_plan_weeks(id) ON DELETE CASCADE NOT NULL,
+  day_number INTEGER NOT NULL,
+  name TEXT, -- e.g. "Push Day", "Upper Body"
+  focus TEXT, -- e.g. "chest_triceps", "back_biceps", "legs"
+  notes TEXT,
+  sort_order INTEGER DEFAULT 0,
+  UNIQUE(week_id, day_number)
+);
+
+-- ============================================================
+-- WORKOUT PLAN EXERCISES
+-- ============================================================
+CREATE TABLE workout_plan_exercises (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  day_id UUID REFERENCES workout_plan_days(id) ON DELETE CASCADE NOT NULL,
+  exercise_id UUID REFERENCES exercises(id) ON DELETE SET NULL,
+  exercise_name TEXT, -- fallback if exercise not in library
+  sets INTEGER,
+  reps TEXT, -- e.g. "8-12", "to failure", "AMRAP"
+  weight TEXT, -- e.g. "80kg", "RPE 8", "bodyweight"
+  rest_seconds INTEGER,
+  tempo TEXT, -- e.g. "3-1-2-0"
+  superset_group INTEGER, -- exercises with same group number are supersetted
+  notes TEXT,
+  sort_order INTEGER DEFAULT 0
+);
+
+-- ============================================================
+-- NUTRITION PLANS (assigned to clients)
 -- ============================================================
 CREATE TABLE nutrition_plans (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   client_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  data JSONB NOT NULL DEFAULT '{}',
-  is_active BOOLEAN DEFAULT TRUE,
+  template_id UUID REFERENCES plan_templates(id) ON DELETE SET NULL,
+  name TEXT NOT NULL,
+  goal TEXT, -- e.g. 'bulk', 'cut', 'maintenance', 'recomp'
+  daily_calories INTEGER,
+  protein_g INTEGER,
+  carbs_g INTEGER,
+  fats_g INTEGER,
+  meals_per_day INTEGER DEFAULT 4,
+  notes TEXT,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('draft', 'active', 'completed', 'archived')),
+  start_date DATE,
+  end_date DATE,
+  created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================
+-- NUTRITION PLAN MEALS
+-- ============================================================
+CREATE TABLE nutrition_plan_meals (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  plan_id UUID REFERENCES nutrition_plans(id) ON DELETE CASCADE NOT NULL,
+  meal_number INTEGER NOT NULL,
+  name TEXT, -- e.g. "Breakfast", "Post-Workout"
+  time_suggestion TEXT, -- e.g. "07:00", "After training"
+  foods JSONB NOT NULL DEFAULT '[]', -- [{name, amount, unit, calories, protein, carbs, fats}]
+  calories INTEGER,
+  protein_g INTEGER,
+  carbs_g INTEGER,
+  fats_g INTEGER,
+  notes TEXT,
+  sort_order INTEGER DEFAULT 0,
+  UNIQUE(plan_id, meal_number)
 );
 
 -- ============================================================
@@ -215,7 +325,13 @@ ALTER TABLE exercises ENABLE ROW LEVEL SECURITY;
 ALTER TABLE training_plans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE training_days ENABLE ROW LEVEL SECURITY;
 ALTER TABLE training_exercises ENABLE ROW LEVEL SECURITY;
+ALTER TABLE plan_templates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE workout_plans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE workout_plan_weeks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE workout_plan_days ENABLE ROW LEVEL SECURITY;
+ALTER TABLE workout_plan_exercises ENABLE ROW LEVEL SECURITY;
 ALTER TABLE nutrition_plans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE nutrition_plan_meals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE transformations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE questionnaires ENABLE ROW LEVEL SECURITY;
@@ -268,11 +384,57 @@ CREATE POLICY "Admins can manage all training exercises" ON training_exercises F
   EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
 );
 
--- NUTRITION PLANS
+-- PLAN TEMPLATES (admin manages, clients can view)
+CREATE POLICY "Anyone can view plan templates" ON plan_templates FOR SELECT USING (TRUE);
+CREATE POLICY "Admins can manage plan templates" ON plan_templates FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+);
+
+-- WORKOUT PLANS (own data + admin full access)
+CREATE POLICY "Clients can view own workout plans" ON workout_plans FOR SELECT USING (
+  client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
+);
+CREATE POLICY "Admins can manage all workout plans" ON workout_plans FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+);
+
+-- WORKOUT PLAN WEEKS
+CREATE POLICY "Clients can view own workout weeks" ON workout_plan_weeks FOR SELECT USING (
+  plan_id IN (SELECT id FROM workout_plans WHERE client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()))
+);
+CREATE POLICY "Admins can manage all workout weeks" ON workout_plan_weeks FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+);
+
+-- WORKOUT PLAN DAYS
+CREATE POLICY "Clients can view own workout days" ON workout_plan_days FOR SELECT USING (
+  week_id IN (SELECT id FROM workout_plan_weeks WHERE plan_id IN (SELECT id FROM workout_plans WHERE client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())))
+);
+CREATE POLICY "Admins can manage all workout days" ON workout_plan_days FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+);
+
+-- WORKOUT PLAN EXERCISES
+CREATE POLICY "Clients can view own workout exercises" ON workout_plan_exercises FOR SELECT USING (
+  day_id IN (SELECT id FROM workout_plan_days WHERE week_id IN (SELECT id FROM workout_plan_weeks WHERE plan_id IN (SELECT id FROM workout_plans WHERE client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()))))
+);
+CREATE POLICY "Admins can manage all workout exercises" ON workout_plan_exercises FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+);
+
+-- NUTRITION PLANS (own data + admin full access)
 CREATE POLICY "Clients can view own nutrition plans" ON nutrition_plans FOR SELECT USING (
   client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
 );
 CREATE POLICY "Admins can manage all nutrition plans" ON nutrition_plans FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+);
+
+-- NUTRITION PLAN MEALS
+CREATE POLICY "Clients can view own nutrition meals" ON nutrition_plan_meals FOR SELECT USING (
+  plan_id IN (SELECT id FROM nutrition_plans WHERE client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()))
+);
+CREATE POLICY "Admins can manage all nutrition meals" ON nutrition_plan_meals FOR ALL USING (
   EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
 );
 
@@ -333,3 +495,14 @@ CREATE INDEX idx_blog_posts_slug ON blog_posts(slug);
 CREATE INDEX idx_blog_posts_published ON blog_posts(is_published, published_at DESC);
 CREATE INDEX idx_transformations_featured ON transformations(is_featured, sort_order);
 CREATE INDEX idx_contact_messages_read ON contact_messages(is_read, created_at DESC);
+CREATE INDEX idx_plan_templates_type ON plan_templates(type);
+CREATE INDEX idx_plan_templates_created_by ON plan_templates(created_by);
+CREATE INDEX idx_workout_plans_client ON workout_plans(client_id);
+CREATE INDEX idx_workout_plans_status ON workout_plans(client_id, status);
+CREATE INDEX idx_workout_plan_weeks_plan ON workout_plan_weeks(plan_id);
+CREATE INDEX idx_workout_plan_days_week ON workout_plan_days(week_id);
+CREATE INDEX idx_workout_plan_exercises_day ON workout_plan_exercises(day_id);
+CREATE INDEX idx_workout_plan_exercises_exercise ON workout_plan_exercises(exercise_id);
+CREATE INDEX idx_nutrition_plans_client ON nutrition_plans(client_id);
+CREATE INDEX idx_nutrition_plans_status ON nutrition_plans(client_id, status);
+CREATE INDEX idx_nutrition_plan_meals_plan ON nutrition_plan_meals(plan_id);
