@@ -11,8 +11,9 @@ import {
   getClientTrainingPlans,
   getClientNutritionPlans,
 } from "@/lib/supabase/queries";
-import { localizedField } from "@/lib/supabase/types";
-import type { Profile, Locale, TrainingPlan, TrainingDay, TrainingExercise, Exercise, NutritionPlan, NutritionPlanMeal } from "@/lib/supabase/types";
+import type { Profile, TrainingPlan, TrainingDay, TrainingExercise, Exercise, NutritionPlan, NutritionPlanMeal } from "@/lib/supabase/types";
+import WorkoutPlanEditor from "@/components/portal/WorkoutPlanEditor";
+import NutritionPlanEditor from "@/components/portal/NutritionPlanEditor";
 
 type TrainingPlanWithDetails = TrainingPlan & {
   training_days: (TrainingDay & {
@@ -28,7 +29,7 @@ type Tab = "profile" | "training" | "nutrition";
 
 export default function ClientDetailContent({ clientId }: { clientId: string }) {
   const t = useTranslations("Portal");
-  const locale = useLocale() as Locale;
+  const locale = useLocale();
 
   const [client, setClient] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,21 +66,25 @@ export default function ClientDetailContent({ clientId }: { clientId: string }) 
       .finally(() => setLoading(false));
   }, [clientId]);
 
+  function loadTraining() {
+    setLoadingTraining(true);
+    getClientTrainingPlans(clientId)
+      .then(setTrainingPlans)
+      .catch(() => {})
+      .finally(() => setLoadingTraining(false));
+  }
+
+  function loadNutrition() {
+    setLoadingNutrition(true);
+    getClientNutritionPlans(clientId)
+      .then(setNutritionPlans)
+      .catch(() => {})
+      .finally(() => setLoadingNutrition(false));
+  }
+
   useEffect(() => {
-    if (activeTab === "training" && trainingPlans.length === 0) {
-      setLoadingTraining(true);
-      getClientTrainingPlans(clientId)
-        .then(setTrainingPlans)
-        .catch(() => {})
-        .finally(() => setLoadingTraining(false));
-    }
-    if (activeTab === "nutrition" && nutritionPlans.length === 0) {
-      setLoadingNutrition(true);
-      getClientNutritionPlans(clientId)
-        .then(setNutritionPlans)
-        .catch(() => {})
-        .finally(() => setLoadingNutrition(false));
-    }
+    if (activeTab === "training" && trainingPlans.length === 0) loadTraining();
+    if (activeTab === "nutrition" && nutritionPlans.length === 0) loadNutrition();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, clientId]);
 
@@ -317,65 +322,12 @@ export default function ClientDetailContent({ clientId }: { clientId: string }) 
             <div className="flex items-center justify-center py-[60px]">
               <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : trainingPlans.length === 0 ? (
-            <div className="bg-white/[0.03] border border-white/10 p-[32px]">
-              <div className="py-[48px] text-center">
-                <svg className="w-16 h-16 text-white/10 mx-auto mb-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                </svg>
-                <p className="font-[family-name:var(--font-sora)] font-semibold text-[18px] text-white/50 mb-[8px]">
-                  {t("noTrainingPlans")}
-                </p>
-              </div>
-            </div>
           ) : (
-            <div className="space-y-[24px]">
-              {trainingPlans.map((plan) => (
-                <div key={plan.id} className="bg-white/[0.03] border border-white/10 p-[24px] max-sm:p-[16px]">
-                  <div className="flex items-center justify-between mb-[16px]">
-                    <div>
-                      <h3 className="font-[family-name:var(--font-sora)] font-semibold text-[18px] text-white">
-                        {plan.name}
-                      </h3>
-                      <span className={`inline-block font-[family-name:var(--font-roboto)] text-[11px] px-[8px] py-[2px] mt-[4px] ${
-                        plan.is_active ? "text-green-400 bg-green-400/10" : "text-white/40 bg-white/5"
-                      }`}>
-                        {plan.is_active ? t("active") : t("inactive")}
-                      </span>
-                    </div>
-                  </div>
-                  {plan.training_days
-                    .sort((a, b) => a.sort_order - b.sort_order)
-                    .map((day) => (
-                      <div key={day.id} className="mb-[12px] last:mb-0">
-                        <p className="font-[family-name:var(--font-roboto)] text-[13px] text-orange-400 mb-[6px]">
-                          {localizedField(day as unknown as Record<string, unknown>, "day_name", locale) || `${t("dayLabel")} ${day.day_number}`}
-                        </p>
-                        {day.training_exercises.length > 0 ? (
-                          <div className="space-y-[2px]">
-                            {day.training_exercises
-                              .sort((a, b) => a.sort_order - b.sort_order)
-                              .map((ex) => (
-                                <div key={ex.id} className="flex items-center justify-between py-[6px] border-b border-white/5">
-                                  <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/70">
-                                    {ex.exercises
-                                      ? localizedField(ex.exercises as unknown as Record<string, unknown>, "name", locale)
-                                      : ex.exercise_name || ""}
-                                  </span>
-                                  <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-                                    {ex.sets} x {ex.reps}
-                                  </span>
-                                </div>
-                              ))}
-                          </div>
-                        ) : (
-                          <p className="font-[family-name:var(--font-roboto)] text-[12px] text-white/30">{t("restDay")}</p>
-                        )}
-                      </div>
-                    ))}
-                </div>
-              ))}
-            </div>
+            <WorkoutPlanEditor
+              clientId={clientId}
+              plans={trainingPlans}
+              onRefresh={loadTraining}
+            />
           )}
         </div>
       )}
@@ -386,69 +338,12 @@ export default function ClientDetailContent({ clientId }: { clientId: string }) 
             <div className="flex items-center justify-center py-[60px]">
               <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : nutritionPlans.length === 0 ? (
-            <div className="bg-white/[0.03] border border-white/10 p-[32px]">
-              <div className="py-[48px] text-center">
-                <svg className="w-16 h-16 text-white/10 mx-auto mb-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5m-6 1.5v-1.5m12 9.75l-1.5.75a3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0L3 16.5m15-3.379a48.474 48.474 0 00-6-.371c-2.032 0-4.034.126-6 .371m12 0c.39.049.777.102 1.163.16 1.07.16 1.837 1.094 1.837 2.175v5.169c0 .621-.504 1.125-1.125 1.125H4.125A1.125 1.125 0 013 20.625v-5.17c0-1.08.768-2.014 1.837-2.174A47.78 47.78 0 016 13.12M12.265 3.11a.375.375 0 11-.53 0L12 2.845l.265.265zm-3 0a.375.375 0 11-.53 0L9 2.845l.265.265zm6 0a.375.375 0 11-.53 0L15 2.845l.265.265z" />
-                </svg>
-                <p className="font-[family-name:var(--font-sora)] font-semibold text-[18px] text-white/50 mb-[8px]">
-                  {t("noNutritionPlans")}
-                </p>
-              </div>
-            </div>
           ) : (
-            <div className="space-y-[24px]">
-              {nutritionPlans.map((plan) => (
-                <div key={plan.id} className="bg-white/[0.03] border border-white/10 p-[24px] max-sm:p-[16px]">
-                  <div className="flex items-center justify-between mb-[16px]">
-                    <div>
-                      <h3 className="font-[family-name:var(--font-sora)] font-semibold text-[18px] text-white">
-                        {plan.name}
-                      </h3>
-                      <span className={`inline-block font-[family-name:var(--font-roboto)] text-[11px] px-[8px] py-[2px] mt-[4px] ${
-                        plan.status === "active" ? "text-green-400 bg-green-400/10" : "text-white/40 bg-white/5"
-                      }`}>
-                        {plan.status === "active" ? t("active") : plan.status}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-orange-500">
-                        {plan.daily_calories || 0}
-                      </span>
-                      <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40 ml-[4px]">kcal</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-[24px] mb-[16px]">
-                    <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/50">
-                      P: {plan.protein_g || 0}g
-                    </span>
-                    <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/50">
-                      C: {plan.carbs_g || 0}g
-                    </span>
-                    <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/50">
-                      F: {plan.fats_g || 0}g
-                    </span>
-                  </div>
-                  {plan.nutrition_plan_meals.length > 0 && (
-                    <div className="space-y-[8px]">
-                      {plan.nutrition_plan_meals
-                        .sort((a, b) => a.sort_order - b.sort_order)
-                        .map((meal) => (
-                          <div key={meal.id} className="flex items-center justify-between py-[6px] border-b border-white/5">
-                            <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/70">
-                              {meal.name || `Meal ${meal.meal_number}`}
-                            </span>
-                            <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-                              {meal.calories || 0} kcal
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            <NutritionPlanEditor
+              clientId={clientId}
+              plans={nutritionPlans}
+              onRefresh={loadNutrition}
+            />
           )}
         </div>
       )}
