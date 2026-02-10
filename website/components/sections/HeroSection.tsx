@@ -23,7 +23,7 @@ export default function HeroSection() {
           <img
             src="/assets/hero-desktop.jpg"
             alt="Aleksandar Stojanović — Personal Fitness Coach"
-            className="absolute inset-0 w-full h-full object-cover object-[center_25%]"
+            className="absolute inset-0 w-full h-full object-cover object-[center_35%]"
           />
           {/* Fade left edge into background */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0A] via-transparent to-transparent w-[30%]" />
