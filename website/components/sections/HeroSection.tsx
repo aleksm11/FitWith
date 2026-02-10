@@ -28,8 +28,11 @@ export default function HeroSection() {
           />
         </picture>
 
-        {/* Dark gradient — bottom (for text readability, only bottom 25%) */}
+        {/* Dark gradient — bottom (mobile: text readability) */}
         <div className="absolute bottom-0 left-0 right-0 h-[25%] bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/80 to-transparent" />
+
+        {/* Dark gradient — left side (desktop: text readability) */}
+        <div className="hidden lg:block absolute inset-0 bg-gradient-to-r from-[#0A0A0A]/90 via-[#0A0A0A]/50 to-transparent w-[60%]" />
         
         {/* Dark gradient — top (for navbar readability) */}
         <div className="absolute top-0 left-0 right-0 h-[120px] bg-gradient-to-b from-[#0A0A0A]/80 to-transparent" />
@@ -53,37 +56,55 @@ export default function HeroSection() {
         {/* Right edge vertical accent */}
         <div className="hidden lg:block absolute right-[40px] top-[15%] h-[150px] w-[3px] bg-gradient-to-b from-transparent via-orange-500 to-transparent z-10" />
 
-        {/* ===== HERO TEXT — only heading + subtitle on the image ===== */}
-        <div className="absolute bottom-[20px] max-sm:bottom-[12px] left-0 right-0 z-10 px-[40px] max-sm:px-[20px]">
-          <div className="max-w-[1280px] mx-auto">
-            <div className="flex flex-col gap-[8px] max-w-[700px] lg:max-w-[50%]">
-              <h1 className="font-[family-name:var(--font-sora)] font-bold text-[42px] leading-[48px] max-lg:text-[34px] max-lg:leading-[40px] max-sm:text-[26px] max-sm:leading-[32px] text-white drop-shadow-lg">
+        {/* ===== DESKTOP: Text vertically centered on the left ===== */}
+        <div className="hidden lg:flex absolute inset-0 z-10 items-center px-[40px] xl:px-[80px]">
+          <div className="max-w-[1280px] mx-auto w-full">
+            <div className="flex flex-col gap-[16px] max-w-[550px]">
+              <h1 className="font-[family-name:var(--font-sora)] font-bold text-[52px] leading-[60px] xl:text-[60px] xl:leading-[68px] text-white drop-shadow-lg">
                 {t("title")}
               </h1>
-              <p className="font-[family-name:var(--font-roboto)] text-[16px] leading-[24px] max-sm:text-[14px] max-sm:leading-[21px] text-white/80 max-w-[460px] drop-shadow-md">
+              <p className="font-[family-name:var(--font-roboto)] text-[18px] leading-[28px] text-white/80 max-w-[460px] drop-shadow-md">
                 {t("subtitle")}
               </p>
+              <div className="flex gap-[16px] mt-[8px]">
+                <Button as="link" href={`/${locale}/kontakt`} size="lg">
+                  {t("cta1")}
+                </Button>
+                <Button as="link" href={`/${locale}/saradnja#cene`} variant="outline" size="lg">
+                  {t("cta2")}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ===== CTA BUTTONS — between hero and stats ===== */}
-      <div className="relative bg-[#0A0A0A] px-[40px] max-sm:px-[20px] pt-[24px] pb-[12px]">
-        <div className="max-w-[1280px] mx-auto">
-          <div className="flex gap-[12px] max-sm:flex-col max-w-[700px] lg:max-w-[50%]">
-            <Button as="link" href={`/${locale}/kontakt`} size="lg">
-              {t("cta1")}
-            </Button>
-            <Button as="link" href={`/${locale}/saradnja#cene`} variant="outline" size="lg">
-              {t("cta2")}
-            </Button>
+        {/* ===== MOBILE: Text at very bottom of image ===== */}
+        <div className="lg:hidden absolute bottom-[12px] left-0 right-0 z-10 px-[20px] sm:px-[40px]">
+          <div className="flex flex-col gap-[8px]">
+            <h1 className="font-[family-name:var(--font-sora)] font-bold text-[26px] leading-[32px] sm:text-[34px] sm:leading-[40px] text-white drop-shadow-lg">
+              {t("title")}
+            </h1>
+            <p className="font-[family-name:var(--font-roboto)] text-[14px] leading-[21px] sm:text-[16px] sm:leading-[24px] text-white/80 max-w-[460px] drop-shadow-md">
+              {t("subtitle")}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* ===== STATS BAR — below CTA ===== */}
-      <div className="relative bg-[#0A0A0A] px-[40px] max-sm:px-[20px] py-[12px] pt-[16px]">
+      {/* ===== MOBILE CTA BUTTONS — between hero and stats ===== */}
+      <div className="lg:hidden relative bg-[#0A0A0A] px-[20px] sm:px-[40px] pt-[24px] pb-[12px]">
+        <div className="flex gap-[12px] flex-col sm:flex-row">
+          <Button as="link" href={`/${locale}/kontakt`} size="lg">
+            {t("cta1")}
+          </Button>
+          <Button as="link" href={`/${locale}/saradnja#cene`} variant="outline" size="lg">
+            {t("cta2")}
+          </Button>
+        </div>
+      </div>
+
+      {/* ===== STATS BAR ===== */}
+      <div className="relative bg-[#0A0A0A] px-[40px] max-sm:px-[20px] py-[16px]">
         <div className="max-w-[1280px] mx-auto">
           <div className="bg-white/[0.03] border border-white/10 backdrop-blur-[18px] px-[48px] py-[36px] max-sm:px-[24px] max-sm:py-[24px] flex items-center justify-between max-lg:flex-wrap max-lg:gap-[32px]">
             {stats.map((stat) => (
