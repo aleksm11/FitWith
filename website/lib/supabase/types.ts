@@ -23,6 +23,8 @@ export interface Profile {
   subscription_end_date: string | null;
   plan_features: string[];
   preferred_locale: Locale;
+  plan_type: "workout" | "nutrition" | "both" | "none";
+  last_report_at: string | null;
   created_at: string;
   updated_at: string;
 }
