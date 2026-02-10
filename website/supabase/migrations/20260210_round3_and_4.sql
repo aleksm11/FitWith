@@ -20,12 +20,20 @@ CREATE TABLE IF NOT EXISTS plan_templates (
 -- Enable RLS on plan_templates
 ALTER TABLE plan_templates ENABLE ROW LEVEL SECURITY;
 
--- Admin-only access to plan templates
-CREATE POLICY "Admins can manage plan templates" ON plan_templates FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
-);
+-- Admin-only access to plan templates (skip if exists)
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Admins can manage plan templates') THEN
+    CREATE POLICY "Admins can manage plan templates" ON plan_templates FOR ALL USING (
+      EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+    );
+  END IF;
+END $$;
 
 -- Create index for faster template lookups
+CREATE INDEX IF NOT EXISTS idx_plan_templates_type ON plan_templates(type);
+CREATE INDEX IF NOT EXISTS idx_plan_templates_created_by ON plan_templates(created_by);
+
+-- Create indexes (skip if exists)
 CREATE INDEX IF NOT EXISTS idx_plan_templates_type ON plan_templates(type);
 CREATE INDEX IF NOT EXISTS idx_plan_templates_created_by ON plan_templates(created_by);
 
@@ -48,5 +56,14 @@ CREATE INDEX IF NOT EXISTS idx_plan_templates_created_by ON plan_templates(creat
 -- }
 
 -- Add updated_at trigger for plan_templates
+DROP TRIGGER IF EXISTS update_plan_templates_updated_at ON plan_templates;
 CREATE TRIGGER update_plan_templates_updated_at BEFORE UPDATE ON plan_templates
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- Round 4 Migration: Add missing columns to plan_templates
+
+-- Add missing columns that the UI expects
+ALTER TABLE plan_templates ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE plan_templates ADD COLUMN IF NOT EXISTS duration_weeks INTEGER DEFAULT 4;
+ALTER TABLE plan_templates ADD COLUMN IF NOT EXISTS difficulty TEXT CHECK (difficulty IN ('beginner', 'intermediate', 'advanced'));
+ALTER TABLE plan_templates ADD COLUMN IF NOT EXISTS goal TEXT;
+ALTER TABLE plan_templates ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';
