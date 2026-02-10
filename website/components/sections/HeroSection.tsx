@@ -17,35 +17,9 @@ export default function HeroSection() {
   return (
     <section className="relative w-full flex flex-col">
       {/* ===== DESKTOP HERO — two columns ===== */}
-      <div className="hidden lg:flex relative w-full min-h-[75dvh] bg-[#0A0A0A]">
-        {/* Left column — text */}
-        <div className="flex flex-col justify-center w-[45%] xl:w-[50%] pl-[40px] xl:pl-[80px] pr-[20px] py-[100px]">
-          <div className="max-w-[550px] ml-auto">
-            {/* Decorative stripes */}
-            <div className="flex flex-col gap-[6px] mb-[32px]">
-              <div className="w-[80px] h-[3px] bg-orange-500" />
-              <div className="w-[50px] h-[3px] bg-orange-500" />
-            </div>
-
-            <h1 className="font-[family-name:var(--font-sora)] font-bold text-[52px] leading-[60px] xl:text-[60px] xl:leading-[68px] text-white">
-              {t("title")}
-            </h1>
-            <p className="font-[family-name:var(--font-roboto)] text-[18px] leading-[28px] text-white/80 max-w-[460px] mt-[16px]">
-              {t("subtitle")}
-            </p>
-            <div className="flex gap-[16px] mt-[24px]">
-              <Button as="link" href={`/${locale}/kontakt`} size="lg">
-                {t("cta1")}
-              </Button>
-              <Button as="link" href={`/${locale}/saradnja#cene`} variant="outline" size="lg">
-                {t("cta2")}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Right column — image */}
-        <div className="relative w-[55%] xl:w-[50%]">
+      <div className="hidden lg:block relative w-full min-h-[75dvh] bg-[#0A0A0A]">
+        {/* Image — positioned absolute on the right half */}
+        <div className="absolute top-0 right-0 bottom-0 w-[55%] xl:w-[50%]">
           <img
             src="/assets/hero-desktop.jpg"
             alt="Aleksandar Stojanović — Personal Fitness Coach"
@@ -64,6 +38,34 @@ export default function HeroSection() {
 
           {/* Right edge vertical accent */}
           <div className="absolute right-[40px] top-[15%] h-[150px] w-[3px] bg-gradient-to-b from-transparent via-orange-500 to-transparent z-10" />
+        </div>
+
+        {/* Text — inside the same max-w container as stats */}
+        <div className="relative z-10 flex items-center min-h-[75dvh] px-[40px]">
+          <div className="max-w-[1280px] mx-auto w-full">
+            <div className="max-w-[500px]">
+              {/* Decorative stripes */}
+              <div className="flex flex-col gap-[6px] mb-[32px]">
+                <div className="w-[80px] h-[3px] bg-orange-500" />
+                <div className="w-[50px] h-[3px] bg-orange-500" />
+              </div>
+
+              <h1 className="font-[family-name:var(--font-sora)] font-bold text-[52px] leading-[60px] xl:text-[60px] xl:leading-[68px] text-white">
+                {t("title")}
+              </h1>
+              <p className="font-[family-name:var(--font-roboto)] text-[18px] leading-[28px] text-white/80 max-w-[460px] mt-[16px]">
+                {t("subtitle")}
+              </p>
+              <div className="flex gap-[16px] mt-[24px]">
+                <Button as="link" href={`/${locale}/kontakt`} size="lg">
+                  {t("cta1")}
+                </Button>
+                <Button as="link" href={`/${locale}/saradnja#cene`} variant="outline" size="lg">
+                  {t("cta2")}
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
