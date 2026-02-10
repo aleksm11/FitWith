@@ -165,7 +165,7 @@ export default function PortalContent() {
         {t("dashboardSubtitle")}
       </p>
 
-      {/* R3-4: New layout - Today's Training → Today's Nutrition → Pretplata */}
+      {/* R4-1: New layout - Training → Daily Macros → Nutrition → Subscription */}
       
       {/* 1. TODAY'S TRAINING */}
       <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px] mb-[24px]">
@@ -255,7 +255,56 @@ export default function PortalContent() {
         )}
       </div>
 
-      {/* 2. TODAY'S NUTRITION */}
+      {/* 2. DAILY MACROS */}
+      <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px] mb-[24px]">
+        <h2 className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-white mb-[20px]">
+          {t("dailyMacros")}
+        </h2>
+        {data.hasNutritionPlan ? (
+          <div className="grid grid-cols-4 gap-[12px]">
+            <div className="bg-white/[0.02] p-[12px] border border-white/5">
+              <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
+                Kalorije
+              </p>
+              <p className="font-[family-name:var(--font-sora)] font-semibold text-[18px] text-orange-500">
+                {data.totalCalories}
+              </p>
+            </div>
+            <div className="bg-white/[0.02] p-[12px] border border-white/5">
+              <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
+                Proteini
+              </p>
+              <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
+                {data.totalProtein}g
+              </p>
+            </div>
+            <div className="bg-white/[0.02] p-[12px] border border-white/5">
+              <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
+                Ugljenih.
+              </p>
+              <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
+                {data.totalCarbs}g
+              </p>
+            </div>
+            <div className="bg-white/[0.02] p-[12px] border border-white/5">
+              <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
+                Masti
+              </p>
+              <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
+                {data.totalFat}g
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="py-[12px] text-center">
+            <p className="font-[family-name:var(--font-roboto)] text-[15px] text-white/40">
+              {t("noNutritionPlanToday")}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* 3. TODAY'S NUTRITION */}
       <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px] mb-[24px]">
         <div className="flex items-center justify-between mb-[20px]">
           <h2 className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-white">
@@ -317,7 +366,7 @@ export default function PortalContent() {
         )}
       </div>
 
-      {/* 3. PRETPLATA (SUBSCRIPTION) */}
+      {/* 4. PRETPLATA (SUBSCRIPTION) */}
       <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px]">
         <h2 className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-white mb-[20px]">
           {t("subscriptionLabel")}

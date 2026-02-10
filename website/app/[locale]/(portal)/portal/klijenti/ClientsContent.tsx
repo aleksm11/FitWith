@@ -46,16 +46,13 @@ export default function ClientsContent() {
 
   return (
     <div>
-      <h1 className="font-[family-name:var(--font-sora)] font-bold text-[36px] leading-[44px] max-sm:text-[28px] max-sm:leading-[36px] text-white mb-[8px]">
-        {t("clients")}
-      </h1>
-      <div className="flex items-center gap-[16px] mb-[32px]">
-        <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/50 flex-1">
-          {t("clientsSubtitle")}
-        </p>
+      <div className="flex items-center justify-between mb-[8px]">
+        <h1 className="font-[family-name:var(--font-sora)] font-bold text-[36px] leading-[44px] max-sm:text-[28px] max-sm:leading-[36px] text-white">
+          {t("clients")}
+        </h1>
         <Link
           href={`/${locale}/portal/klijenti/sabloni`}
-          className="font-[family-name:var(--font-roboto)] text-[13px] text-orange-400 hover:text-orange-300 transition-colors flex items-center gap-[6px] shrink-0"
+          className="font-[family-name:var(--font-roboto)] text-[13px] text-orange-400 hover:text-orange-300 border border-orange-500/40 hover:border-orange-400/60 bg-orange-500/10 px-[16px] py-[8px] transition-all flex items-center gap-[6px] shrink-0"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
@@ -63,6 +60,9 @@ export default function ClientsContent() {
           {t("templates")}
         </Link>
       </div>
+      <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/50 mb-[32px]">
+        {t("clientsSubtitle")}
+      </p>
 
       {/* Search & filters */}
       <div className="flex items-center gap-[16px] mb-[24px] max-sm:flex-col max-sm:items-stretch">
