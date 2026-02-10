@@ -31,8 +31,9 @@ export default function LoginContent() {
   const locale = useLocale();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
-  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "error" | "unverified">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const needsVerification = searchParams.get("verify") === "1";
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,10 +44,15 @@ export default function LoginContent() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    const { error } = await signInWithEmail(email, password);
+    const { error, emailConfirmed } = await signInWithEmail(email, password);
     if (error) {
       setStatus("error");
       setErrorMessage(error);
+      return;
+    }
+
+    if (!emailConfirmed) {
+      setStatus("unverified");
       return;
     }
 
@@ -61,6 +67,15 @@ export default function LoginContent() {
           {t("loginTitle")}
         </h1>
       </div>
+
+      {/* Email verification warnings */}
+      {(needsVerification || status === "unverified") && (
+        <div className="mb-[24px] bg-orange-500/10 border border-orange-500/30 p-[16px]">
+          <p className="font-[family-name:var(--font-roboto)] text-[14px] text-orange-400">
+            {t("emailNotVerified")}
+          </p>
+        </div>
+      )}
 
       {/* Social Login Buttons */}
       <div className="flex flex-col gap-[12px] mb-[24px]">

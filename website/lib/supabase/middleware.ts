@@ -55,13 +55,20 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
+    // Email not verified — redirect to login with message
+    if (!user.email_confirmed_at) {
+      const loginUrl = new URL(`/${locale}/prijava`, request.url);
+      loginUrl.searchParams.set("verify", "1");
+      return NextResponse.redirect(loginUrl);
+    }
+
     // For admin routes, check role
     if (isAdminRoute) {
       try {
         const { data: profile } = await supabase
           .from("profiles")
           .select("role")
-          .eq("id", user.id)
+          .eq("user_id", user.id)
           .single();
 
         if (!profile || profile.role !== "admin") {

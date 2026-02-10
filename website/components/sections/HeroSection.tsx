@@ -15,12 +15,12 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="relative w-full min-h-[100dvh] max-lg:min-h-[80dvh] flex flex-col">
+    <section className="relative w-full min-h-[85dvh] max-lg:min-h-[80dvh] flex flex-col">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A] via-[#0A0A0A] to-[#111111]" />
       <div className="absolute top-[20%] right-[10%] w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[120px]" />
 
-      <div className="relative flex flex-col flex-1 max-w-[1280px] mx-auto w-full px-[40px] max-sm:px-[20px] pt-[160px] max-lg:pt-[120px] max-sm:pt-[100px] pb-[60px]">
+      <div className="relative flex flex-col flex-1 max-w-[1280px] mx-auto w-full px-[40px] max-sm:px-[20px] pt-[140px] max-lg:pt-[120px] max-sm:pt-[100px] pb-[60px]">
         {/* Hero Content */}
         <div className="flex flex-col gap-[32px] max-w-[700px]">
           <h1 className="font-[family-name:var(--font-sora)] font-bold text-[64px] leading-[72px] max-lg:text-[48px] max-lg:leading-[56px] max-sm:text-[36px] max-sm:leading-[44px] text-white">
@@ -42,7 +42,7 @@ export default function HeroSection() {
         </div>
 
         {/* Stats Bar */}
-        <div className="mt-auto pt-[80px] max-sm:pt-[48px]">
+        <div className="mt-auto pt-[48px] max-sm:pt-[48px]">
           <div className="bg-white/[0.03] border border-white/10 backdrop-blur-[18px] px-[48px] py-[36px] max-sm:px-[24px] max-sm:py-[24px] flex items-center justify-between max-lg:flex-wrap max-lg:gap-[32px]">
             {stats.map((stat) => (
               <div key={stat.label} className="flex flex-col gap-[4px] max-lg:w-[calc(50%-16px)] max-sm:w-full">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import LogoutButton from "@/components/shared/LogoutButton";
 import PortalNav from "@/components/portal/PortalNav";
+import QuestionnaireNag from "@/components/portal/QuestionnaireNag";
 
 export default function PortalLayout({
   children,
@@ -13,6 +14,7 @@ export default function PortalLayout({
 
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
+      <QuestionnaireNag />
       {/* Portal header */}
       <header className="border-b border-white/10 px-[40px] max-sm:px-[20px] py-[16px] flex items-center justify-between">
         <Link

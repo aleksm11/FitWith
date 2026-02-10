@@ -4,19 +4,18 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { getMyProfile, updateMyProfile } from "@/lib/supabase/queries";
 import type { Profile } from "@/lib/supabase/types";
-import { mockProfile } from "@/lib/portal/mock-data";
 
 export default function ProfileContent() {
   const t = useTranslations("Portal");
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [fullName, setFullName] = useState(mockProfile.fullName);
-  const [email, setEmail] = useState(mockProfile.email);
-  const [phone, setPhone] = useState(mockProfile.phone);
-  const [tier, setTier] = useState(mockProfile.subscriptionTier);
-  const [active, setActive] = useState(mockProfile.subscriptionActive);
-  const [memberSince, setMemberSince] = useState(mockProfile.memberSince);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [tier, setTier] = useState("none");
+  const [subscriptionEndDate, setSubscriptionEndDate] = useState<string | null>(null);
+  const [planFeatures, setPlanFeatures] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -29,15 +28,18 @@ export default function ProfileContent() {
           setEmail(data.email || "");
           setPhone(data.phone || "");
           setTier(data.subscription_tier);
-          setActive(data.subscription_active);
-          setMemberSince(data.created_at);
+          setSubscriptionEndDate(data.subscription_end_date);
+          setPlanFeatures(data.plan_features || []);
         }
       })
-      .catch(() => {
-        // Use mock data on error
-      })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  // Compute subscription status dynamically
+  const isActive = subscriptionEndDate
+    ? new Date(subscriptionEndDate) >= new Date(new Date().toISOString().split("T")[0])
+    : false;
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -154,20 +156,28 @@ export default function ProfileContent() {
                 <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/50">
                   {t("statusLabel")}
                 </span>
-                <span className={`font-[family-name:var(--font-roboto)] text-[13px] px-[10px] py-[3px] ${
-                  active
-                    ? "text-green-400 bg-green-400/10"
-                    : "text-red-400 bg-red-400/10"
-                }`}>
-                  {active ? t("active") : t("inactive")}
-                </span>
+                {subscriptionEndDate ? (
+                  <span className={`font-[family-name:var(--font-roboto)] text-[13px] px-[10px] py-[3px] ${
+                    isActive
+                      ? "text-green-400 bg-green-400/10"
+                      : "text-red-400 bg-red-400/10"
+                  }`}>
+                    {isActive ? t("active") : t("inactive")}
+                  </span>
+                ) : (
+                  <span className="font-[family-name:var(--font-roboto)] text-[13px] px-[10px] py-[3px] text-white/40 bg-white/5">
+                    {t("noSubscription")}
+                  </span>
+                )}
               </div>
               <div className="flex items-center justify-between">
                 <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/50">
-                  {t("memberSince")}
+                  {t("subscriptionValidUntil")}
                 </span>
                 <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/70">
-                  {new Date(memberSince).toLocaleDateString()}
+                  {subscriptionEndDate
+                    ? new Date(subscriptionEndDate).toLocaleDateString()
+                    : "—"}
                 </span>
               </div>
             </div>
@@ -177,24 +187,30 @@ export default function ProfileContent() {
             <h3 className="font-[family-name:var(--font-sora)] font-semibold text-[14px] text-orange-400 mb-[12px]">
               {t("yourPlanIncludes")}
             </h3>
-            <ul className="space-y-[8px]">
-              {(t.raw("mentoringFeatures") as string[]).map((feature, i) => (
-                <li key={i} className="flex items-start gap-[8px]">
-                  <svg
-                    className="w-4 h-4 text-orange-500 shrink-0 mt-[3px]"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
-                  <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/60">
-                    {feature}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {planFeatures.length > 0 ? (
+              <ul className="space-y-[8px]">
+                {planFeatures.map((feature, i) => (
+                  <li key={i} className="flex items-start gap-[8px]">
+                    <svg
+                      className="w-4 h-4 text-orange-500 shrink-0 mt-[3px]"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                    <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/60">
+                      {feature}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40">
+                {t("noPlanFeatures")}
+              </p>
+            )}
           </div>
         </div>
       </div>

@@ -183,6 +183,20 @@ export async function submitContactMessage(message: {
   if (error) throw error;
 }
 
+export async function getMyQuestionnaire() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data, error } = await supabase
+    .from("questionnaires")
+    .select("id")
+    .eq("user_id", user.id)
+    .limit(1)
+    .maybeSingle();
+  if (error) return null;
+  return data;
+}
+
 export async function submitQuestionnaire(data: Record<string, unknown>) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -244,6 +258,15 @@ export async function updateUserTier(profileId: string, tier: string, active: bo
   const { error } = await supabase
     .from("profiles")
     .update({ subscription_tier: tier, subscription_active: active })
+    .eq("id", profileId);
+  if (error) throw error;
+}
+
+export async function updateUserSubscription(profileId: string, endDate: string | null, planFeatures: string[]) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("profiles")
+    .update({ subscription_end_date: endDate, plan_features: planFeatures })
     .eq("id", profileId);
   if (error) throw error;
 }

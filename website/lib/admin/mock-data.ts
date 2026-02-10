@@ -8,6 +8,8 @@ export type AdminUser = {
   role: "client" | "admin";
   tier: "mentoring" | "training" | "nutrition" | "none";
   subscriptionActive: boolean;
+  subscriptionEndDate: string | null;
+  planFeatures: string[];
   memberSince: string;
   lastLogin: string;
 };
@@ -121,6 +123,8 @@ export const mockUsers: AdminUser[] = [
     role: "client",
     tier: "mentoring",
     subscriptionActive: true,
+    subscriptionEndDate: null,
+    planFeatures: [],
     memberSince: "2025-09-15",
     lastLogin: "2026-02-08",
   },
@@ -132,6 +136,8 @@ export const mockUsers: AdminUser[] = [
     role: "client",
     tier: "training",
     subscriptionActive: true,
+    subscriptionEndDate: null,
+    planFeatures: [],
     memberSince: "2025-11-01",
     lastLogin: "2026-02-07",
   },
@@ -143,6 +149,8 @@ export const mockUsers: AdminUser[] = [
     role: "client",
     tier: "mentoring",
     subscriptionActive: true,
+    subscriptionEndDate: null,
+    planFeatures: [],
     memberSince: "2026-01-10",
     lastLogin: "2026-02-08",
   },
@@ -154,6 +162,8 @@ export const mockUsers: AdminUser[] = [
     role: "client",
     tier: "nutrition",
     subscriptionActive: true,
+    subscriptionEndDate: null,
+    planFeatures: [],
     memberSince: "2025-10-20",
     lastLogin: "2026-02-06",
   },
@@ -165,6 +175,8 @@ export const mockUsers: AdminUser[] = [
     role: "client",
     tier: "nutrition",
     subscriptionActive: false,
+    subscriptionEndDate: null,
+    planFeatures: [],
     memberSince: "2025-08-05",
     lastLogin: "2026-01-15",
   },
@@ -176,6 +188,8 @@ export const mockUsers: AdminUser[] = [
     role: "client",
     tier: "mentoring",
     subscriptionActive: true,
+    subscriptionEndDate: null,
+    planFeatures: [],
     memberSince: "2026-02-05",
     lastLogin: "2026-02-08",
   },
@@ -187,6 +201,8 @@ export const mockUsers: AdminUser[] = [
     role: "client",
     tier: "training",
     subscriptionActive: true,
+    subscriptionEndDate: null,
+    planFeatures: [],
     memberSince: "2026-02-03",
     lastLogin: "2026-02-08",
   },
@@ -198,6 +214,8 @@ export const mockUsers: AdminUser[] = [
     role: "client",
     tier: "none",
     subscriptionActive: false,
+    subscriptionEndDate: null,
+    planFeatures: [],
     memberSince: "2025-07-12",
     lastLogin: "2025-12-20",
   },
@@ -209,6 +227,8 @@ export const mockUsers: AdminUser[] = [
     role: "admin",
     tier: "none",
     subscriptionActive: false,
+    subscriptionEndDate: null,
+    planFeatures: [],
     memberSince: "2025-01-01",
     lastLogin: "2026-02-09",
   },

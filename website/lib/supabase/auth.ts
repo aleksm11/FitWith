@@ -3,6 +3,7 @@ import type { UserRole } from "./types";
 
 type AuthResult = {
   error: string | null;
+  emailConfirmed?: boolean;
 };
 
 /** Sign in with email + password */
@@ -11,8 +12,12 @@ export async function signInWithEmail(
   password: string
 ): Promise<AuthResult> {
   const supabase = createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  return { error: error?.message ?? null };
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) return { error: error.message };
+  return {
+    error: null,
+    emailConfirmed: !!data.user?.email_confirmed_at,
+  };
 }
 
 /** Sign up with email + password */

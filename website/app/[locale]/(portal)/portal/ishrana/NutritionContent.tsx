@@ -3,33 +3,77 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { getMyNutritionPlan } from "@/lib/supabase/queries";
-import { nutritionPlan as mockNutritionPlan } from "@/lib/portal/mock-data";
-import type { NutritionDay } from "@/lib/portal/mock-data";
+
+type Meal = {
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  foods: { name: string; amount: string }[];
+};
+
+type NutritionData = {
+  totalCalories: number;
+  totalProtein: number;
+  totalCarbs: number;
+  totalFat: number;
+  meals: Meal[];
+};
 
 export default function NutritionContent() {
   const t = useTranslations("Portal");
-  const [plan, setPlan] = useState<NutritionDay>(mockNutritionPlan);
+  const [plan, setPlan] = useState<NutritionData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getMyNutritionPlan()
       .then((data) => {
         if (data?.data) {
-          const parsed = data.data as unknown as NutritionDay;
+          const parsed = data.data as unknown as NutritionData;
           if (parsed.meals && parsed.totalCalories) {
             setPlan(parsed);
           }
         }
       })
-      .catch(() => {
-        // Use mock data
-      })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-[80px]">
+        <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!plan) {
+    return (
+      <div>
+        <h1 className="font-[family-name:var(--font-sora)] font-bold text-[36px] leading-[44px] max-sm:text-[28px] max-sm:leading-[36px] text-white mb-[8px]">
+          {t("nutrition")}
+        </h1>
+        <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/50 mb-[32px]">
+          {t("nutritionSubtitle")}
+        </p>
+        <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px]">
+          <div className="py-[48px] text-center">
+            <svg className="w-16 h-16 text-white/10 mx-auto mb-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5m-6 1.5v-1.5m12 9.75l-1.5.75a3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0L3 16.5m15-3.379a48.474 48.474 0 00-6-.371c-2.032 0-4.034.126-6 .371m12 0c.39.049.777.102 1.163.16 1.07.16 1.837 1.094 1.837 2.175v5.169c0 .621-.504 1.125-1.125 1.125H4.125A1.125 1.125 0 013 20.625v-5.17c0-1.08.768-2.014 1.837-2.174A47.78 47.78 0 016 13.12M12.265 3.11a.375.375 0 11-.53 0L12 2.845l.265.265zm-3 0a.375.375 0 11-.53 0L9 2.845l.265.265zm6 0a.375.375 0 11-.53 0L15 2.845l.265.265z" />
+            </svg>
+            <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white/50 mb-[8px]">
+              {t("noNutritionPlanAssigned")}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const macroBar = (value: number, color: string) => {
     const multiplier = color === "bg-green-500" ? 9 : 4;
-    const pct = Math.round((value * multiplier) / plan.totalCalories * 100);
+    const pct = plan.totalCalories > 0 ? Math.round((value * multiplier) / plan.totalCalories * 100) : 0;
     return (
       <div className="flex items-center gap-[12px]">
         <div className="flex-1 h-[6px] bg-white/5 rounded-full overflow-hidden">
@@ -41,14 +85,6 @@ export default function NutritionContent() {
       </div>
     );
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-[80px]">
-        <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -120,7 +156,7 @@ export default function NutritionContent() {
           >
             <div className="flex items-center justify-between mb-[16px]">
               <h3 className="font-[family-name:var(--font-sora)] font-semibold text-[18px] text-white">
-                {t(`meal_${meal.nameKey}`)}
+                {meal.name}
               </h3>
               <span className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-orange-500">
                 {meal.calories} kcal
@@ -134,7 +170,7 @@ export default function NutritionContent() {
                   className="flex items-center justify-between py-[6px] border-b border-white/5 last:border-0"
                 >
                   <span className="font-[family-name:var(--font-roboto)] text-[15px] text-white/70">
-                    {t(`food_${food.nameKey}`)}
+                    {food.name}
                   </span>
                   <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40">
                     {food.amount}

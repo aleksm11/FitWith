@@ -271,7 +271,8 @@
     "resetButton": "Send reset link",
     "checkEmail": "Check your email",
     "confirmEmail": "We sent you a confirmation link. Please check your inbox.",
-    "logout": "Logout"
+    "logout": "Logout",
+    "emailNotVerified": "Please verify your email address before accessing the portal. Check your inbox."
   },
   "Portal": {
     "title": "Portal",
@@ -381,7 +382,19 @@
       "Access to exercise library",
       "Direct communication with coach",
       "Plan adjustments as needed"
-    ]
+    ],
+    "noTrainingPlan": "Your coach hasn't assigned a training plan yet",
+    "noNutritionPlan": "Your coach hasn't assigned a nutrition plan yet",
+    "noPlanYet": "Your coach hasn't created a plan for you yet. Stay tuned!",
+    "noTrainingPlanAssigned": "No training plan assigned yet. Your coach will create one soon.",
+    "noNutritionPlanAssigned": "No nutrition plan assigned yet. Your coach will create one soon.",
+    "noSubscription": "Not active",
+    "subscriptionValidUntil": "Valid until",
+    "noPlanFeatures": "Your coach will set up your plan features.",
+    "questionnaireNagTitle": "Complete the initial questionnaire",
+    "questionnaireNagMessage": "To create a personalized training and nutrition plan, we need you to fill out a short questionnaire about your goals and habits.",
+    "fillNow": "Fill out now",
+    "remindLater": "Remind me later"
   },
   "Admin": {
     "title": "Admin Panel",
@@ -439,6 +452,9 @@
     "changeRole": "Change Role",
     "changeTier": "Change Tier",
     "userDetails": "User Details",
+    "subscriptionEndDate": "Subscription valid until",
+    "planFeatures": "Plan features",
+    "planFeaturesPlaceholder": "One feature per line...",
     "exerciseName": "Exercise Name",
     "category": "Category",
     "muscles": "Muscles",

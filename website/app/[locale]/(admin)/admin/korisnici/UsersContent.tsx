@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { mockUsers, type AdminUser } from "@/lib/admin/mock-data";
-import { getUsers, updateUserRole, updateUserTier } from "@/lib/supabase/queries";
+import { getUsers, updateUserRole, updateUserTier, updateUserSubscription } from "@/lib/supabase/queries";
 import type { Profile } from "@/lib/supabase/types";
 
 const tierColors: Record<string, string> = {
@@ -22,6 +22,8 @@ function profileToUser(p: Profile): AdminUser {
     role: p.role === "admin" ? "admin" : "client",
     tier: p.subscription_tier as AdminUser["tier"],
     subscriptionActive: p.subscription_active,
+    subscriptionEndDate: p.subscription_end_date,
+    planFeatures: p.plan_features || [],
     memberSince: new Date(p.created_at).toLocaleDateString("sr-Latn"),
     lastLogin: new Date(p.updated_at).toLocaleDateString("sr-Latn"),
   };
@@ -37,6 +39,8 @@ export default function UsersContent() {
   const [saving, setSaving] = useState(false);
   const [editRole, setEditRole] = useState("client");
   const [editTier, setEditTier] = useState("none");
+  const [editEndDate, setEditEndDate] = useState("");
+  const [editFeatures, setEditFeatures] = useState("");
 
   useEffect(() => {
     getUsers()
@@ -64,15 +68,19 @@ export default function UsersContent() {
       setSelectedUser(user);
       setEditRole(user.role);
       setEditTier(user.tier);
+      setEditEndDate(user.subscriptionEndDate || "");
+      setEditFeatures((user.planFeatures || []).join("\n"));
     }
   }
 
   function handleSave() {
     if (!selectedUser) return;
     setSaving(true);
+    const features = editFeatures.split("\n").map((f) => f.trim()).filter(Boolean);
     Promise.all([
       updateUserRole(selectedUser.id, editRole),
       updateUserTier(selectedUser.id, editTier, editTier !== "none"),
+      updateUserSubscription(selectedUser.id, editEndDate || null, features),
     ])
       .then(() => {
         const updated: AdminUser = {
@@ -80,6 +88,8 @@ export default function UsersContent() {
           role: editRole as AdminUser["role"],
           tier: editTier as AdminUser["tier"],
           subscriptionActive: editTier !== "none",
+          subscriptionEndDate: editEndDate || null,
+          planFeatures: features,
         };
         setUsers(users.map((u) => (u.id === selectedUser.id ? updated : u)));
         setSelectedUser(updated);
@@ -214,6 +224,25 @@ export default function UsersContent() {
                 <option value="nutrition" className="bg-[#1A1A1A]">{t("nutritionTier")}</option>
                 <option value="none" className="bg-[#1A1A1A]">{t("none")}</option>
               </select>
+            </div>
+            <div>
+              <p className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40 mb-[4px]">{t("subscriptionEndDate")}</p>
+              <input
+                type="date"
+                value={editEndDate}
+                onChange={(e) => setEditEndDate(e.target.value)}
+                className="w-full bg-white/[0.03] border border-white/10 px-[12px] py-[8px] text-[14px] text-white font-[family-name:var(--font-roboto)] focus:outline-none focus:border-orange-500/50"
+              />
+            </div>
+            <div className="col-span-2 max-sm:col-span-1">
+              <p className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40 mb-[4px]">{t("planFeatures")}</p>
+              <textarea
+                value={editFeatures}
+                onChange={(e) => setEditFeatures(e.target.value)}
+                rows={4}
+                placeholder={t("planFeaturesPlaceholder")}
+                className="w-full bg-white/[0.03] border border-white/10 px-[12px] py-[8px] text-[14px] text-white font-[family-name:var(--font-roboto)] focus:outline-none focus:border-orange-500/50 placeholder:text-white/20 resize-none"
+              />
             </div>
           </div>
           <div className="flex gap-[12px] mt-[20px]">

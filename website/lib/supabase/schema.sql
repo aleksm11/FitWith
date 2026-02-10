@@ -17,6 +17,8 @@ CREATE TABLE profiles (
   avatar_url TEXT,
   subscription_tier TEXT DEFAULT 'none' CHECK (subscription_tier IN ('mentoring', 'training', 'nutrition', 'none')),
   subscription_active BOOLEAN DEFAULT FALSE,
+  subscription_end_date DATE,
+  plan_features JSONB DEFAULT '[]',
   preferred_locale TEXT DEFAULT 'sr' CHECK (preferred_locale IN ('sr', 'en', 'ru')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

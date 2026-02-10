@@ -17,6 +17,8 @@ export interface Profile {
   avatar_url: string | null;
   subscription_tier: SubscriptionTier;
   subscription_active: boolean;
+  subscription_end_date: string | null;
+  plan_features: string[];
   preferred_locale: Locale;
   created_at: string;
   updated_at: string;

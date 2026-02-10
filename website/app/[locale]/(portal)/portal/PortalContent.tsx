@@ -6,17 +6,13 @@ import { useTranslations, useLocale } from "next-intl";
 import { getMyProfile, getMyTrainingPlan, getMyNutritionPlan } from "@/lib/supabase/queries";
 import { localizedField } from "@/lib/supabase/types";
 import type { Locale } from "@/lib/supabase/types";
-import {
-  getTodayTraining,
-  getNextWorkoutDay,
-  mockProfile,
-  nutritionPlan as mockNutritionPlan,
-} from "@/lib/portal/mock-data";
 
 type DashboardData = {
   profileName: string;
   tier: string;
-  active: boolean;
+  subscriptionEndDate: string | null;
+  hasTrainingPlan: boolean;
+  hasNutritionPlan: boolean;
   totalCalories: number;
   totalProtein: number;
   totalCarbs: number;
@@ -37,23 +33,22 @@ export default function PortalContent() {
     Promise.all([getMyProfile(), getMyTrainingPlan(), getMyNutritionPlan()])
       .then(([profile, trainingPlan, nutritionPlan]) => {
         // Profile
-        const profileName = profile?.full_name || mockProfile.fullName;
-        const tier = profile?.subscription_tier || mockProfile.subscriptionTier;
-        const active = profile?.subscription_active ?? mockProfile.subscriptionActive;
+        const profileName = profile?.full_name || "";
+        const tier = profile?.subscription_tier || "none";
+        const subscriptionEndDate = profile?.subscription_end_date ?? null;
 
         // Nutrition
-        let totalCalories = mockNutritionPlan.totalCalories;
-        let totalProtein = mockNutritionPlan.totalProtein;
-        let totalCarbs = mockNutritionPlan.totalCarbs;
-        let totalFat = mockNutritionPlan.totalFat;
+        let totalCalories = 0;
+        let totalProtein = 0;
+        let totalCarbs = 0;
+        let totalFat = 0;
+        const hasNutritionPlan = !!nutritionPlan?.data;
         if (nutritionPlan?.data) {
           const np = nutritionPlan.data as { totalCalories?: number; totalProtein?: number; totalCarbs?: number; totalFat?: number };
-          if (np.totalCalories) {
-            totalCalories = np.totalCalories;
-            totalProtein = np.totalProtein || 0;
-            totalCarbs = np.totalCarbs || 0;
-            totalFat = np.totalFat || 0;
-          }
+          totalCalories = np.totalCalories || 0;
+          totalProtein = np.totalProtein || 0;
+          totalCarbs = np.totalCarbs || 0;
+          totalFat = np.totalFat || 0;
         }
 
         // Training
@@ -61,8 +56,9 @@ export default function PortalContent() {
         let todayExercises: { name: string; slug: string; sets: number; reps: string }[] = [];
         let isRestDay = true;
         let nextWorkout: { label: string; focus: string; count: number } | null = null;
+        const hasTrainingPlan = !!(trainingPlan && trainingPlan.training_days.length > 0);
 
-        if (trainingPlan && trainingPlan.training_days.length > 0) {
+        if (hasTrainingPlan) {
           const dayIndex = new Date().getDay();
           const mapped = dayIndex === 0 ? 6 : dayIndex - 1;
           const sorted = [...trainingPlan.training_days].sort((a, b) => a.sort_order - b.sort_order);
@@ -96,31 +92,14 @@ export default function PortalContent() {
               }
             }
           }
-        } else {
-          // Mock data fallback
-          const today = getTodayTraining();
-          const next = getNextWorkoutDay();
-          isRestDay = today.exercises.length === 0;
-          todayFocus = isRestDay ? "" : t(`focus_${today.focusKey}`);
-          todayExercises = today.exercises.map((ex) => ({
-            name: t(`exercise_${ex.nameKey}`),
-            slug: ex.exerciseSlug,
-            sets: ex.sets,
-            reps: ex.reps,
-          }));
-          if (next && isRestDay) {
-            nextWorkout = {
-              label: t(`day_${next.dayKey}`),
-              focus: t(`focus_${next.focusKey}`),
-              count: next.exercises.length,
-            };
-          }
         }
 
         setData({
           profileName,
           tier,
-          active,
+          subscriptionEndDate,
+          hasTrainingPlan,
+          hasNutritionPlan,
           totalCalories,
           totalProtein,
           totalCarbs,
@@ -132,29 +111,20 @@ export default function PortalContent() {
         });
       })
       .catch(() => {
-        // Full mock fallback
-        const today = getTodayTraining();
-        const next = getNextWorkoutDay();
-        const isRestDay = today.exercises.length === 0;
         setData({
-          profileName: mockProfile.fullName,
-          tier: mockProfile.subscriptionTier,
-          active: mockProfile.subscriptionActive,
-          totalCalories: mockNutritionPlan.totalCalories,
-          totalProtein: mockNutritionPlan.totalProtein,
-          totalCarbs: mockNutritionPlan.totalCarbs,
-          totalFat: mockNutritionPlan.totalFat,
-          todayFocus: isRestDay ? "" : t(`focus_${today.focusKey}`),
-          todayExercises: today.exercises.map((ex) => ({
-            name: t(`exercise_${ex.nameKey}`),
-            slug: ex.exerciseSlug,
-            sets: ex.sets,
-            reps: ex.reps,
-          })),
-          isRestDay,
-          nextWorkout: next && isRestDay
-            ? { label: t(`day_${next.dayKey}`), focus: t(`focus_${next.focusKey}`), count: next.exercises.length }
-            : null,
+          profileName: "",
+          tier: "none",
+          subscriptionEndDate: null,
+          hasTrainingPlan: false,
+          hasNutritionPlan: false,
+          totalCalories: 0,
+          totalProtein: 0,
+          totalCarbs: 0,
+          totalFat: 0,
+          todayFocus: "",
+          todayExercises: [],
+          isRestDay: true,
+          nextWorkout: null,
         });
       })
       .finally(() => setLoading(false));
@@ -168,6 +138,11 @@ export default function PortalContent() {
       </div>
     );
   }
+
+  // Compute subscription status dynamically from end date
+  const isActive = data.subscriptionEndDate
+    ? new Date(data.subscriptionEndDate) >= new Date(new Date().toISOString().split("T")[0])
+    : false;
 
   return (
     <div>
@@ -189,13 +164,19 @@ export default function PortalContent() {
           <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white">
             {t(`tier_${data.tier}`)}
           </p>
-          <span className={`inline-block mt-[8px] font-[family-name:var(--font-roboto)] text-[12px] px-[10px] py-[3px] ${
-            data.active
-              ? "text-green-400 bg-green-400/10"
-              : "text-red-400 bg-red-400/10"
-          }`}>
-            {data.active ? t("active") : t("inactive")}
-          </span>
+          {data.subscriptionEndDate ? (
+            <span className={`inline-block mt-[8px] font-[family-name:var(--font-roboto)] text-[12px] px-[10px] py-[3px] ${
+              isActive
+                ? "text-green-400 bg-green-400/10"
+                : "text-red-400 bg-red-400/10"
+            }`}>
+              {isActive ? t("active") : t("inactive")}
+            </span>
+          ) : (
+            <span className="inline-block mt-[8px] font-[family-name:var(--font-roboto)] text-[12px] px-[10px] py-[3px] text-white/40 bg-white/5">
+              {t("noSubscription")}
+            </span>
+          )}
         </div>
 
         {/* Today's macros */}
@@ -203,20 +184,28 @@ export default function PortalContent() {
           <p className="font-[family-name:var(--font-roboto)] text-[12px] uppercase tracking-[1.5px] text-white/40 mb-[8px]">
             {t("todaysMacros")}
           </p>
-          <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white">
-            {data.totalCalories} kcal
-          </p>
-          <div className="flex gap-[16px] mt-[8px]">
-            <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-              P: {data.totalProtein}g
-            </span>
-            <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-              C: {data.totalCarbs}g
-            </span>
-            <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-              F: {data.totalFat}g
-            </span>
-          </div>
+          {data.hasNutritionPlan ? (
+            <>
+              <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white">
+                {data.totalCalories} kcal
+              </p>
+              <div className="flex gap-[16px] mt-[8px]">
+                <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
+                  P: {data.totalProtein}g
+                </span>
+                <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
+                  C: {data.totalCarbs}g
+                </span>
+                <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
+                  F: {data.totalFat}g
+                </span>
+              </div>
+            </>
+          ) : (
+            <p className="font-[family-name:var(--font-roboto)] text-[14px] text-white/30 mt-[4px]">
+              {t("noNutritionPlan")}
+            </p>
+          )}
         </div>
 
         {/* Training status */}
@@ -224,75 +213,94 @@ export default function PortalContent() {
           <p className="font-[family-name:var(--font-roboto)] text-[12px] uppercase tracking-[1.5px] text-white/40 mb-[8px]">
             {t("todaysTraining")}
           </p>
-          {data.isRestDay ? (
-            <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white/60">
-              {t("restDay")}
-            </p>
+          {data.hasTrainingPlan ? (
+            data.isRestDay ? (
+              <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white/60">
+                {t("restDay")}
+              </p>
+            ) : (
+              <>
+                <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white">
+                  {data.todayFocus}
+                </p>
+                <p className="mt-[8px] font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
+                  {data.todayExercises.length} {t("exercisesCount")}
+                </p>
+              </>
+            )
           ) : (
-            <>
-              <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white">
-                {data.todayFocus}
-              </p>
-              <p className="mt-[8px] font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-                {data.todayExercises.length} {t("exercisesCount")}
-              </p>
-            </>
+            <p className="font-[family-name:var(--font-roboto)] text-[14px] text-white/30 mt-[4px]">
+              {t("noTrainingPlan")}
+            </p>
           )}
         </div>
       </div>
 
       {/* Today's workout detail */}
-      <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px] mb-[24px]">
-        <div className="flex items-center justify-between mb-[24px]">
-          <h2 className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-white">
-            {data.isRestDay ? t("restDayTitle") : t("todaysWorkout")}
-          </h2>
-          {!data.isRestDay && (
-            <Link
-              href={`/${locale}/portal/trening`}
-              className="font-[family-name:var(--font-roboto)] text-[14px] text-orange-500 hover:text-orange-400 transition-colors"
-            >
-              {t("viewFullPlan")}
-            </Link>
+      {data.hasTrainingPlan ? (
+        <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px] mb-[24px]">
+          <div className="flex items-center justify-between mb-[24px]">
+            <h2 className="font-[family-name:var(--font-sora)] font-bold text-[24px] text-white">
+              {data.isRestDay ? t("restDayTitle") : t("todaysWorkout")}
+            </h2>
+            {!data.isRestDay && (
+              <Link
+                href={`/${locale}/portal/trening`}
+                className="font-[family-name:var(--font-roboto)] text-[14px] text-orange-500 hover:text-orange-400 transition-colors"
+              >
+                {t("viewFullPlan")}
+              </Link>
+            )}
+          </div>
+
+          {data.isRestDay ? (
+            <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/50 leading-[26px]">
+              {t("restDayMessage")}
+            </p>
+          ) : (
+            <div className="space-y-[12px]">
+              {data.todayExercises.map((ex, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between py-[12px] border-b border-white/5 last:border-0"
+                >
+                  <div className="flex items-center gap-[12px]">
+                    <span className="font-[family-name:var(--font-sora)] font-semibold text-[14px] text-orange-500 w-[24px]">
+                      {i + 1}
+                    </span>
+                    {ex.slug ? (
+                      <Link
+                        href={`/${locale}/vezbe/${ex.slug}`}
+                        className="font-[family-name:var(--font-roboto)] text-[15px] text-white hover:text-orange-400 transition-colors"
+                      >
+                        {ex.name}
+                      </Link>
+                    ) : (
+                      <span className="font-[family-name:var(--font-roboto)] text-[15px] text-white">
+                        {ex.name}
+                      </span>
+                    )}
+                  </div>
+                  <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40">
+                    {ex.sets} x {ex.reps}
+                  </span>
+                </div>
+              ))}
+            </div>
           )}
         </div>
-
-        {data.isRestDay ? (
-          <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/50 leading-[26px]">
-            {t("restDayMessage")}
-          </p>
-        ) : (
-          <div className="space-y-[12px]">
-            {data.todayExercises.map((ex, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between py-[12px] border-b border-white/5 last:border-0"
-              >
-                <div className="flex items-center gap-[12px]">
-                  <span className="font-[family-name:var(--font-sora)] font-semibold text-[14px] text-orange-500 w-[24px]">
-                    {i + 1}
-                  </span>
-                  {ex.slug ? (
-                    <Link
-                      href={`/${locale}/vezbe/${ex.slug}`}
-                      className="font-[family-name:var(--font-roboto)] text-[15px] text-white hover:text-orange-400 transition-colors"
-                    >
-                      {ex.name}
-                    </Link>
-                  ) : (
-                    <span className="font-[family-name:var(--font-roboto)] text-[15px] text-white">
-                      {ex.name}
-                    </span>
-                  )}
-                </div>
-                <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40">
-                  {ex.sets} x {ex.reps}
-                </span>
-              </div>
-            ))}
+      ) : (
+        <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px] mb-[24px]">
+          <div className="py-[32px] text-center">
+            <svg className="w-12 h-12 text-white/10 mx-auto mb-[16px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/40">
+              {t("noPlanYet")}
+            </p>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Next workout */}
       {data.nextWorkout && data.isRestDay && (

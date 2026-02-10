@@ -6,8 +6,6 @@ import { useTranslations, useLocale } from "next-intl";
 import { getMyTrainingPlan } from "@/lib/supabase/queries";
 import { localizedField } from "@/lib/supabase/types";
 import type { Locale } from "@/lib/supabase/types";
-import { trainingPlan as mockTrainingPlan } from "@/lib/portal/mock-data";
-import type { TrainingDay as MockTrainingDay } from "@/lib/portal/mock-data";
 
 type SupabaseDay = {
   id: string;
@@ -49,23 +47,8 @@ type DisplayDay = {
   }[];
 };
 
-const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const;
-
-function normalizeMockDay(day: MockTrainingDay, t: (key: string) => string): DisplayDay {
-  return {
-    label: t(`day_${day.dayKey}`),
-    focus: t(`focus_${day.focusKey}`),
-    exercises: day.exercises.map((ex) => ({
-      name: t(`exercise_${ex.nameKey}`),
-      slug: ex.exerciseSlug,
-      sets: ex.sets,
-      reps: ex.reps,
-      restSeconds: ex.restSeconds,
-    })),
-  };
-}
-
 function normalizeSupabaseDay(day: SupabaseDay, locale: Locale, t: (key: string) => string): DisplayDay {
+  const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const;
   const name = localizedField(day as unknown as Record<string, unknown>, "day_name", locale);
   return {
     label: name || t(`day_${dayKeys[day.day_number - 1] || "monday"}`),
@@ -88,14 +71,11 @@ export default function TrainingContent() {
   const t = useTranslations("Portal");
   const locale = useLocale() as Locale;
 
-  const todayIndex = (() => {
-    const d = new Date().getDay();
-    return d === 0 ? 6 : d - 1;
-  })();
-  const [activeDay, setActiveDay] = useState(todayIndex);
+  const [activeDay, setActiveDay] = useState(0);
   const [days, setDays] = useState<DisplayDay[]>([]);
   const [dayLabels, setDayLabels] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasPlan, setHasPlan] = useState(false);
 
   useEffect(() => {
     getMyTrainingPlan()
@@ -109,21 +89,16 @@ export default function TrainingContent() {
           });
           setDays(normalizedDays);
           setDayLabels(labels);
-          setActiveDay(0);
-        } else {
-          // Fallback to mock data
-          const normalizedDays = mockTrainingPlan.map((d) => normalizeMockDay(d, t));
-          const labels = dayKeys.map((key) => t(`day_${key}`));
-          setDays(normalizedDays);
-          setDayLabels(labels);
+          setHasPlan(true);
+          // Set active day to today
+          const todayIndex = (() => {
+            const d = new Date().getDay();
+            return d === 0 ? 6 : d - 1;
+          })();
+          setActiveDay(Math.min(todayIndex, sorted.length - 1));
         }
       })
-      .catch(() => {
-        const normalizedDays = mockTrainingPlan.map((d) => normalizeMockDay(d, t));
-        const labels = dayKeys.map((key) => t(`day_${key}`));
-        setDays(normalizedDays);
-        setDayLabels(labels);
-      })
+      .catch(() => {})
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -132,6 +107,29 @@ export default function TrainingContent() {
     return (
       <div className="flex items-center justify-center py-[80px]">
         <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!hasPlan) {
+    return (
+      <div>
+        <h1 className="font-[family-name:var(--font-sora)] font-bold text-[36px] leading-[44px] max-sm:text-[28px] max-sm:leading-[36px] text-white mb-[8px]">
+          {t("training")}
+        </h1>
+        <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/50 mb-[32px]">
+          {t("trainingSubtitle")}
+        </p>
+        <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px]">
+          <div className="py-[48px] text-center">
+            <svg className="w-16 h-16 text-white/10 mx-auto mb-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white/50 mb-[8px]">
+              {t("noTrainingPlanAssigned")}
+            </p>
+          </div>
+        </div>
       </div>
     );
   }

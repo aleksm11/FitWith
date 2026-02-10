@@ -271,7 +271,8 @@
     "resetButton": "Pošalji link za reset",
     "checkEmail": "Proverite email",
     "confirmEmail": "Poslali smo vam link za potvrdu. Proverite inbox.",
-    "logout": "Odjavi se"
+    "logout": "Odjavi se",
+    "emailNotVerified": "Molimo potvrdite vašu email adresu pre nego što pristupite portalu. Proverite inbox."
   },
   "Portal": {
     "title": "Portal",
@@ -381,7 +382,19 @@
       "Pristup biblioteci vežbi",
       "Direktna komunikacija sa trenerom",
       "Prilagođavanje plana po potrebi"
-    ]
+    ],
+    "noTrainingPlan": "Trener vam još nije dodelio plan treninga",
+    "noNutritionPlan": "Trener vam još nije dodelio plan ishrane",
+    "noPlanYet": "Vaš trener još nije kreirao plan za vas. Budite strpljivi!",
+    "noTrainingPlanAssigned": "Plan treninga još nije dodeljen. Vaš trener će ga uskoro kreirati.",
+    "noNutritionPlanAssigned": "Plan ishrane još nije dodeljen. Vaš trener će ga uskoro kreirati.",
+    "noSubscription": "Nije aktivna",
+    "subscriptionValidUntil": "Pretplata važi do",
+    "noPlanFeatures": "Vaš trener će podesiti stavke vašeg plana.",
+    "questionnaireNagTitle": "Popunite inicijalni upitnik",
+    "questionnaireNagMessage": "Da bismo vam kreirali personalizovan plan treninga i ishrane, potrebno je da popunite kratak upitnik o vašim ciljevima i navikama.",
+    "fillNow": "Popuni sada",
+    "remindLater": "Podseti me kasnije"
   },
   "Admin": {
     "title": "Admin panel",
@@ -439,6 +452,9 @@
     "changeRole": "Promeni ulogu",
     "changeTier": "Promeni paket",
     "userDetails": "Detalji korisnika",
+    "subscriptionEndDate": "Pretplata važi do",
+    "planFeatures": "Stavke plana",
+    "planFeaturesPlaceholder": "Jedna stavka po redu...",
     "exerciseName": "Naziv vežbe",
     "category": "Kategorija",
     "muscles": "Mišići",
