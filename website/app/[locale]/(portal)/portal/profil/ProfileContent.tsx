@@ -98,9 +98,11 @@ export default function ProfileContent() {
               <label className="block font-[family-name:var(--font-roboto)] text-[13px] text-white/50 mb-[6px]">
                 {t("emailLabel")}
               </label>
+              {/* TODO: email change flow */}
               <input
                 type="email"
                 value={email}
+                readOnly
                 disabled
                 className="w-full bg-white/[0.03] border border-white/10 px-[16px] py-[12px] font-[family-name:var(--font-roboto)] text-[15px] text-white/50 placeholder-white/30 focus:border-orange-500/50 focus:outline-none transition-colors cursor-not-allowed"
               />

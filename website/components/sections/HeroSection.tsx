@@ -36,10 +36,11 @@ export default function HeroSection() {
           {/* Fade bottom edge */}
           <div className="absolute bottom-0 left-0 right-0 h-[15%] bg-gradient-to-t from-[#0A0A0A] to-transparent" />
 
-          {/* Decorative stripes — bottom right */}
-          <div className="absolute bottom-[20%] right-[40px] z-10 flex flex-col items-end gap-[6px]">
-            <div className="w-[80px] h-[3px] bg-orange-500" />
-            <div className="w-[50px] h-[3px] bg-orange-500" />
+          {/* Diagonal decorative stripes — top right corner */}
+          <div className="absolute top-0 right-0 w-[40%] h-[50%] overflow-hidden pointer-events-none">
+            <div className="absolute top-[10%] right-[-10%] w-[120%] h-[8px] bg-orange-500/30 transform rotate-45 origin-center" />
+            <div className="absolute top-[20%] right-[-10%] w-[120%] h-[8px] bg-orange-500/20 transform rotate-45 origin-center" />
+            <div className="absolute top-[30%] right-[-10%] w-[120%] h-[8px] bg-orange-500/15 transform rotate-45 origin-center" />
           </div>
 
           {/* Right edge vertical accent */}
@@ -57,7 +58,7 @@ export default function HeroSection() {
               </div>
 
               <h1 className="font-[family-name:var(--font-sora)] font-bold text-[52px] leading-[60px] xl:text-[60px] xl:leading-[68px]">
-                <span className="text-transparent [-webkit-text-stroke:2px_white] [text-stroke:2px_white]">{titleFirst}</span>
+                <span className="text-transparent [-webkit-text-stroke:2px_white] [text-stroke:2px_white] [paint-order:stroke_fill]">{titleFirst}</span>
                 <span className="text-white">{titleRest}</span>
               </h1>
               <p className="font-[family-name:var(--font-roboto)] text-[18px] leading-[28px] text-white/80 max-w-[460px] mt-[16px]">
@@ -99,7 +100,7 @@ export default function HeroSection() {
         <div className="absolute bottom-[12px] left-0 right-0 z-10 px-[20px] sm:px-[40px]">
           <div className="flex flex-col gap-[8px]">
             <h1 className="font-[family-name:var(--font-sora)] font-bold text-[26px] leading-[32px] sm:text-[34px] sm:leading-[40px] drop-shadow-lg">
-              <span className="text-transparent [-webkit-text-stroke:1.5px_white] [text-stroke:1.5px_white]">{titleFirst}</span>
+              <span className="text-transparent [-webkit-text-stroke:1.5px_white] [text-stroke:1.5px_white] [paint-order:stroke_fill]">{titleFirst}</span>
               <span className="text-white">{titleRest}</span>
             </h1>
             <p className="font-[family-name:var(--font-roboto)] text-[14px] leading-[21px] sm:text-[16px] sm:leading-[24px] text-white/80 max-w-[460px] drop-shadow-md">
