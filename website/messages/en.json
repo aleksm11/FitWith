@@ -387,6 +387,7 @@
     "noTrainingPlan": "Your coach hasn't assigned a training plan yet",
     "noNutritionPlan": "Your coach hasn't assigned a nutrition plan yet",
     "noPlanYet": "Your coach hasn't created a plan for you yet. Stay tuned!",
+    "editPlan": "Edit plan",
     "noTrainingPlanAssigned": "No training plan assigned yet. Your coach will create one soon.",
     "noNutritionPlanAssigned": "No nutrition plan assigned yet. Your coach will create one soon.",
     "noSubscription": "Not active",

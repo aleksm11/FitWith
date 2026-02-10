@@ -387,6 +387,7 @@
     "noTrainingPlan": "Trener vam još nije dodelio plan treninga",
     "noNutritionPlan": "Trener vam još nije dodelio plan ishrane",
     "noPlanYet": "Vaš trener još nije kreirao plan za vas. Budite strpljivi!",
+    "editPlan": "Izmeni plan",
     "noTrainingPlanAssigned": "Plan treninga još nije dodeljen. Vaš trener će ga uskoro kreirati.",
     "noNutritionPlanAssigned": "Plan ishrane još nije dodeljen. Vaš trener će ga uskoro kreirati.",
     "noSubscription": "Nije aktivna",
