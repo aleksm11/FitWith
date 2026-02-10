@@ -317,6 +317,22 @@ CREATE TABLE site_settings (
 );
 
 -- ============================================================
+-- ADMIN HELPER FUNCTION (SECURITY DEFINER to bypass RLS)
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE user_id = auth.uid() AND role = 'admin'
+  );
+$$;
+
+-- ============================================================
 -- ROW LEVEL SECURITY POLICIES
 -- ============================================================
 
@@ -343,23 +359,19 @@ ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
 -- PROFILES
 CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Admins can view all profiles" ON profiles FOR SELECT USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
-);
-CREATE POLICY "Admins can update all profiles" ON profiles FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
-);
+CREATE POLICY "Admins have full access to profiles" ON profiles FOR ALL
+  USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 -- EXERCISES (public read)
 CREATE POLICY "Anyone can view exercises" ON exercises FOR SELECT USING (TRUE);
 CREATE POLICY "Admins can manage exercises" ON exercises FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- EXERCISE CATEGORIES (public read)
 CREATE POLICY "Anyone can view categories" ON exercise_categories FOR SELECT USING (TRUE);
 CREATE POLICY "Admins can manage categories" ON exercise_categories FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- TRAINING PLANS (own data)
@@ -367,7 +379,7 @@ CREATE POLICY "Clients can view own plans" ON training_plans FOR SELECT USING (
   client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
 );
 CREATE POLICY "Admins can manage all plans" ON training_plans FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- TRAINING DAYS
@@ -375,7 +387,7 @@ CREATE POLICY "Clients can view own training days" ON training_days FOR SELECT U
   plan_id IN (SELECT id FROM training_plans WHERE client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()))
 );
 CREATE POLICY "Admins can manage all training days" ON training_days FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- TRAINING EXERCISES
@@ -383,13 +395,13 @@ CREATE POLICY "Clients can view own training exercises" ON training_exercises FO
   day_id IN (SELECT id FROM training_days WHERE plan_id IN (SELECT id FROM training_plans WHERE client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())))
 );
 CREATE POLICY "Admins can manage all training exercises" ON training_exercises FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- PLAN TEMPLATES (admin manages, clients can view)
 CREATE POLICY "Anyone can view plan templates" ON plan_templates FOR SELECT USING (TRUE);
 CREATE POLICY "Admins can manage plan templates" ON plan_templates FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- WORKOUT PLANS (own data + admin full access)
@@ -397,7 +409,7 @@ CREATE POLICY "Clients can view own workout plans" ON workout_plans FOR SELECT U
   client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
 );
 CREATE POLICY "Admins can manage all workout plans" ON workout_plans FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- WORKOUT PLAN WEEKS
@@ -405,7 +417,7 @@ CREATE POLICY "Clients can view own workout weeks" ON workout_plan_weeks FOR SEL
   plan_id IN (SELECT id FROM workout_plans WHERE client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()))
 );
 CREATE POLICY "Admins can manage all workout weeks" ON workout_plan_weeks FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- WORKOUT PLAN DAYS
@@ -413,7 +425,7 @@ CREATE POLICY "Clients can view own workout days" ON workout_plan_days FOR SELEC
   week_id IN (SELECT id FROM workout_plan_weeks WHERE plan_id IN (SELECT id FROM workout_plans WHERE client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())))
 );
 CREATE POLICY "Admins can manage all workout days" ON workout_plan_days FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- WORKOUT PLAN EXERCISES
@@ -421,7 +433,7 @@ CREATE POLICY "Clients can view own workout exercises" ON workout_plan_exercises
   day_id IN (SELECT id FROM workout_plan_days WHERE week_id IN (SELECT id FROM workout_plan_weeks WHERE plan_id IN (SELECT id FROM workout_plans WHERE client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()))))
 );
 CREATE POLICY "Admins can manage all workout exercises" ON workout_plan_exercises FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- NUTRITION PLANS (own data + admin full access)
@@ -429,7 +441,7 @@ CREATE POLICY "Clients can view own nutrition plans" ON nutrition_plans FOR SELE
   client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid())
 );
 CREATE POLICY "Admins can manage all nutrition plans" ON nutrition_plans FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- NUTRITION PLAN MEALS
@@ -437,41 +449,41 @@ CREATE POLICY "Clients can view own nutrition meals" ON nutrition_plan_meals FOR
   plan_id IN (SELECT id FROM nutrition_plans WHERE client_id IN (SELECT id FROM profiles WHERE user_id = auth.uid()))
 );
 CREATE POLICY "Admins can manage all nutrition meals" ON nutrition_plan_meals FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- BLOG POSTS (public read for published)
 CREATE POLICY "Anyone can view published posts" ON blog_posts FOR SELECT USING (is_published = TRUE);
 CREATE POLICY "Admins can manage all posts" ON blog_posts FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- TRANSFORMATIONS (public read)
 CREATE POLICY "Anyone can view transformations" ON transformations FOR SELECT USING (TRUE);
 CREATE POLICY "Admins can manage transformations" ON transformations FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- QUESTIONNAIRES
 CREATE POLICY "Users can view own questionnaires" ON questionnaires FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert own questionnaires" ON questionnaires FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Admins can view all questionnaires" ON questionnaires FOR SELECT USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- CONTACT MESSAGES (anyone can insert, admin can read)
 CREATE POLICY "Anyone can submit contact message" ON contact_messages FOR INSERT WITH CHECK (TRUE);
 CREATE POLICY "Admins can view messages" ON contact_messages FOR SELECT USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 CREATE POLICY "Admins can update messages" ON contact_messages FOR UPDATE USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- SITE SETTINGS (public read)
 CREATE POLICY "Anyone can view settings" ON site_settings FOR SELECT USING (TRUE);
 CREATE POLICY "Admins can manage settings" ON site_settings FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE user_id = auth.uid() AND role = 'admin')
+  public.is_admin()
 );
 
 -- ============================================================
