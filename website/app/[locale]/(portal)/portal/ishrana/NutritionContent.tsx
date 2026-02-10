@@ -2,31 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { getMyNutritionPlan, getClientNutritionPlans } from "@/lib/supabase/queries";
+import { getMyNutritionPlan, getClientNutritionPlans, getMyProfile } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/client";
 import NutritionPlanEditor from "@/components/portal/NutritionPlanEditor";
+import NutritionPlanCard from "@/components/portal/NutritionPlanCard";
+import { getCurrentDayOfWeekBelgrade, getWeekdayName } from "@/lib/utils/timezone";
+import type { NutritionPlan, NutritionPlanMeal } from "@/lib/supabase/types";
 
-type Meal = {
-  name: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  foods: { name: string; amount: string }[];
-};
-
-type NutritionData = {
-  totalCalories: number;
-  totalProtein: number;
-  totalCarbs: number;
-  totalFat: number;
-  meals: Meal[];
+type NutritionPlanWithMeals = NutritionPlan & {
+  nutrition_plan_meals: NutritionPlanMeal[];
 };
 
 export default function NutritionContent() {
   const t = useTranslations("Portal");
-  const locale = useLocale();
-  const [plan, setPlan] = useState<NutritionData | null>(null);
+  const locale = useLocale() as "sr" | "en" | "ru";
+  const [plan, setPlan] = useState<NutritionPlanWithMeals | null>(null);
   const [loading, setLoading] = useState(true);
   const [profileId, setProfileId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -34,22 +24,13 @@ export default function NutritionContent() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [adminPlans, setAdminPlans] = useState<any[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedDay, setSelectedDay] = useState(getCurrentDayOfWeekBelgrade());
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        supabase
-          .from("profiles")
-          .select("id, role")
-          .eq("user_id", user.id)
-          .single()
-          .then(({ data }) => {
-            if (data) {
-              setProfileId(data.id);
-              setIsAdmin(data.role === "admin");
-            }
-          });
+    getMyProfile().then((p) => {
+      if (p) {
+        setProfileId(p.id);
+        setIsAdmin(p.role === "admin");
       }
     });
   }, []);
@@ -62,36 +43,19 @@ export default function NutritionContent() {
 
   function handleRefresh() {
     setRefreshKey((k) => k + 1);
+    loadPlan();
+  }
+
+  function loadPlan() {
     getMyNutritionPlan()
-      .then((data) => {
-        if (data?.daily_calories) {
-          setPlan({
-            totalCalories: data.daily_calories || 0,
-            totalProtein: data.protein_g || 0,
-            totalCarbs: data.carbs_g || 0,
-            totalFat: data.fats_g || 0,
-            meals: [],
-          });
-        }
-      })
-      .catch(() => {});
+      .then((data) => setPlan(data || null))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
-    getMyNutritionPlan()
-      .then((data) => {
-        if (data?.daily_calories) {
-          setPlan({
-            totalCalories: data.daily_calories || 0,
-            totalProtein: data.protein_g || 0,
-            totalCarbs: data.carbs_g || 0,
-            totalFat: data.fats_g || 0,
-            meals: [],
-          });
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    loadPlan();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {
@@ -101,6 +65,29 @@ export default function NutritionContent() {
       </div>
     );
   }
+
+  // Build weekday-based nutrition data from meals
+  const buildNutritionDay = () => {
+    if (!plan || !plan.nutrition_plan_meals || plan.nutrition_plan_meals.length === 0) return null;
+    const meals = plan.nutrition_plan_meals
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((meal) => ({
+        name: meal.name || `Obrok ${meal.meal_number}`,
+        foods: (meal.foods || []).map((f) => ({
+          name: f.name,
+          amount: f.unit ? `${f.amount}${f.unit}` : String(f.amount || ""),
+          calories: f.calories || 0,
+          protein: f.protein || 0,
+          carbs: f.carbs || 0,
+          fat: f.fats || 0,
+        })),
+      }));
+    // Same meals apply to all days (nutrition doesn't vary by weekday typically)
+    return { day_of_week: selectedDay, meals };
+  };
+
+  const todayNutrition = buildNutritionDay();
+  const weekdays = [1, 2, 3, 4, 5, 6, 7];
 
   if (!plan) {
     return (
@@ -130,21 +117,6 @@ export default function NutritionContent() {
       </div>
     );
   }
-
-  const macroBar = (value: number, color: string) => {
-    const multiplier = color === "bg-green-500" ? 9 : 4;
-    const pct = plan.totalCalories > 0 ? Math.round((value * multiplier) / plan.totalCalories * 100) : 0;
-    return (
-      <div className="flex items-center gap-[12px]">
-        <div className="flex-1 h-[6px] bg-white/5 rounded-full overflow-hidden">
-          <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
-        </div>
-        <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40 w-[40px] text-right">
-          {pct}%
-        </span>
-      </div>
-    );
-  };
 
   return (
     <div>
@@ -176,103 +148,47 @@ export default function NutritionContent() {
         </div>
       )}
 
-      {/* Macros overview */}
-      <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px] mb-[24px]">
-        <h2 className="font-[family-name:var(--font-sora)] font-bold text-[20px] text-white mb-[24px]">
-          {t("dailyOverview")}
-        </h2>
-
-        <div className="text-center mb-[32px]">
-          <span className="font-[family-name:var(--font-sora)] font-bold text-[48px] max-sm:text-[36px] text-orange-500">
-            {plan.totalCalories}
-          </span>
-          <span className="font-[family-name:var(--font-roboto)] text-[18px] text-white/40 ml-[8px]">
-            kcal
-          </span>
-        </div>
-
-        <div className="grid grid-cols-3 gap-[24px] max-sm:grid-cols-1">
-          <div>
-            <div className="flex items-center justify-between mb-[8px]">
-              <span className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70">
-                {t("protein")}
-              </span>
-              <span className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
-                {plan.totalProtein}g
-              </span>
-            </div>
-            {macroBar(plan.totalProtein, "bg-orange-500")}
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-[8px]">
-              <span className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70">
-                {t("carbs")}
-              </span>
-              <span className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
-                {plan.totalCarbs}g
-              </span>
-            </div>
-            {macroBar(plan.totalCarbs, "bg-blue-500")}
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-[8px]">
-              <span className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70">
-                {t("fat")}
-              </span>
-              <span className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
-                {plan.totalFat}g
-              </span>
-            </div>
-            {macroBar(plan.totalFat, "bg-green-500")}
-          </div>
-        </div>
+      {/* Weekday tabs */}
+      <div className="flex gap-[4px] mb-[24px] overflow-x-auto pb-[4px]">
+        {weekdays.map((dow) => {
+          const isToday = dow === getCurrentDayOfWeekBelgrade();
+          return (
+            <button
+              key={dow}
+              onClick={() => setSelectedDay(dow)}
+              className={`font-[family-name:var(--font-roboto)] text-[13px] px-[14px] py-[8px] transition-all cursor-pointer whitespace-nowrap ${
+                selectedDay === dow
+                  ? "bg-orange-500 text-white"
+                  : isToday
+                  ? "bg-white/[0.06] border border-orange-500/30 text-orange-400"
+                  : "bg-white/[0.03] border border-white/10 text-white/50 hover:border-white/20"
+              }`}
+            >
+              {getWeekdayName(dow, locale)}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Meals */}
-      <div className="space-y-[16px]">
-        {plan.meals.map((meal, i) => (
-          <div
-            key={i}
-            className="bg-white/[0.03] border border-white/10 p-[24px] max-sm:p-[16px]"
-          >
-            <div className="flex items-center justify-between mb-[16px]">
-              <h3 className="font-[family-name:var(--font-sora)] font-semibold text-[18px] text-white">
-                {meal.name}
-              </h3>
-              <span className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-orange-500">
-                {meal.calories} kcal
-              </span>
-            </div>
+      {/* Nutrition plan card for selected day */}
+      <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px]">
+        {/* Plan name + macros header */}
+        <div className="flex items-center justify-between mb-[20px]">
+          <h2 className="font-[family-name:var(--font-sora)] font-bold text-[20px] text-white">
+            {plan.name}
+          </h2>
+          <span className={`inline-block font-[family-name:var(--font-roboto)] text-[11px] px-[8px] py-[2px] ${
+            plan.status === "active" ? "text-green-400 bg-green-400/10" : "text-white/40 bg-white/5"
+          }`}>
+            {plan.status === "active" ? t("active") : plan.status}
+          </span>
+        </div>
 
-            <div className="space-y-[8px] mb-[16px]">
-              {meal.foods.map((food, j) => (
-                <div
-                  key={j}
-                  className="flex items-center justify-between py-[6px] border-b border-white/5 last:border-0"
-                >
-                  <span className="font-[family-name:var(--font-roboto)] text-[15px] text-white/70">
-                    {food.name}
-                  </span>
-                  <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40">
-                    {food.amount}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex gap-[20px] pt-[12px] border-t border-white/10">
-              <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-                P: {meal.protein}g
-              </span>
-              <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-                C: {meal.carbs}g
-              </span>
-              <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
-                F: {meal.fat}g
-              </span>
-            </div>
-          </div>
-        ))}
+        <NutritionPlanCard
+          dayOfWeek={selectedDay}
+          day={todayNutrition}
+          locale={locale}
+        />
       </div>
     </div>
   );

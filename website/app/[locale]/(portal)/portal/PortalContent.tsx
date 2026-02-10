@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { getMyProfile, getMyTrainingPlan, getMyNutritionPlan } from "@/lib/supabase/queries";
+import NutritionPlanCard from "@/components/portal/NutritionPlanCard";
+import type { NutritionPlanMeal } from "@/lib/supabase/types";
 import { localizedField } from "@/lib/supabase/types";
 import type { Locale } from "@/lib/supabase/types";
 import { getCurrentDayOfWeekBelgrade, getWeekdayName } from "@/lib/utils/timezone";
@@ -22,6 +24,7 @@ type DashboardData = {
   todayExercises: { name: string; slug: string; sets: number; reps: string }[];
   isRestDay: boolean;
   nextWorkout: { label: string; focus: string; count: number } | null;
+  nutritionMeals: NutritionPlanMeal[];
 };
 
 export default function PortalContent() {
@@ -44,11 +47,13 @@ export default function PortalContent() {
         let totalCarbs = 0;
         let totalFat = 0;
         const hasNutritionPlan = !!nutritionPlan?.daily_calories;
+        let nutritionMeals: NutritionPlanMeal[] = [];
         if (nutritionPlan) {
           totalCalories = nutritionPlan.daily_calories || 0;
           totalProtein = nutritionPlan.protein_g || 0;
           totalCarbs = nutritionPlan.carbs_g || 0;
           totalFat = nutritionPlan.fats_g || 0;
+          nutritionMeals = (nutritionPlan as unknown as { nutrition_plan_meals?: NutritionPlanMeal[] }).nutrition_plan_meals || [];
         }
 
         // Training - use Belgrade timezone to detect today
@@ -112,6 +117,7 @@ export default function PortalContent() {
           todayExercises,
           isRestDay,
           nextWorkout,
+          nutritionMeals,
         });
       })
       .catch(() => {
@@ -129,6 +135,7 @@ export default function PortalContent() {
           todayExercises: [],
           isRestDay: true,
           nextWorkout: null,
+          nutritionMeals: [],
         });
       })
       .finally(() => setLoading(false));
@@ -274,45 +281,39 @@ export default function PortalContent() {
             </p>
           </div>
         ) : (
-          <div>
-            <div className="grid grid-cols-4 gap-[12px] mb-[16px]">
-              <div className="bg-white/[0.02] p-[12px] border border-white/5">
-                <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
-                  Kalorije
-                </p>
-                <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
-                  {data.totalCalories}
-                </p>
-              </div>
-              <div className="bg-white/[0.02] p-[12px] border border-white/5">
-                <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
-                  Proteini
-                </p>
-                <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
-                  {data.totalProtein}g
-                </p>
-              </div>
-              <div className="bg-white/[0.02] p-[12px] border border-white/5">
-                <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
-                  Ugljenih.
-                </p>
-                <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
-                  {data.totalCarbs}g
-                </p>
-              </div>
-              <div className="bg-white/[0.02] p-[12px] border border-white/5">
-                <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
-                  Masti
-                </p>
-                <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
-                  {data.totalFat}g
-                </p>
-              </div>
-            </div>
-            <p className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40">
-              {t("nutritionPlanActive")}
-            </p>
-          </div>
+          <NutritionPlanCard
+            dayOfWeek={getCurrentDayOfWeekBelgrade()}
+            day={data.nutritionMeals.length > 0 ? {
+              day_of_week: getCurrentDayOfWeekBelgrade(),
+              meals: data.nutritionMeals
+                .sort((a, b) => a.sort_order - b.sort_order)
+                .map((meal) => ({
+                  name: meal.name || `Obrok ${meal.meal_number}`,
+                  foods: (meal.foods || []).map((f) => ({
+                    name: f.name,
+                    amount: f.unit ? `${f.amount}${f.unit}` : String(f.amount || ""),
+                    calories: f.calories || 0,
+                    protein: f.protein || 0,
+                    carbs: f.carbs || 0,
+                    fat: f.fats || 0,
+                  })),
+                })),
+            } : {
+              day_of_week: getCurrentDayOfWeekBelgrade(),
+              meals: [{
+                name: t("dailyOverview"),
+                foods: [{
+                  name: `${data.totalCalories} kcal | P: ${data.totalProtein}g | C: ${data.totalCarbs}g | F: ${data.totalFat}g`,
+                  amount: "",
+                  calories: data.totalCalories,
+                  protein: data.totalProtein,
+                  carbs: data.totalCarbs,
+                  fat: data.totalFat,
+                }],
+              }],
+            }}
+            locale={locale as "sr" | "en" | "ru"}
+          />
         )}
       </div>
 

@@ -165,13 +165,13 @@ export async function getMyNutritionPlan() {
   if (!profile) return null;
   const { data, error } = await supabase
     .from("nutrition_plans")
-    .select("*")
+    .select("*, nutrition_plan_meals(*)")
     .eq("client_id", profile.id)
     .eq("status", "active")
     .limit(1)
     .single();
   if (error) return null;
-  return data as NutritionPlan;
+  return data as NutritionPlan & { nutrition_plan_meals: NutritionPlanMeal[] };
 }
 
 // ============================================================
