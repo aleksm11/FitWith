@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import {
   createTrainingPlan,
@@ -11,9 +11,10 @@ import {
   deleteTrainingDay,
   deleteTrainingPlan,
   searchExercises,
+  getPlanTemplates,
 } from "@/lib/supabase/queries";
 import { localizedField } from "@/lib/supabase/types";
-import type { Locale, TrainingPlan, TrainingDay, TrainingExercise, Exercise } from "@/lib/supabase/types";
+import type { Locale, TrainingPlan, TrainingDay, TrainingExercise, Exercise, PlanTemplate } from "@/lib/supabase/types";
 
 type TrainingPlanWithDetails = TrainingPlan & {
   training_days: (TrainingDay & {
@@ -53,6 +54,15 @@ export default function WorkoutPlanEditor({ clientId, plans, onRefresh }: Props)
   const [creating, setCreating] = useState(false);
   const [newPlanName, setNewPlanName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [templates, setTemplates] = useState<PlanTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
+
+  // Load templates when creating
+  useEffect(() => {
+    if (creating) {
+      getPlanTemplates("workout").then(setTemplates).catch(() => {});
+    }
+  }, [creating]);
 
   // Add exercise state
   const [addingToDay, setAddingToDay] = useState<string | null>(null);
@@ -70,6 +80,7 @@ export default function WorkoutPlanEditor({ clientId, plans, onRefresh }: Props)
     try {
       await createTrainingPlan({ client_id: clientId, name: newPlanName });
       setNewPlanName("");
+      setSelectedTemplateId("");
       setCreating(false);
       onRefresh();
     } catch {
@@ -178,7 +189,23 @@ export default function WorkoutPlanEditor({ clientId, plans, onRefresh }: Props)
     <div className="space-y-[24px]">
       {/* Create new plan */}
       {creating ? (
-        <div className="bg-white/[0.03] border border-orange-500/30 p-[24px]">
+        <div className="bg-white/[0.03] border border-orange-500/30 p-[24px] space-y-[12px]">
+          {templates.length > 0 && (
+            <select
+              value={selectedTemplateId}
+              onChange={(e) => {
+                setSelectedTemplateId(e.target.value);
+                const tpl = templates.find((t) => t.id === e.target.value);
+                if (tpl && !newPlanName) setNewPlanName(tpl.name);
+              }}
+              className="w-full bg-white/[0.03] border border-white/10 px-[14px] py-[10px] font-[family-name:var(--font-roboto)] text-[14px] text-white/70 focus:border-orange-500/50 focus:outline-none appearance-none cursor-pointer"
+            >
+              <option value="" className="bg-[#1a1a1a]">{t("templates")}...</option>
+              {templates.map((tpl) => (
+                <option key={tpl.id} value={tpl.id} className="bg-[#1a1a1a]">{tpl.name}</option>
+              ))}
+            </select>
+          )}
           <div className="flex items-center gap-[12px]">
             <input
               type="text"
@@ -231,7 +258,7 @@ export default function WorkoutPlanEditor({ clientId, plans, onRefresh }: Props)
             </div>
             <button
               onClick={() => handleDeletePlan(plan.id)}
-              className="font-[family-name:var(--font-roboto)] text-[12px] text-white/30 hover:text-red-400 transition-colors cursor-pointer"
+              className="font-[family-name:var(--font-roboto)] text-[12px] text-red-400/60 hover:text-red-400 hover:bg-red-400/10 border border-red-400/20 hover:border-red-400/40 px-[12px] py-[6px] transition-colors cursor-pointer"
             >
               {t("deleteTemplate")}
             </button>
@@ -400,27 +427,29 @@ export default function WorkoutPlanEditor({ clientId, plans, onRefresh }: Props)
           {/* Add day */}
           <div className="px-[24px] py-[12px]">
             {addingDayToPlan === plan.id ? (
-              <div className="flex items-center gap-[8px]">
+              <div className="flex flex-wrap items-center gap-[8px]">
                 <input
                   type="text"
                   value={newDayName}
                   onChange={(e) => setNewDayName(e.target.value)}
                   placeholder={t("dayNamePlaceholder")}
-                  className="flex-1 bg-white/[0.03] border border-white/10 px-[12px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white placeholder-white/30 focus:border-orange-500/50 focus:outline-none"
+                  className="flex-1 min-w-[150px] bg-white/[0.03] border border-white/10 px-[12px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white placeholder-white/30 focus:border-orange-500/50 focus:outline-none"
                   onKeyDown={(e) => e.key === "Enter" && handleAddDay(plan.id)}
                 />
-                <button
-                  onClick={() => handleAddDay(plan.id)}
-                  className="bg-orange-500/20 text-orange-400 font-[family-name:var(--font-roboto)] text-[12px] px-[14px] py-[8px] hover:bg-orange-500/30 transition-colors cursor-pointer"
-                >
-                  {t("addDay")}
-                </button>
-                <button
-                  onClick={() => { setAddingDayToPlan(null); setNewDayName(""); }}
-                  className="font-[family-name:var(--font-roboto)] text-[12px] text-white/30 cursor-pointer px-[8px]"
-                >
-                  {t("cancel")}
-                </button>
+                <div className="flex items-center gap-[8px]">
+                  <button
+                    onClick={() => handleAddDay(plan.id)}
+                    className="bg-orange-500/20 text-orange-400 font-[family-name:var(--font-roboto)] text-[12px] px-[14px] py-[8px] hover:bg-orange-500/30 transition-colors cursor-pointer whitespace-nowrap"
+                  >
+                    {t("addDay")}
+                  </button>
+                  <button
+                    onClick={() => { setAddingDayToPlan(null); setNewDayName(""); }}
+                    className="font-[family-name:var(--font-roboto)] text-[12px] text-white/30 cursor-pointer px-[8px] whitespace-nowrap"
+                  >
+                    {t("cancel")}
+                  </button>
+                </div>
               </div>
             ) : (
               <button

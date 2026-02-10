@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
-import { getMyTrainingPlan } from "@/lib/supabase/queries";
+import { getMyTrainingPlan, getClientTrainingPlans } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/client";
 import { localizedField } from "@/lib/supabase/types";
 import type { Locale } from "@/lib/supabase/types";
+import WorkoutPlanEditor from "@/components/portal/WorkoutPlanEditor";
 
 type SupabaseDay = {
   id: string;
@@ -79,6 +80,10 @@ export default function TrainingContent() {
   const [hasPlan, setHasPlan] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [adminPlans, setAdminPlans] = useState<any[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const supabase = createClient();
@@ -98,6 +103,33 @@ export default function TrainingContent() {
       }
     });
   }, []);
+
+  // Load admin plans for editor
+  useEffect(() => {
+    if (isAdmin && profileId) {
+      getClientTrainingPlans(profileId).then(setAdminPlans).catch(() => {});
+    }
+  }, [isAdmin, profileId, refreshKey]);
+
+  function handleRefresh() {
+    setRefreshKey((k) => k + 1);
+    // Also reload the display
+    getMyTrainingPlan()
+      .then((plan) => {
+        if (plan && plan.training_days.length > 0) {
+          const sorted = [...plan.training_days].sort((a, b) => a.sort_order - b.sort_order);
+          const normalizedDays = sorted.map((d) => normalizeSupabaseDay(d as unknown as SupabaseDay, locale, t));
+          const labels = sorted.map((d) => {
+            const name = localizedField(d as unknown as Record<string, unknown>, "day_name", locale);
+            return name || `${t("dayLabel")} ${d.day_number}`;
+          });
+          setDays(normalizedDays);
+          setDayLabels(labels);
+          setHasPlan(true);
+        }
+      })
+      .catch(() => {});
+  }
 
   useEffect(() => {
     getMyTrainingPlan()
@@ -142,16 +174,22 @@ export default function TrainingContent() {
         <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/50 mb-[32px]">
           {t("trainingSubtitle")}
         </p>
-        <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px]">
-          <div className="py-[48px] text-center">
-            <svg className="w-16 h-16 text-white/10 mx-auto mb-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
-            <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white/50 mb-[8px]">
-              {t("noTrainingPlanAssigned")}
-            </p>
+        {isAdmin && profileId ? (
+          <div className="mb-[32px]">
+            <WorkoutPlanEditor clientId={profileId} plans={adminPlans} onRefresh={handleRefresh} />
           </div>
-        </div>
+        ) : (
+          <div className="bg-white/[0.03] border border-white/10 p-[32px] max-sm:p-[20px]">
+            <div className="py-[48px] text-center">
+              <svg className="w-16 h-16 text-white/10 mx-auto mb-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+              <p className="font-[family-name:var(--font-sora)] font-semibold text-[20px] text-white/50 mb-[8px]">
+                {t("noTrainingPlanAssigned")}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -167,20 +205,28 @@ export default function TrainingContent() {
           {t("training")}
         </h1>
         {isAdmin && profileId && (
-          <Link
-            href={`/${locale}/portal/klijenti/${profileId}`}
-            className="flex items-center gap-[6px] font-[family-name:var(--font-roboto)] text-[13px] text-orange-400 hover:text-orange-300 transition-colors"
+          <button
+            onClick={() => setShowEditor(!showEditor)}
+            className="flex items-center gap-[6px] font-[family-name:var(--font-roboto)] text-[13px] text-orange-400 hover:text-orange-300 transition-colors cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
             </svg>
             {t("editPlan")}
-          </Link>
+          </button>
         )}
       </div>
       <p className="font-[family-name:var(--font-roboto)] text-[16px] text-white/50 mb-[32px]">
         {t("trainingSubtitle")}
       </p>
+
+      {/* Admin editor */}
+      {isAdmin && profileId && showEditor && (
+        <div className="mb-[32px] border border-orange-500/20 p-[24px] max-sm:p-[16px] bg-white/[0.02]">
+          <h3 className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-orange-400 mb-[16px]">{t("editPlan")}</h3>
+          <WorkoutPlanEditor clientId={profileId} plans={adminPlans} onRefresh={handleRefresh} />
+        </div>
+      )}
 
       {/* Day tabs */}
       <div className="flex flex-wrap gap-[6px] mb-[32px]">

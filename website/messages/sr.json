@@ -17,7 +17,16 @@
     "portal": "Portal",
     "startNow": "Započni",
     "register": "Registracija",
-    "logout": "Odjavi se"
+    "logout": "Odjavi se",
+    "tagline": "Tvoj trener, tvoj plan.",
+    "pagesTitle": "Stranice",
+    "servicesTitle": "Usluge",
+    "service1": "Online mentorstvo",
+    "service2": "Plan treninga",
+    "service3": "Plan ishrane",
+    "legalTitle": "Pravne informacije",
+    "privacy": "Politika privatnosti",
+    "copyright": "Sva prava zadržana."
   },
   "Hero": {
     "title": "TVOJ LIČNI FITNES TRENER",
@@ -31,7 +40,21 @@
     "stat3Value": "1000+",
     "stat3Label": "kreiranih planova",
     "stat4Value": "500+",
-    "stat4Label": "vežbi u biblioteci"
+    "stat4Label": "vežbi u biblioteci",
+    "heroTitle": "TVOJ put do rezultata",
+    "heroSubtitle": "Personalizovani planovi treninga i ishrane za tvoje ciljeve",
+    "ctaTitle": "Započni transformaciju",
+    "ctaText": "Kontaktiraj me i započni svoj put ka boljoj verziji sebe.",
+    "statsTitle": "Rezultati govore",
+    "philosophyTitle": "Moja filozofija",
+    "philosophyText": "Verujem u individualan pristup svakom klijentu. Nema univerzalnog rešenja — svaki plan je prilagođen vašim ciljevima, životnom stilu i mogućnostima.",
+    "certTitle": "Sertifikati",
+    "cert1": "Licencirani fitnes trener",
+    "cert2": "Sertifikovani nutricionista",
+    "cert3": "Specijalizacija za sportsku ishranu",
+    "bio1": "Više od 5 godina iskustva u fitnes industriji",
+    "bio2": "Rad sa više od 200 klijenata",
+    "bio3": "Fokus na dugoročne rezultate"
   },
   "Services": {
     "title": "Kako mogu da ti pomognem",
@@ -73,7 +96,8 @@
     "transformation3Name": "Nikola J.",
     "transformation3Quote": "Dobio sam 10kg čiste mišićne mase za 20 nedelja. Plan je bio savršeno prilagođen mom rasporedu i ciljevima.",
     "transformation4Name": "Jelena I.",
-    "transformation4Quote": "Konačno sam pronašla pristup koji funkcioniše. -12kg za 10 nedelja, bez gladovanja, uz zdrave navike koje zadržavam i dalje."
+    "transformation4Quote": "Konačno sam pronašla pristup koji funkcioniše. -12kg za 10 nedelja, bez gladovanja, uz zdrave navike koje zadržavam i dalje.",
+    "viewAll": "Pogledaj sve"
   },
   "Pricing": {
     "title": "Cene paketa",
@@ -117,7 +141,17 @@
     "faq3Q": "Koliko traje jedan ciklus?",
     "faq3A": "Svaki plan je kreiran za period od mesec dana, sa mogućnošću produženja i prilagođavanja na osnovu vašeg napretka.",
     "faq4Q": "Da li je potrebna oprema?",
-    "faq4A": "Plan treninga se prilagođava vašoj dostupnoj opremi — bilo da trenirate u teretani, kod kuće ili na otvorenom."
+    "faq4A": "Plan treninga se prilagođava vašoj dostupnoj opremi — bilo da trenirate u teretani, kod kuće ili na otvorenom.",
+    "ctaTitle": "Spreman da počneš?",
+    "tier1Title": "Plan treninga",
+    "tier1Subtitle": "Personalizovan program vežbanja",
+    "tier1Desc": "Detaljan plan treninga prilagođen vašim ciljevima i nivou iskustva.",
+    "tier2Title": "Plan ishrane",
+    "tier2Subtitle": "Prilagođen plan ishrane",
+    "tier2Desc": "Plan ishrane sa detaljnim rasporedom obroka i makro nutrijentima.",
+    "tier3Title": "Online mentorstvo",
+    "tier3Subtitle": "Kompletna podrška",
+    "tier3Desc": "Plan treninga + ishrane sa nedeljnim praćenjem i prilagođavanjem."
   },
   "WhyChoose": {
     "title": "Zašto baš FitWith?",
@@ -447,7 +481,15 @@
     "weeklyReportTitle": "Vreme za nedeljni izveštaj",
     "weeklyReportMessage": "Prošlo je 7 dana od vašeg poslednjeg izveštaja o napretku. Popunite kratak upitnik kako bi vaš trener mogao da prilagodi plan.",
     "createTrainingPlan": "Kreiraj plan treninga",
-    "createNutritionPlan": "Kreiraj plan ishrane"
+    "createNutritionPlan": "Kreiraj plan ishrane",
+    "newPlanName": "Naziv plana",
+    "dayNamePlaceholder": "Naziv dana (npr. Ponedeljak)",
+    "addDay": "Dodaj dan",
+    "addExercise": "Dodaj vežbu",
+    "addMeal": "Dodaj obrok",
+    "mealName": "Naziv obroka",
+    "editMacros": "Izmeni makrose",
+    "searchExercise": "Pretraži vežbe..."
   },
   "Admin": {
     "title": "Admin panel",

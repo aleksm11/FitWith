@@ -17,7 +17,16 @@
     "portal": "Portal",
     "startNow": "Get Started",
     "register": "Register",
-    "logout": "Logout"
+    "logout": "Logout",
+    "tagline": "Your trainer, your plan.",
+    "pagesTitle": "Pages",
+    "servicesTitle": "Services",
+    "service1": "Online mentoring",
+    "service2": "Training plan",
+    "service3": "Nutrition plan",
+    "legalTitle": "Legal",
+    "privacy": "Privacy policy",
+    "copyright": "All rights reserved."
   },
   "Hero": {
     "title": "YOUR PERSONAL FITNESS COACH",
@@ -31,7 +40,21 @@
     "stat3Value": "1000+",
     "stat3Label": "plans created",
     "stat4Value": "500+",
-    "stat4Label": "exercises in library"
+    "stat4Label": "exercises in library",
+    "heroTitle": "YOUR path to results",
+    "heroSubtitle": "Personalized training and nutrition plans for your goals",
+    "ctaTitle": "Start your transformation",
+    "ctaText": "Contact me and start your journey to a better version of yourself.",
+    "statsTitle": "Results speak",
+    "philosophyTitle": "My philosophy",
+    "philosophyText": "I believe in an individual approach to every client. There is no universal solution — every plan is tailored to your goals, lifestyle, and abilities.",
+    "certTitle": "Certifications",
+    "cert1": "Licensed fitness trainer",
+    "cert2": "Certified nutritionist",
+    "cert3": "Sports nutrition specialization",
+    "bio1": "Over 5 years of experience in the fitness industry",
+    "bio2": "Working with over 200 clients",
+    "bio3": "Focus on long-term results"
   },
   "Services": {
     "title": "How I can help you",
@@ -73,7 +96,8 @@
     "transformation3Name": "Nikola J.",
     "transformation3Quote": "I gained 10kg of lean muscle mass in 20 weeks. The plan was perfectly tailored to my schedule and goals.",
     "transformation4Name": "Jelena I.",
-    "transformation4Quote": "I finally found an approach that works. -12kg in 10 weeks, no starvation, with healthy habits I maintain to this day."
+    "transformation4Quote": "I finally found an approach that works. -12kg in 10 weeks, no starvation, with healthy habits I maintain to this day.",
+    "viewAll": "View all"
   },
   "Pricing": {
     "title": "Pricing",
@@ -117,7 +141,17 @@
     "faq3Q": "How long is one cycle?",
     "faq3A": "Each plan is designed for a one-month period, with the option to extend and adjust based on your progress.",
     "faq4Q": "Do I need equipment?",
-    "faq4A": "The training plan is adapted to your available equipment — whether you train in a gym, at home, or outdoors."
+    "faq4A": "The training plan is adapted to your available equipment — whether you train in a gym, at home, or outdoors.",
+    "ctaTitle": "Ready to start?",
+    "tier1Title": "Training plan",
+    "tier1Subtitle": "Personalized workout program",
+    "tier1Desc": "Detailed training plan tailored to your goals and experience level.",
+    "tier2Title": "Nutrition plan",
+    "tier2Subtitle": "Customized nutrition plan",
+    "tier2Desc": "Nutrition plan with detailed meal schedule and macronutrients.",
+    "tier3Title": "Online mentoring",
+    "tier3Subtitle": "Complete support",
+    "tier3Desc": "Training + nutrition plan with weekly tracking and adjustments."
   },
   "WhyChoose": {
     "title": "Why FitWith?",
@@ -447,7 +481,15 @@
     "weeklyReportTitle": "Time for your weekly report",
     "weeklyReportMessage": "It's been 7 days since your last progress report. Fill out a quick questionnaire so your coach can adjust your plan.",
     "createTrainingPlan": "Create training plan",
-    "createNutritionPlan": "Create nutrition plan"
+    "createNutritionPlan": "Create nutrition plan",
+    "newPlanName": "Plan name",
+    "dayNamePlaceholder": "Day name (e.g. Monday)",
+    "addDay": "Add day",
+    "addExercise": "Add exercise",
+    "addMeal": "Add meal",
+    "mealName": "Meal name",
+    "editMacros": "Edit macros",
+    "searchExercise": "Search exercises..."
   },
   "Admin": {
     "title": "Admin Panel",

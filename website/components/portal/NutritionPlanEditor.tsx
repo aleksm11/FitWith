@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import {
   createNutritionPlan,
@@ -9,8 +9,9 @@ import {
   createNutritionPlanMeal,
   updateNutritionPlanMeal,
   deleteNutritionPlanMeal,
+  getPlanTemplates,
 } from "@/lib/supabase/queries";
-import type { NutritionPlan, NutritionPlanMeal } from "@/lib/supabase/types";
+import type { NutritionPlan, NutritionPlanMeal, PlanTemplate } from "@/lib/supabase/types";
 
 type NutritionPlanWithMeals = NutritionPlan & {
   nutrition_plan_meals: NutritionPlanMeal[];
@@ -27,6 +28,15 @@ export default function NutritionPlanEditor({ clientId, plans, onRefresh }: Prop
 
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [templates, setTemplates] = useState<PlanTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
+
+  useEffect(() => {
+    if (creating) {
+      getPlanTemplates("nutrition").then(setTemplates).catch(() => {});
+    }
+  }, [creating]);
+
   const [newPlan, setNewPlan] = useState({
     name: "",
     daily_calories: 2000,
@@ -141,6 +151,32 @@ export default function NutritionPlanEditor({ clientId, plans, onRefresh }: Prop
       {/* Create new plan */}
       {creating ? (
         <div className="bg-white/[0.03] border border-orange-500/30 p-[24px] space-y-[16px]">
+          {templates.length > 0 && (
+            <select
+              value={selectedTemplateId}
+              onChange={(e) => {
+                setSelectedTemplateId(e.target.value);
+                const tpl = templates.find((t) => t.id === e.target.value);
+                if (tpl) {
+                  const data = tpl.data as Record<string, number>;
+                  setNewPlan({
+                    ...newPlan,
+                    name: newPlan.name || tpl.name,
+                    daily_calories: data?.daily_calories || newPlan.daily_calories,
+                    protein_g: data?.protein_g || newPlan.protein_g,
+                    carbs_g: data?.carbs_g || newPlan.carbs_g,
+                    fats_g: data?.fats_g || newPlan.fats_g,
+                  });
+                }
+              }}
+              className="w-full bg-white/[0.03] border border-white/10 px-[14px] py-[10px] font-[family-name:var(--font-roboto)] text-[14px] text-white/70 focus:border-orange-500/50 focus:outline-none appearance-none cursor-pointer"
+            >
+              <option value="" className="bg-[#1a1a1a]">{t("templates")}...</option>
+              {templates.map((tpl) => (
+                <option key={tpl.id} value={tpl.id} className="bg-[#1a1a1a]">{tpl.name}</option>
+              ))}
+            </select>
+          )}
           <input
             type="text"
             value={newPlan.name}
@@ -150,22 +186,22 @@ export default function NutritionPlanEditor({ clientId, plans, onRefresh }: Prop
           />
           <div className="grid grid-cols-4 gap-[12px]">
             <div>
-              <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 mb-[4px]">kcal</label>
+              <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-orange-500 mb-[4px]">kcal</label>
               <input type="number" value={newPlan.daily_calories} onChange={(e) => setNewPlan({ ...newPlan, daily_calories: parseInt(e.target.value) || 0 })}
                 className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white text-center focus:border-orange-500/50 focus:outline-none" />
             </div>
             <div>
-              <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 mb-[4px]">{t("protein")}</label>
+              <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-orange-500 mb-[4px]">{t("protein")}</label>
               <input type="number" value={newPlan.protein_g} onChange={(e) => setNewPlan({ ...newPlan, protein_g: parseInt(e.target.value) || 0 })}
                 className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white text-center focus:border-orange-500/50 focus:outline-none" />
             </div>
             <div>
-              <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 mb-[4px]">{t("carbs")}</label>
+              <label className="block font-[family-name:var(--font-roboto)] text-[9px] uppercase tracking-[1px] text-orange-500 mb-[4px] leading-tight">{t("carbs")}</label>
               <input type="number" value={newPlan.carbs_g} onChange={(e) => setNewPlan({ ...newPlan, carbs_g: parseInt(e.target.value) || 0 })}
                 className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white text-center focus:border-orange-500/50 focus:outline-none" />
             </div>
             <div>
-              <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 mb-[4px]">{t("fat")}</label>
+              <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-orange-500 mb-[4px]">{t("fat")}</label>
               <input type="number" value={newPlan.fats_g} onChange={(e) => setNewPlan({ ...newPlan, fats_g: parseInt(e.target.value) || 0 })}
                 className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white text-center focus:border-orange-500/50 focus:outline-none" />
             </div>
@@ -211,7 +247,7 @@ export default function NutritionPlanEditor({ clientId, plans, onRefresh }: Prop
                 {t("editMacros")}
               </button>
               <button onClick={() => handleDeletePlan(plan.id)}
-                className="font-[family-name:var(--font-roboto)] text-[12px] text-white/30 hover:text-red-400 transition-colors cursor-pointer">
+                className="font-[family-name:var(--font-roboto)] text-[12px] text-red-400/60 hover:text-red-400 hover:bg-red-400/10 border border-red-400/20 hover:border-red-400/40 px-[12px] py-[6px] transition-colors cursor-pointer">
                 {t("deleteTemplate")}
               </button>
             </div>
@@ -223,22 +259,22 @@ export default function NutritionPlanEditor({ clientId, plans, onRefresh }: Prop
               <div className="space-y-[12px]">
                 <div className="grid grid-cols-4 gap-[12px]">
                   <div>
-                    <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 mb-[4px]">kcal</label>
+                    <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-orange-500 mb-[4px]">kcal</label>
                     <input type="number" value={editMacros.daily_calories} onChange={(e) => setEditMacros({ ...editMacros, daily_calories: parseInt(e.target.value) || 0 })}
                       className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white text-center focus:border-orange-500/50 focus:outline-none" />
                   </div>
                   <div>
-                    <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 mb-[4px]">P</label>
+                    <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-orange-500 mb-[4px]">{t("protein")}</label>
                     <input type="number" value={editMacros.protein_g} onChange={(e) => setEditMacros({ ...editMacros, protein_g: parseInt(e.target.value) || 0 })}
                       className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white text-center focus:border-orange-500/50 focus:outline-none" />
                   </div>
                   <div>
-                    <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 mb-[4px]">C</label>
+                    <label className="block font-[family-name:var(--font-roboto)] text-[9px] uppercase tracking-[1px] text-orange-500 mb-[4px] leading-tight">{t("carbs")}</label>
                     <input type="number" value={editMacros.carbs_g} onChange={(e) => setEditMacros({ ...editMacros, carbs_g: parseInt(e.target.value) || 0 })}
                       className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white text-center focus:border-orange-500/50 focus:outline-none" />
                   </div>
                   <div>
-                    <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 mb-[4px]">F</label>
+                    <label className="block font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-orange-500 mb-[4px]">{t("fat")}</label>
                     <input type="number" value={editMacros.fats_g} onChange={(e) => setEditMacros({ ...editMacros, fats_g: parseInt(e.target.value) || 0 })}
                       className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white text-center focus:border-orange-500/50 focus:outline-none" />
                   </div>

@@ -1,6 +1,7 @@
 import Navbar from "@/components/sections/Navbar";
 import PortalSubNav from "@/components/portal/PortalSubNav";
 import QuestionnaireNag from "@/components/portal/QuestionnaireNag";
+import SwipePortalWrapper from "@/components/portal/SwipePortalWrapper";
 
 export default function PortalLayout({
   children,
@@ -17,11 +18,13 @@ export default function PortalLayout({
       <QuestionnaireNag />
       <div className="pt-[80px] max-sm:pt-[64px]">
         <PortalSubNav />
-        <main className="px-[40px] max-sm:px-[20px] py-[40px]">
-          <div className="max-w-[1280px] mx-auto">
-            {children}
-          </div>
-        </main>
+        <SwipePortalWrapper>
+          <main className="px-[40px] max-sm:px-[20px] py-[40px]">
+            <div className="max-w-[1280px] mx-auto">
+              {children}
+            </div>
+          </main>
+        </SwipePortalWrapper>
       </div>
     </div>
   );
