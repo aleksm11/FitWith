@@ -8,10 +8,16 @@ import type {
   TrainingDay,
   TrainingExercise,
   NutritionPlan,
+  NutritionPlanMeal,
   ContactMessage,
   Questionnaire,
   Profile,
   SiteSetting,
+  PlanTemplate,
+  WorkoutPlan,
+  WorkoutPlanWeek,
+  WorkoutPlanDay,
+  WorkoutPlanExercise,
 } from "./types";
 
 // ============================================================
@@ -601,6 +607,254 @@ export async function updateSiteSetting(key: string, values: { value_sr?: string
     const { error } = await supabase.from("site_settings").insert({ key, ...values });
     if (error) throw error;
   }
+}
+
+// --- Client Management (admin) ---
+export async function getClientProfile(profileId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", profileId)
+    .single();
+  if (error) return null;
+  return data as Profile;
+}
+
+export async function updateUserPlanType(profileId: string, planType: string) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("profiles")
+    .update({ plan_type: planType })
+    .eq("id", profileId);
+  if (error) throw error;
+}
+
+export async function getClientWorkoutPlans(clientId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("workout_plans")
+    .select("*, workout_plan_weeks(*, workout_plan_days(*, workout_plan_exercises(*, exercises(*))))")
+    .eq("client_id", clientId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data as (WorkoutPlan & {
+    workout_plan_weeks: (WorkoutPlanWeek & {
+      workout_plan_days: (WorkoutPlanDay & {
+        workout_plan_exercises: (WorkoutPlanExercise & { exercises: Exercise | null })[];
+      })[];
+    })[];
+  })[];
+}
+
+export async function getClientNutritionPlans(clientId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("nutrition_plans")
+    .select("*, nutrition_plan_meals(*)")
+    .eq("client_id", clientId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data as (NutritionPlan & { nutrition_plan_meals: NutritionPlanMeal[] })[];
+}
+
+export async function getClientTrainingPlans(clientId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("training_plans")
+    .select("*, training_days(*, training_exercises(*, exercises(*)))")
+    .eq("client_id", clientId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data as (TrainingPlan & {
+    training_days: (TrainingDay & {
+      training_exercises: (TrainingExercise & { exercises: Exercise | null })[];
+    })[];
+  })[];
+}
+
+// --- Plan Templates ---
+export async function getPlanTemplates(type?: string) {
+  const supabase = createClient();
+  let query = supabase.from("plan_templates").select("*").order("created_at", { ascending: false });
+  if (type) query = query.eq("type", type);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data as PlanTemplate[];
+}
+
+export async function getPlanTemplate(id: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("plan_templates")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) return null;
+  return data as PlanTemplate;
+}
+
+export async function createPlanTemplate(template: {
+  name: string;
+  type: string;
+  description?: string;
+  duration_weeks?: number;
+  difficulty?: string;
+  goal?: string;
+  data?: Record<string, unknown>;
+  tags?: string[];
+  created_by?: string;
+}) {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("plan_templates").insert(template).select().single();
+  if (error) throw error;
+  return data as PlanTemplate;
+}
+
+export async function updatePlanTemplate(id: string, updates: Partial<PlanTemplate>) {
+  const supabase = createClient();
+  const { error } = await supabase.from("plan_templates").update(updates).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deletePlanTemplate(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("plan_templates").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Workout Plans CRUD ---
+export async function createWorkoutPlan(plan: {
+  client_id: string;
+  name: string;
+  template_id?: string;
+  description?: string;
+  status?: string;
+  start_date?: string;
+  end_date?: string;
+  created_by?: string;
+}) {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("workout_plans").insert(plan).select().single();
+  if (error) throw error;
+  return data as WorkoutPlan;
+}
+
+export async function updateWorkoutPlan(id: string, updates: Partial<WorkoutPlan>) {
+  const supabase = createClient();
+  const { error } = await supabase.from("workout_plans").update(updates).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteWorkoutPlan(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("workout_plans").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Workout Plan Weeks ---
+export async function createWorkoutPlanWeek(week: {
+  plan_id: string;
+  week_number: number;
+  name?: string;
+  deload?: boolean;
+  notes?: string;
+}) {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("workout_plan_weeks").insert(week).select().single();
+  if (error) throw error;
+  return data as WorkoutPlanWeek;
+}
+
+export async function deleteWorkoutPlanWeek(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("workout_plan_weeks").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Workout Plan Days ---
+export async function createWorkoutPlanDay(day: {
+  week_id: string;
+  day_number: number;
+  name?: string;
+  focus?: string;
+  notes?: string;
+  sort_order?: number;
+}) {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("workout_plan_days").insert(day).select().single();
+  if (error) throw error;
+  return data as WorkoutPlanDay;
+}
+
+export async function deleteWorkoutPlanDay(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("workout_plan_days").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Workout Plan Exercises ---
+export async function createWorkoutPlanExercise(exercise: {
+  day_id: string;
+  exercise_id?: string;
+  exercise_name?: string;
+  sets?: number;
+  reps?: string;
+  weight?: string;
+  rest_seconds?: number;
+  tempo?: string;
+  superset_group?: number;
+  notes?: string;
+  sort_order?: number;
+}) {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("workout_plan_exercises").insert(exercise).select().single();
+  if (error) throw error;
+  return data as WorkoutPlanExercise;
+}
+
+export async function updateWorkoutPlanExercise(id: string, updates: Partial<WorkoutPlanExercise>) {
+  const supabase = createClient();
+  const { error } = await supabase.from("workout_plan_exercises").update(updates).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteWorkoutPlanExercise(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("workout_plan_exercises").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Nutrition Plan Meals ---
+export async function createNutritionPlanMeal(meal: {
+  plan_id: string;
+  meal_number: number;
+  name?: string;
+  time_suggestion?: string;
+  foods?: Record<string, unknown>[];
+  calories?: number;
+  protein_g?: number;
+  carbs_g?: number;
+  fats_g?: number;
+  notes?: string;
+  sort_order?: number;
+}) {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("nutrition_plan_meals").insert(meal).select().single();
+  if (error) throw error;
+  return data as NutritionPlanMeal;
+}
+
+export async function updateNutritionPlanMeal(id: string, updates: Partial<NutritionPlanMeal>) {
+  const supabase = createClient();
+  const { error } = await supabase.from("nutrition_plan_meals").update(updates).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteNutritionPlanMeal(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("nutrition_plan_meals").delete().eq("id", id);
+  if (error) throw error;
 }
 
 // --- File Upload ---

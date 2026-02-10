@@ -1,10 +1,19 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
+import { getMyProfile } from "@/lib/supabase/queries";
 
-const navItems = [
+type NavItem = {
+  key: string;
+  href: string;
+  icon: React.ReactNode;
+  adminOnly?: boolean;
+};
+
+const navItems: NavItem[] = [
   {
     key: "dashboard",
     href: "/portal",
@@ -49,18 +58,39 @@ const navItems = [
       />
     ),
   },
+  {
+    key: "clients",
+    href: "/portal/klijenti",
+    adminOnly: true,
+    icon: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+      />
+    ),
+  },
 ];
 
 export default function PortalSubNav() {
   const t = useTranslations("Portal");
   const locale = useLocale();
   const pathname = usePathname();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    getMyProfile().then((profile) => {
+      if (profile?.role === "admin") setIsAdmin(true);
+    });
+  }, []);
+
+  const visibleItems = navItems.filter((item) => !item.adminOnly || isAdmin);
 
   return (
     <div className="bg-[#0A0A0A] border-b border-white/10">
       <nav className="max-w-[1280px] mx-auto px-[40px] max-sm:px-[20px] overflow-x-auto">
         <div className="flex items-center gap-[32px] max-sm:gap-[24px]">
-          {navItems.map((item) => {
+          {visibleItems.map((item) => {
             const fullHref = `/${locale}${item.href}`;
             const isActive =
               item.href === "/portal"
