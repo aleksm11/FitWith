@@ -491,7 +491,19 @@
     "addMeal": "Add meal",
     "mealName": "Meal name",
     "editMacros": "Edit macros",
-    "searchExercise": "Search exercises..."
+    "searchExercise": "Search exercises...",
+    "noNutritionPlanToday": "No nutrition plan for today",
+    "noTrainingPlanToday": "No training plan for today",
+    "activeUntil": "Active until",
+    "expiredOn": "Expired on",
+    "addFood": "Add food item",
+    "foodNamePlaceholder": "Food name",
+    "daysCount": "days",
+    "mealsCount": "meals",
+    "mealDefault": "Meal",
+    "dayDefault": "Day",
+    "noDataAvailable": "No data available",
+    "itemsCount": "items"
   },
   "Admin": {
     "title": "Admin Panel",

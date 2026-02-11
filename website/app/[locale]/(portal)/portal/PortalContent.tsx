@@ -220,34 +220,35 @@ export default function PortalContent() {
               {data.todayFocus}
             </h3>
             <p className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40 mb-[16px]">
-              {data.todayExercises.length} vežbi
+              {data.todayExercises.length} {t("exercisesCount")}
             </p>
-            <div className="space-y-[10px]">
+            <div>
+              {/* Table header */}
+              <div className="grid grid-cols-[1fr_60px_70px] gap-[6px] pb-[6px] mb-[4px] border-b border-white/5">
+                <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-orange-500">{t("exerciseLabel")}</span>
+                <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-orange-500 text-center">{t("setsLabel")}</span>
+                <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-orange-500 text-center">{t("repsLabel")}</span>
+              </div>
+              {/* Exercise rows */}
               {data.todayExercises.map((ex, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between py-[10px] border-b border-white/5 last:border-0"
+                  className="grid grid-cols-[1fr_60px_70px] gap-[6px] py-[8px] border-b border-white/5 last:border-0 items-center"
                 >
-                  <div className="flex items-center gap-[10px] flex-1 min-w-0">
-                    <span className="font-[family-name:var(--font-sora)] font-semibold text-[13px] text-orange-500 w-[20px] flex-shrink-0">
-                      {i + 1}
+                  {ex.slug ? (
+                    <Link
+                      href={`/${locale}/vezbe/${ex.slug}`}
+                      className="font-[family-name:var(--font-roboto)] text-[13px] text-white hover:text-orange-400 transition-colors underline decoration-white/20 underline-offset-2"
+                    >
+                      {ex.name}
+                    </Link>
+                  ) : (
+                    <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/70">
+                      {ex.name}
                     </span>
-                    {ex.slug ? (
-                      <Link
-                        href={`/${locale}/vezbe/${ex.slug}`}
-                        className="font-[family-name:var(--font-roboto)] text-[14px] text-white hover:text-orange-400 transition-colors truncate"
-                      >
-                        {ex.name}
-                      </Link>
-                    ) : (
-                      <span className="font-[family-name:var(--font-roboto)] text-[14px] text-white truncate">
-                        {ex.name}
-                      </span>
-                    )}
-                  </div>
-                  <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/40 flex-shrink-0 ml-[12px] whitespace-nowrap">
-                    {ex.sets} x {ex.reps}
-                  </span>
+                  )}
+                  <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/60 text-center">{ex.sets}</span>
+                  <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/60 text-center">{ex.reps}</span>
                 </div>
               ))}
             </div>
@@ -264,7 +265,7 @@ export default function PortalContent() {
           <div className="grid grid-cols-4 gap-[12px]">
             <div className="bg-white/[0.02] p-[12px] border border-white/5">
               <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
-                Kalorije
+                {t("calories")}
               </p>
               <p className="font-[family-name:var(--font-sora)] font-semibold text-[18px] text-orange-500">
                 {data.totalCalories}
@@ -272,7 +273,7 @@ export default function PortalContent() {
             </div>
             <div className="bg-white/[0.02] p-[12px] border border-white/5">
               <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
-                Proteini
+                {t("protein")}
               </p>
               <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
                 {data.totalProtein}g
@@ -280,7 +281,7 @@ export default function PortalContent() {
             </div>
             <div className="bg-white/[0.02] p-[12px] border border-white/5">
               <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
-                Ugljenih.
+                {t("carbs")}
               </p>
               <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
                 {data.totalCarbs}g
@@ -288,7 +289,7 @@ export default function PortalContent() {
             </div>
             <div className="bg-white/[0.02] p-[12px] border border-white/5">
               <p className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1px] text-white/40 mb-[4px]">
-                Masti
+                {t("fat")}
               </p>
               <p className="font-[family-name:var(--font-sora)] font-semibold text-[16px] text-white">
                 {data.totalFat}g
@@ -337,7 +338,7 @@ export default function PortalContent() {
               meals: data.nutritionMeals
                 .sort((a, b) => a.sort_order - b.sort_order)
                 .map((meal) => ({
-                  name: meal.name || `Obrok ${meal.meal_number}`,
+                  name: meal.name || `${t("mealDefault")} ${meal.meal_number}`,
                   foods: (meal.foods || []).map((f) => ({
                     name: f.name,
                     amount: f.unit ? `${f.amount}${f.unit}` : String(f.amount || ""),

@@ -491,7 +491,19 @@
     "addMeal": "Добавить приём пищи",
     "mealName": "Название приёма пищи",
     "editMacros": "Изменить макросы",
-    "searchExercise": "Поиск упражнений..."
+    "searchExercise": "Поиск упражнений...",
+    "noNutritionPlanToday": "Нет плана питания на сегодня",
+    "noTrainingPlanToday": "Нет плана тренировок на сегодня",
+    "activeUntil": "Активно до",
+    "expiredOn": "Истекло",
+    "addFood": "Добавить продукт",
+    "foodNamePlaceholder": "Название продукта",
+    "daysCount": "дней",
+    "mealsCount": "приёмов пищи",
+    "mealDefault": "Приём пищи",
+    "dayDefault": "День",
+    "noDataAvailable": "Нет данных",
+    "itemsCount": "элементов"
   },
   "Admin": {
     "title": "Панель администратора",

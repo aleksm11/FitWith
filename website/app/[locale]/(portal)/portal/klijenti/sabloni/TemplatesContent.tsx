@@ -626,7 +626,7 @@ export default function TemplatesContent() {
                             onClick={(e) => e.stopPropagation()}
                             placeholder="07:00"
                             className="bg-transparent border-none px-0 py-0 font-[family-name:var(--font-roboto)] text-[12px] text-white/40 focus:outline-none w-[50px] text-center" />
-                          <span className="font-[family-name:var(--font-roboto)] text-[11px] text-white/30">{meal.foods.length} items</span>
+                          <span className="font-[family-name:var(--font-roboto)] text-[11px] text-white/30">{meal.foods.length} {t("itemsCount")}</span>
                         </div>
                         <button onClick={(e) => { e.stopPropagation(); removeMeal(mi); }}
                           className="font-[family-name:var(--font-roboto)] text-[11px] text-red-400/60 hover:text-red-400 hover:bg-red-400/10 border border-red-400/20 px-[8px] py-[4px] transition-colors cursor-pointer">
@@ -639,7 +639,7 @@ export default function TemplatesContent() {
                           {meal.foods.map((food, fi) => (
                             <div key={fi} className="flex items-center gap-[8px]">
                               <input type="text" value={food.name} onChange={(e) => updateFood(mi, fi, "name", e.target.value)}
-                                placeholder="Naziv namirnice"
+                                placeholder={t("foodNamePlaceholder")}
                                 className="flex-1 min-w-0 bg-white/[0.03] border border-white/10 px-[10px] py-[6px] font-[family-name:var(--font-roboto)] text-[13px] text-white placeholder-white/30 focus:border-orange-500/50 focus:outline-none" />
                               <input type="text" value={food.amount} onChange={(e) => updateFood(mi, fi, "amount", e.target.value)}
                                 placeholder="100g"
@@ -652,7 +652,7 @@ export default function TemplatesContent() {
                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
-                            Dodaj namirnicu
+                            {t("addFood")}
                           </button>
                         </div>
                       )}
@@ -730,10 +730,10 @@ export default function TemplatesContent() {
                           {template.duration_weeks}w
                         </span>
                         {isWorkout && days.length > 0 && (
-                          <span className="font-[family-name:var(--font-roboto)] text-[11px] text-white/30">{days.length} dana</span>
+                          <span className="font-[family-name:var(--font-roboto)] text-[11px] text-white/30">{days.length} {t("daysCount")}</span>
                         )}
                         {!isWorkout && meals.length > 0 && (
-                          <span className="font-[family-name:var(--font-roboto)] text-[11px] text-white/30">{meals.length} obroka</span>
+                          <span className="font-[family-name:var(--font-roboto)] text-[11px] text-white/30">{meals.length} {t("mealsCount")}</span>
                         )}
                       </div>
                       {template.description && (
@@ -769,7 +769,7 @@ export default function TemplatesContent() {
                       <div className="space-y-[12px]">
                         {days.map((day, di) => (
                           <div key={di}>
-                            <h4 className="font-[family-name:var(--font-sora)] font-semibold text-[14px] text-orange-400 mb-[8px]">{day.name || `Dan ${di + 1}`}</h4>
+                            <h4 className="font-[family-name:var(--font-sora)] font-semibold text-[14px] text-orange-400 mb-[8px]">{day.name || `${t("dayDefault")} ${di + 1}`}</h4>
                             {day.exercises.length > 0 && (
                               <>
                                 <div className="grid grid-cols-[1fr_60px_70px_60px] gap-[6px] pb-[4px] border-b border-white/5">
@@ -813,7 +813,7 @@ export default function TemplatesContent() {
                         {meals.map((meal, mi) => (
                           <div key={mi}>
                             <h4 className="font-[family-name:var(--font-sora)] font-semibold text-[14px] text-orange-400 mb-[4px]">
-                              {meal.name || `Obrok ${mi + 1}`}
+                              {meal.name || `${t("mealDefault")} ${mi + 1}`}
                               {meal.time_suggestion && <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/30 ml-[8px]">{meal.time_suggestion}</span>}
                             </h4>
                             {meal.foods.map((food, fi) => (
@@ -828,7 +828,7 @@ export default function TemplatesContent() {
                     )}
 
                     {isWorkout && days.length === 0 && !isWorkout && meals.length === 0 && (
-                      <p className="font-[family-name:var(--font-roboto)] text-[13px] text-white/30 text-center py-[20px]">Nema podataka</p>
+                      <p className="font-[family-name:var(--font-roboto)] text-[13px] text-white/30 text-center py-[20px]">{t("noDataAvailable")}</p>
                     )}
                   </div>
                 )}
