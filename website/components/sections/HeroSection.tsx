@@ -58,7 +58,7 @@ export default function HeroSection() {
               </div>
 
               <h1 className="font-[family-name:var(--font-sora)] font-bold text-[52px] leading-[60px] xl:text-[60px] xl:leading-[68px]">
-                <span className="text-transparent [-webkit-text-stroke:1.5px_white] [text-stroke:1.5px_white] [paint-order:stroke_fill] tracking-[0.04em]">{titleFirst}</span>
+                <span className="text-[#0A0A0A] [-webkit-text-stroke:2px_white] [paint-order:stroke_fill] tracking-[0.05em]">{titleFirst}</span>
                 <span className="text-white">{titleRest}</span>
               </h1>
               <p className="font-[family-name:var(--font-roboto)] text-[18px] leading-[28px] text-white/80 max-w-[460px] mt-[16px]">
@@ -100,7 +100,7 @@ export default function HeroSection() {
         <div className="absolute bottom-[12px] left-0 right-0 z-10 px-[20px] sm:px-[40px]">
           <div className="flex flex-col gap-[8px]">
             <h1 className="font-[family-name:var(--font-sora)] font-bold text-[26px] leading-[32px] sm:text-[34px] sm:leading-[40px] drop-shadow-lg">
-              <span className="text-transparent [-webkit-text-stroke:1px_white] [text-stroke:1px_white] [paint-order:stroke_fill] tracking-[0.04em]">{titleFirst}</span>
+              <span className="text-[#0A0A0A] [-webkit-text-stroke:1.5px_white] [paint-order:stroke_fill] tracking-[0.05em]">{titleFirst}</span>
               <span className="text-white">{titleRest}</span>
             </h1>
             <p className="font-[family-name:var(--font-roboto)] text-[14px] leading-[21px] sm:text-[16px] sm:leading-[24px] text-white/80 max-w-[460px] drop-shadow-md">

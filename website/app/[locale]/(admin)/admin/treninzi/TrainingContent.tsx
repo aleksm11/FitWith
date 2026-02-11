@@ -19,6 +19,17 @@ import {
   createTrainingExercise,
 } from "@/lib/supabase/queries";
 import type { Profile, Exercise, ExerciseCategory } from "@/lib/supabase/types";
+import { getWeekdayName } from "@/lib/utils/timezone";
+
+const WEEKDAYS = [
+  { value: 1, label: "Ponedeljak" },
+  { value: 2, label: "Utorak" },
+  { value: 3, label: "Sreda" },
+  { value: 4, label: "Četvrtak" },
+  { value: 5, label: "Petak" },
+  { value: 6, label: "Subota" },
+  { value: 7, label: "Nedelja" },
+];
 
 const statusColors: Record<string, string> = {
   active: "bg-green-500/10 text-green-400",
@@ -65,7 +76,8 @@ export default function TrainingContent() {
               createdAt: new Date(tp.created_at).toLocaleDateString("sr-Latn"),
               days: (tp.training_days || []).map((d) => ({
                 id: d.id,
-                dayName: d.day_name_sr || `Dan ${d.day_number}`,
+                dayName: d.day_of_week ? getWeekdayName(d.day_of_week, "sr") : (d.day_name_sr || `Dan ${d.day_number}`),
+                dayOfWeek: d.day_of_week || null,
                 focus: d.notes || "",
                 exercises: (d.training_exercises || []).map((ex) => ({
                   exerciseId: ex.exercise_id || "",
@@ -150,20 +162,23 @@ export default function TrainingContent() {
       .finally(() => setSaving(false));
   }
 
-  function handleAddDay() {
+  function handleAddDay(dayOfWeek: number) {
     if (!selectedPlan) return;
     const dayNumber = selectedPlan.days.length + 1;
+    const weekdayName = getWeekdayName(dayOfWeek, "sr");
 
     createTrainingDay({
       plan_id: selectedPlan.id,
       day_number: dayNumber,
-      day_name_sr: `Dan ${dayNumber}`,
-      sort_order: dayNumber,
+      day_of_week: dayOfWeek,
+      day_name_sr: weekdayName,
+      sort_order: dayOfWeek,
     })
       .then((result) => {
         const newDay: AdminTrainingDay = {
           id: result.id,
-          dayName: result.day_name_sr || `Dan ${dayNumber}`,
+          dayName: weekdayName,
+          dayOfWeek: dayOfWeek,
           focus: "",
           exercises: [],
         };
@@ -174,7 +189,8 @@ export default function TrainingContent() {
       .catch(() => {
         const newDay: AdminTrainingDay = {
           id: `td${Date.now()}`,
-          dayName: `Dan ${dayNumber}`,
+          dayName: weekdayName,
+          dayOfWeek: dayOfWeek,
           focus: "",
           exercises: [],
         };
@@ -236,12 +252,13 @@ export default function TrainingContent() {
     setPlans(plans.map((p) => (p.id === updated.id ? updated : p)));
   }
 
-  function handleDayFieldChange(dayId: string, field: string, value: string) {
+  function handleDayFieldChange(dayId: string, field: string, value: string | number) {
     if (!selectedPlan) return;
+    const parsedValue = field === "dayOfWeek" ? Number(value) : value;
     const updated = {
       ...selectedPlan,
       days: selectedPlan.days.map((d) =>
-        d.id === dayId ? { ...d, [field]: value } : d
+        d.id === dayId ? { ...d, [field]: parsedValue } : d
       ),
     };
     setSelectedPlan(updated);
@@ -381,15 +398,22 @@ export default function TrainingContent() {
             <h2 className="font-[family-name:var(--font-sora)] font-bold text-[20px] text-white">
               {selectedPlan.name}
             </h2>
-            <button
-              onClick={handleAddDay}
-              className="bg-orange-500/10 text-orange-400 px-[16px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] hover:bg-orange-500/20 transition-colors flex items-center gap-[6px]"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-              {t("addDay")}
-            </button>
+            <div className="flex items-center gap-[8px]">
+              <select
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (val) handleAddDay(val);
+                  e.target.value = "";
+                }}
+                defaultValue=""
+                className="bg-orange-500/10 text-orange-400 px-[12px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] hover:bg-orange-500/20 transition-colors border-0 focus:outline-none cursor-pointer appearance-none"
+              >
+                <option value="" disabled className="bg-[#1A1A1A]">+ {t("addDay")}</option>
+                {WEEKDAYS.filter((w) => !selectedPlan.days.some((d) => d.dayOfWeek === w.value)).map((w) => (
+                  <option key={w.value} value={w.value} className="bg-[#1A1A1A]">{w.label}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {selectedPlan.days.length === 0 && (
@@ -404,12 +428,21 @@ export default function TrainingContent() {
                 <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-[12px] mb-[16px]">
                   <div>
                     <label className="block font-[family-name:var(--font-roboto)] text-[12px] text-white/40 mb-[4px]">{t("dayName")}</label>
-                    <input
-                      type="text"
-                      value={day.dayName}
-                      onChange={(e) => handleDayFieldChange(day.id, "dayName", e.target.value)}
+                    <select
+                      value={day.dayOfWeek || ""}
+                      onChange={(e) => {
+                        const dow = parseInt(e.target.value);
+                        const name = getWeekdayName(dow, "sr");
+                        handleDayFieldChange(day.id, "dayOfWeek", String(dow));
+                        handleDayFieldChange(day.id, "dayName", name);
+                      }}
                       className="w-full bg-white/[0.03] border border-white/10 px-[12px] py-[8px] text-[14px] text-white font-[family-name:var(--font-roboto)] focus:outline-none focus:border-orange-500/50"
-                    />
+                    >
+                      <option value="" className="bg-[#1A1A1A]">{t("dayName")}...</option>
+                      {WEEKDAYS.map((w) => (
+                        <option key={w.value} value={w.value} className="bg-[#1A1A1A]">{w.label}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block font-[family-name:var(--font-roboto)] text-[12px] text-white/40 mb-[4px]">{t("focus")}</label>
@@ -426,7 +459,7 @@ export default function TrainingContent() {
                 {day.exercises.length > 0 && (
                   <div className="space-y-[8px] mb-[12px]">
                     {day.exercises.map((ex, exIndex) => (
-                      <div key={exIndex} className="grid grid-cols-[1fr_60px_80px_60px] max-sm:grid-cols-2 gap-[8px] items-end">
+                      <div key={exIndex} className="space-y-[8px] bg-white/[0.02] p-[10px] border border-white/5">
                         <div>
                           <label className="block font-[family-name:var(--font-roboto)] text-[11px] text-white/30 mb-[2px]">{t("selectExercise")}</label>
                           <select
@@ -440,32 +473,34 @@ export default function TrainingContent() {
                             ))}
                           </select>
                         </div>
-                        <div>
-                          <label className="block font-[family-name:var(--font-roboto)] text-[11px] text-white/30 mb-[2px]">{t("sets")}</label>
-                          <input
-                            type="number"
-                            value={ex.sets}
-                            onChange={(e) => handleExerciseChange(day.id, exIndex, "sets", parseInt(e.target.value) || 0)}
-                            className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[6px] text-[13px] text-white font-[family-name:var(--font-roboto)] focus:outline-none focus:border-orange-500/50"
-                          />
-                        </div>
-                        <div>
-                          <label className="block font-[family-name:var(--font-roboto)] text-[11px] text-white/30 mb-[2px]">{t("reps")}</label>
-                          <input
-                            type="text"
-                            value={ex.reps}
-                            onChange={(e) => handleExerciseChange(day.id, exIndex, "reps", e.target.value)}
-                            className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[6px] text-[13px] text-white font-[family-name:var(--font-roboto)] focus:outline-none focus:border-orange-500/50"
-                          />
-                        </div>
-                        <div>
-                          <label className="block font-[family-name:var(--font-roboto)] text-[11px] text-white/30 mb-[2px]">{t("rest")}</label>
-                          <input
-                            type="number"
-                            value={ex.restSeconds}
-                            onChange={(e) => handleExerciseChange(day.id, exIndex, "restSeconds", parseInt(e.target.value) || 0)}
-                            className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[6px] text-[13px] text-white font-[family-name:var(--font-roboto)] focus:outline-none focus:border-orange-500/50"
-                          />
+                        <div className="grid grid-cols-3 gap-[8px]">
+                          <div>
+                            <label className="block font-[family-name:var(--font-roboto)] text-[11px] text-white/30 mb-[2px]">{t("sets")}</label>
+                            <input
+                              type="number"
+                              value={ex.sets}
+                              onChange={(e) => handleExerciseChange(day.id, exIndex, "sets", parseInt(e.target.value) || 0)}
+                              className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[6px] text-[13px] text-white font-[family-name:var(--font-roboto)] focus:outline-none focus:border-orange-500/50"
+                            />
+                          </div>
+                          <div>
+                            <label className="block font-[family-name:var(--font-roboto)] text-[11px] text-white/30 mb-[2px]">{t("reps")}</label>
+                            <input
+                              type="text"
+                              value={ex.reps}
+                              onChange={(e) => handleExerciseChange(day.id, exIndex, "reps", e.target.value)}
+                              className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[6px] text-[13px] text-white font-[family-name:var(--font-roboto)] focus:outline-none focus:border-orange-500/50"
+                            />
+                          </div>
+                          <div>
+                            <label className="block font-[family-name:var(--font-roboto)] text-[11px] text-white/30 mb-[2px]">{t("rest")}</label>
+                            <input
+                              type="number"
+                              value={ex.restSeconds}
+                              onChange={(e) => handleExerciseChange(day.id, exIndex, "restSeconds", parseInt(e.target.value) || 0)}
+                              className="w-full bg-white/[0.03] border border-white/10 px-[10px] py-[6px] text-[13px] text-white font-[family-name:var(--font-roboto)] focus:outline-none focus:border-orange-500/50"
+                            />
+                          </div>
                         </div>
                       </div>
                     ))}

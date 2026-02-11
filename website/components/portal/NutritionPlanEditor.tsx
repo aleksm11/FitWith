@@ -324,46 +324,58 @@ export default function NutritionPlanEditor({ clientId, plans, onRefresh }: Prop
           {/* Meals */}
           {plan.nutrition_plan_meals
             .sort((a, b) => a.sort_order - b.sort_order)
-            .map((meal) => (
-              <div key={meal.id} className="flex items-center gap-[8px] px-[24px] py-[12px] border-b border-white/5 last:border-0">
-                <input
-                  type="text"
-                  defaultValue={meal.name || ""}
-                  onBlur={(e) => handleUpdateMeal(meal.id, { name: e.target.value } as Partial<NutritionPlanMeal>)}
-                  className="flex-1 bg-transparent border border-transparent hover:border-white/10 focus:border-orange-500/50 px-[8px] py-[4px] font-[family-name:var(--font-roboto)] text-[13px] text-white/70 focus:outline-none transition-colors"
-                />
-                <input
-                  type="text"
-                  defaultValue={meal.time_suggestion || ""}
-                  onBlur={(e) => handleUpdateMeal(meal.id, { time_suggestion: e.target.value } as Partial<NutritionPlanMeal>)}
-                  placeholder="00:00"
-                  className="w-[70px] bg-transparent border border-transparent hover:border-white/10 focus:border-orange-500/50 px-[6px] py-[4px] font-[family-name:var(--font-roboto)] text-[12px] text-white/40 text-center focus:outline-none transition-colors"
-                />
-                <input
-                  type="number"
-                  defaultValue={meal.calories || 0}
-                  onBlur={(e) => handleUpdateMeal(meal.id, { calories: parseInt(e.target.value) || 0 } as Partial<NutritionPlanMeal>)}
-                  className="w-[70px] bg-transparent border border-white/10 px-[6px] py-[4px] font-[family-name:var(--font-roboto)] text-[12px] text-white/50 text-center focus:border-orange-500/50 focus:outline-none"
-                />
-                <span className="font-[family-name:var(--font-roboto)] text-[10px] text-white/20 w-[30px]">kcal</span>
-                <button onClick={() => handleDeleteMeal(meal.id)}
-                  className="text-white/20 hover:text-red-400 transition-colors cursor-pointer">
-                  ×
-                </button>
-              </div>
-            ))}
+            .map((meal) => {
+              const mealFoods = meal.foods || [];
+              const foodCalTotal = mealFoods.reduce((sum, f) => sum + (f.calories || 0), 0);
+              const displayCal = foodCalTotal || meal.calories || 0;
+              return (
+                <div key={meal.id} className="px-[24px] py-[12px] border-b border-white/5 last:border-0">
+                  <div className="flex items-center gap-[8px]">
+                    <input
+                      type="text"
+                      defaultValue={meal.name || ""}
+                      onBlur={(e) => handleUpdateMeal(meal.id, { name: e.target.value } as Partial<NutritionPlanMeal>)}
+                      className="flex-1 bg-transparent border border-transparent hover:border-white/10 focus:border-orange-500/50 px-[8px] py-[4px] font-[family-name:var(--font-roboto)] text-[13px] text-white/70 focus:outline-none transition-colors"
+                    />
+                    <input
+                      type="number"
+                      defaultValue={meal.calories || 0}
+                      onBlur={(e) => handleUpdateMeal(meal.id, { calories: parseInt(e.target.value) || 0 } as Partial<NutritionPlanMeal>)}
+                      className="w-[80px] bg-transparent border border-white/10 px-[6px] py-[4px] font-[family-name:var(--font-roboto)] text-[12px] text-white/50 text-center focus:border-orange-500/50 focus:outline-none"
+                    />
+                    <span className="font-[family-name:var(--font-roboto)] text-[10px] text-white/20 shrink-0">kcal</span>
+                    <button onClick={() => handleDeleteMeal(meal.id)}
+                      className="text-white/20 hover:text-red-400 transition-colors cursor-pointer shrink-0">
+                      ×
+                    </button>
+                  </div>
+                  {mealFoods.length > 0 && (
+                    <div className="mt-[8px] ml-[8px] space-y-[2px]">
+                      {mealFoods.map((f, fi) => (
+                        <div key={fi} className="flex items-center gap-[8px] font-[family-name:var(--font-roboto)] text-[12px] text-white/40">
+                          <span className="text-white/20 w-[12px] shrink-0">{fi + 1}.</span>
+                          <span className="flex-1 truncate">{f.name}</span>
+                          <span className="shrink-0">{f.amount}{f.unit}</span>
+                          <span className="shrink-0 text-white/30">{f.calories || 0} kcal</span>
+                        </div>
+                      ))}
+                      <div className="flex justify-end font-[family-name:var(--font-roboto)] text-[11px] text-orange-400/60 pt-[4px]">
+                        {t("calories")}: {displayCal} kcal
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
 
           {/* Add meal */}
           <div className="px-[24px] py-[12px]">
             {addingMealToPlan === plan.id ? (
               <div className="space-y-[8px]">
-                <div className="grid grid-cols-[1fr_80px_80px] gap-[8px]">
+                <div className="grid grid-cols-[1fr_100px] gap-[8px]">
                   <input type="text" value={newMeal.name} onChange={(e) => setNewMeal({ ...newMeal, name: e.target.value })}
                     placeholder={t("mealName")}
                     className="bg-white/[0.03] border border-white/10 px-[12px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white placeholder-white/30 focus:border-orange-500/50 focus:outline-none" />
-                  <input type="text" value={newMeal.time_suggestion} onChange={(e) => setNewMeal({ ...newMeal, time_suggestion: e.target.value })}
-                    placeholder="07:00"
-                    className="bg-white/[0.03] border border-white/10 px-[12px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white placeholder-white/30 text-center focus:border-orange-500/50 focus:outline-none" />
                   <input type="number" value={newMeal.calories || ""} onChange={(e) => setNewMeal({ ...newMeal, calories: parseInt(e.target.value) || 0 })}
                     placeholder="kcal"
                     className="bg-white/[0.03] border border-white/10 px-[12px] py-[8px] font-[family-name:var(--font-roboto)] text-[13px] text-white placeholder-white/30 text-center focus:border-orange-500/50 focus:outline-none" />

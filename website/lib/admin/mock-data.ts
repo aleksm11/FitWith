@@ -40,6 +40,7 @@ export type AdminTrainingPlan = {
 export type AdminTrainingDay = {
   id: string;
   dayName: string;
+  dayOfWeek: number | null; // 1=Monday...7=Sunday
   focus: string;
   exercises: AdminTrainingExercise[];
 };
@@ -271,6 +272,7 @@ export const mockTrainingPlans: AdminTrainingPlan[] = [
       {
         id: "td1",
         dayName: "Ponedeljak",
+        dayOfWeek: 1,
         focus: "Grudi i triceps",
         exercises: [
           { exerciseId: "e1", exerciseName: "Bench press", sets: 4, reps: "8-10", restSeconds: 120, notes: "" },
@@ -281,6 +283,7 @@ export const mockTrainingPlans: AdminTrainingPlan[] = [
       {
         id: "td2",
         dayName: "Utorak",
+        dayOfWeek: 2,
         focus: "Leđa i biceps",
         exercises: [
           { exerciseId: "e9", exerciseName: "Mrtvo vučenje", sets: 4, reps: "6-8", restSeconds: 180, notes: "" },
@@ -291,6 +294,7 @@ export const mockTrainingPlans: AdminTrainingPlan[] = [
       {
         id: "td3",
         dayName: "Četvrtak",
+        dayOfWeek: 4,
         focus: "Noge i core",
         exercises: [
           { exerciseId: "e3", exerciseName: "Čučanj", sets: 4, reps: "8-10", restSeconds: 150, notes: "" },
@@ -313,6 +317,7 @@ export const mockTrainingPlans: AdminTrainingPlan[] = [
       {
         id: "td4",
         dayName: "Ponedeljak",
+        dayOfWeek: 1,
         focus: "Full body A",
         exercises: [
           { exerciseId: "e3", exerciseName: "Čučanj", sets: 3, reps: "10-12", restSeconds: 90, notes: "" },

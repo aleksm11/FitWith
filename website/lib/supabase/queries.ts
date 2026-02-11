@@ -433,6 +433,7 @@ export async function copyTrainingPlan(planId: string, newClientId: string) {
 export async function createTrainingDay(day: {
   plan_id: string;
   day_number: number;
+  day_of_week?: number;
   day_name_sr?: string;
   day_name_en?: string;
   day_name_ru?: string;

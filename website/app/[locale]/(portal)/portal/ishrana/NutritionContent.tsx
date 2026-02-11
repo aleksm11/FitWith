@@ -71,17 +71,32 @@ export default function NutritionContent() {
     if (!plan || !plan.nutrition_plan_meals || plan.nutrition_plan_meals.length === 0) return null;
     const meals = plan.nutrition_plan_meals
       .sort((a, b) => a.sort_order - b.sort_order)
-      .map((meal) => ({
-        name: meal.name || t("mealDefault", {n: meal.meal_number}),
-        foods: (meal.foods || []).map((f) => ({
-          name: f.name,
-          amount: f.unit ? `${f.amount}${f.unit}` : String(f.amount || ""),
-          calories: f.calories || 0,
-          protein: f.protein || 0,
-          carbs: f.carbs || 0,
-          fat: f.fats || 0,
-        })),
-      }));
+      .map((meal) => {
+        const hasFoods = meal.foods && meal.foods.length > 0;
+        const foods = hasFoods
+          ? meal.foods.map((f) => ({
+              name: f.name,
+              amount: f.unit ? `${f.amount}${f.unit}` : String(f.amount || ""),
+              calories: f.calories || 0,
+              protein: f.protein || 0,
+              carbs: f.carbs || 0,
+              fat: f.fats || 0,
+            }))
+          : (meal.calories || meal.protein_g || meal.carbs_g || meal.fats_g)
+            ? [{
+                name: `${meal.calories || 0} kcal`,
+                amount: "",
+                calories: meal.calories || 0,
+                protein: meal.protein_g || 0,
+                carbs: meal.carbs_g || 0,
+                fat: meal.fats_g || 0,
+              }]
+            : [];
+        return {
+          name: meal.name || t("mealDefault", {n: meal.meal_number}),
+          foods,
+        };
+      });
     // Same meals apply to all days (nutrition doesn't vary by weekday typically)
     return { day_of_week: selectedDay, meals };
   };

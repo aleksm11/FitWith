@@ -6,6 +6,10 @@ type AuthResult = {
   emailConfirmed?: boolean;
 };
 
+function getSiteUrl() {
+  return process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== "undefined" ? window.location.origin : "");
+}
+
 /** Sign in with email + password */
 export async function signInWithEmail(
   email: string,
@@ -32,7 +36,7 @@ export async function signUpWithEmail(
     password,
     options: {
       data: { full_name: fullName },
-      emailRedirectTo: `${window.location.origin}/auth/callback`,
+      emailRedirectTo: `${getSiteUrl()}/auth/callback`,
     },
   });
   return { error: error?.message ?? null };
@@ -44,7 +48,7 @@ export async function signInWithGoogle(redirectTo?: string) {
   await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${window.location.origin}/auth/callback${
+      redirectTo: `${getSiteUrl()}/auth/callback${
         redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ""
       }`,
     },
@@ -57,7 +61,7 @@ export async function signInWithApple(redirectTo?: string) {
   await supabase.auth.signInWithOAuth({
     provider: "apple",
     options: {
-      redirectTo: `${window.location.origin}/auth/callback${
+      redirectTo: `${getSiteUrl()}/auth/callback${
         redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ""
       }`,
     },

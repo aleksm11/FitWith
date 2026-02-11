@@ -395,8 +395,14 @@ export default function NutritionContent() {
 
                 {meal.foods.length > 0 && (
                   <div className="space-y-[8px] mb-[12px]">
+                    {/* Column headers */}
+                    <div className="grid grid-cols-[1fr_100px_90px] max-sm:grid-cols-1 gap-[8px] max-sm:hidden">
+                      <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 px-[10px]">{t("foodName")}</span>
+                      <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 px-[10px]">{t("amount")}</span>
+                      <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 px-[10px]">{t("calories")}</span>
+                    </div>
                     {meal.foods.map((food, foodIndex) => (
-                      <div key={foodIndex} className="grid grid-cols-[1fr_100px_80px] max-sm:grid-cols-1 gap-[8px]">
+                      <div key={foodIndex} className="grid grid-cols-[1fr_100px_90px] max-sm:grid-cols-1 gap-[8px]">
                         <input
                           type="text"
                           value={food.name}
