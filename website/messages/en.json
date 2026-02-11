@@ -500,7 +500,11 @@
     "foodNamePlaceholder": "Food name",
     "daysCount": "days",
     "mealsCount": "meals",
-    "mealDefault": "Meal",
+    "mealDefault": "Meal {n}",
+    "calories": "Calories",
+    "foodItem": "Food",
+    "amount": "Amount",
+    "noNutritionForDay": "No nutrition plan for {day}",
     "dayDefault": "Day",
     "noDataAvailable": "No data available",
     "itemsCount": "items"

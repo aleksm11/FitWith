@@ -813,7 +813,7 @@ export default function TemplatesContent() {
                         {meals.map((meal, mi) => (
                           <div key={mi}>
                             <h4 className="font-[family-name:var(--font-sora)] font-semibold text-[14px] text-orange-400 mb-[4px]">
-                              {meal.name || `${t("mealDefault")} ${mi + 1}`}
+                              {meal.name || t("mealDefault", {n: mi + 1})}
                               {meal.time_suggestion && <span className="font-[family-name:var(--font-roboto)] text-[12px] text-white/30 ml-[8px]">{meal.time_suggestion}</span>}
                             </h4>
                             {meal.foods.map((food, fi) => (

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { getMyProfile, getMyTrainingPlan, getMyNutritionPlan } from "@/lib/supabase/queries";
 import NutritionPlanCard from "@/components/portal/NutritionPlanCard";
+import ExerciseTable from "@/components/portal/ExerciseTable";
 import type { NutritionPlanMeal } from "@/lib/supabase/types";
 import { localizedField } from "@/lib/supabase/types";
 import type { Locale } from "@/lib/supabase/types";
@@ -21,7 +22,7 @@ type DashboardData = {
   totalCarbs: number;
   totalFat: number;
   todayFocus: string;
-  todayExercises: { name: string; slug: string; sets: number; reps: string }[];
+  todayExercises: { name: string; slug: string; sets: number; reps: string; restSeconds: number }[];
   isRestDay: boolean;
   nextWorkout: { label: string; focus: string; count: number } | null;
   nutritionMeals: NutritionPlanMeal[];
@@ -58,7 +59,7 @@ export default function PortalContent() {
 
         // Training - use Belgrade timezone to detect today
         let todayFocus = "";
-        let todayExercises: { name: string; slug: string; sets: number; reps: string }[] = [];
+        let todayExercises: { name: string; slug: string; sets: number; reps: string; restSeconds: number }[] = [];
         let isRestDay = true;
         let nextWorkout: { label: string; focus: string; count: number } | null = null;
         const hasTrainingPlan = !!(trainingPlan && trainingPlan.training_days.length > 0);
@@ -79,6 +80,7 @@ export default function PortalContent() {
               slug: ex.exercises?.slug || "",
               sets: ex.sets || 0,
               reps: ex.reps || "",
+              restSeconds: ex.rest_seconds || 0,
             }));
           } else {
             // No plan for today
@@ -222,36 +224,7 @@ export default function PortalContent() {
             <p className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40 mb-[16px]">
               {data.todayExercises.length} {t("exercisesCount")}
             </p>
-            <div>
-              {/* Table header */}
-              <div className="grid grid-cols-[1fr_60px_70px] gap-[6px] pb-[6px] mb-[4px] border-b border-white/5">
-                <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-orange-500">{t("exerciseLabel")}</span>
-                <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-orange-500 text-center">{t("setsLabel")}</span>
-                <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-orange-500 text-center">{t("repsLabel")}</span>
-              </div>
-              {/* Exercise rows */}
-              {data.todayExercises.map((ex, i) => (
-                <div
-                  key={i}
-                  className="grid grid-cols-[1fr_60px_70px] gap-[6px] py-[8px] border-b border-white/5 last:border-0 items-center"
-                >
-                  {ex.slug ? (
-                    <Link
-                      href={`/${locale}/vezbe/${ex.slug}`}
-                      className="font-[family-name:var(--font-roboto)] text-[13px] text-white hover:text-orange-400 transition-colors underline decoration-white/20 underline-offset-2"
-                    >
-                      {ex.name}
-                    </Link>
-                  ) : (
-                    <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/70">
-                      {ex.name}
-                    </span>
-                  )}
-                  <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/60 text-center">{ex.sets}</span>
-                  <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/60 text-center">{ex.reps}</span>
-                </div>
-              ))}
-            </div>
+            <ExerciseTable exercises={data.todayExercises} locale={locale} />
           </div>
         )}
       </div>
@@ -338,7 +311,7 @@ export default function PortalContent() {
               meals: data.nutritionMeals
                 .sort((a, b) => a.sort_order - b.sort_order)
                 .map((meal) => ({
-                  name: meal.name || `${t("mealDefault")} ${meal.meal_number}`,
+                  name: meal.name || t("mealDefault", {n: meal.meal_number}),
                   foods: (meal.foods || []).map((f) => ({
                     name: f.name,
                     amount: f.unit ? `${f.amount}${f.unit}` : String(f.amount || ""),

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { getWeekdayName } from "@/lib/utils/timezone";
 
 /**
@@ -37,6 +38,7 @@ type Props = {
 };
 
 export default function NutritionPlanCard({ dayOfWeek, day, locale }: Props) {
+  const t = useTranslations("Portal");
   const weekdayName = getWeekdayName(dayOfWeek, locale);
 
   if (!day || day.meals.length === 0) {
@@ -46,7 +48,7 @@ export default function NutritionPlanCard({ dayOfWeek, day, locale }: Props) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <p className="font-[family-name:var(--font-roboto)] text-[15px] text-white/40">
-          Nema plana ishrane za {weekdayName}
+          {t("noNutritionForDay", {day: weekdayName})}
         </p>
       </div>
     );
@@ -76,7 +78,7 @@ export default function NutritionPlanCard({ dayOfWeek, day, locale }: Props) {
       <div className="grid grid-cols-4 gap-[8px] mb-[20px]">
         <div className="bg-white/[0.02] p-[10px] border border-white/5">
           <p className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/40 mb-[3px]">
-            Kalorije
+            {t("calories")}
           </p>
           <p className="font-[family-name:var(--font-sora)] font-semibold text-[15px] text-white">
             {dailyTotals.calories}
@@ -84,7 +86,7 @@ export default function NutritionPlanCard({ dayOfWeek, day, locale }: Props) {
         </div>
         <div className="bg-white/[0.02] p-[10px] border border-white/5">
           <p className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/40 mb-[3px]">
-            Proteini
+            {t("protein")}
           </p>
           <p className="font-[family-name:var(--font-sora)] font-semibold text-[15px] text-white">
             {dailyTotals.protein}g
@@ -92,7 +94,7 @@ export default function NutritionPlanCard({ dayOfWeek, day, locale }: Props) {
         </div>
         <div className="bg-white/[0.02] p-[10px] border border-white/5">
           <p className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/40 mb-[3px]">
-            Ugljenih.
+            {t("carbs")}
           </p>
           <p className="font-[family-name:var(--font-sora)] font-semibold text-[15px] text-white">
             {dailyTotals.carbs}g
@@ -100,7 +102,7 @@ export default function NutritionPlanCard({ dayOfWeek, day, locale }: Props) {
         </div>
         <div className="bg-white/[0.02] p-[10px] border border-white/5">
           <p className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/40 mb-[3px]">
-            Masti
+            {t("fat")}
           </p>
           <p className="font-[family-name:var(--font-sora)] font-semibold text-[15px] text-white">
             {dailyTotals.fat}g
@@ -121,13 +123,13 @@ export default function NutritionPlanCard({ dayOfWeek, day, locale }: Props) {
               {/* Header */}
               <div className="grid grid-cols-[2fr_1fr_80px_60px_60px_60px] max-sm:hidden gap-[8px] pb-[8px] border-b border-white/10">
                 <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30">
-                  Namirnica
+                  {t("foodItem")}
                 </span>
                 <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30">
-                  Količina
+                  {t("amount")}
                 </span>
                 <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 text-right">
-                  Kalorije
+                  {t("calories")}
                 </span>
                 <span className="font-[family-name:var(--font-roboto)] text-[10px] uppercase tracking-[1px] text-white/30 text-right">
                   P

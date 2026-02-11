@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { getMyTrainingPlan, getClientTrainingPlans } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/client";
 import { localizedField } from "@/lib/supabase/types";
 import type { Locale } from "@/lib/supabase/types";
+import ExerciseTable from "@/components/portal/ExerciseTable";
 import WorkoutPlanEditor from "@/components/portal/WorkoutPlanEditor";
 import { getCurrentDayOfWeekBelgrade, getWeekdayName } from "@/lib/utils/timezone";
 
@@ -276,7 +276,7 @@ export default function TrainingContent() {
           </div>
           {!isRestDay && (
             <span className="font-[family-name:var(--font-roboto)] text-[13px] text-white/40 whitespace-nowrap flex-shrink-0 ml-[12px]">
-              {day.exercises.length} vežbi
+              {day.exercises.length} {t("exercisesCount")}
             </span>
           )}
         </div>
@@ -301,60 +301,7 @@ export default function TrainingContent() {
             </p>
           </div>
         ) : (
-          <>
-            {/* Table header */}
-            <div className="grid grid-cols-[1fr_80px_80px_80px] max-sm:grid-cols-[1fr_60px_60px_60px] gap-[8px] pb-[12px] border-b border-white/10 mb-[8px]">
-              <span className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1.5px] text-white/30">
-                {t("exerciseLabel")}
-              </span>
-              <span className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1.5px] text-white/30 text-center">
-                {t("setsLabel")}
-              </span>
-              <span className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1.5px] text-white/30 text-center">
-                {t("repsLabel")}
-              </span>
-              <span className="font-[family-name:var(--font-roboto)] text-[11px] uppercase tracking-[1.5px] text-white/30 text-center">
-                {t("restLabel")}
-              </span>
-            </div>
-
-            {/* Exercise rows */}
-            <div className="space-y-[4px]">
-              {day.exercises.map((ex, i) => (
-                <div
-                  key={i}
-                  className="grid grid-cols-[1fr_80px_80px_80px] max-sm:grid-cols-[1fr_60px_60px_60px] gap-[8px] py-[14px] border-b border-white/5 last:border-0 items-center"
-                >
-                  <div className="flex items-center gap-[12px]">
-                    <span className="font-[family-name:var(--font-sora)] font-semibold text-[13px] text-orange-500 w-[20px] shrink-0">
-                      {i + 1}
-                    </span>
-                    {ex.slug ? (
-                      <Link
-                        href={`/${locale}/vezbe/${ex.slug}`}
-                        className="font-[family-name:var(--font-roboto)] text-[15px] text-white hover:text-orange-400 transition-colors underline decoration-white/20 underline-offset-2"
-                      >
-                        {ex.name}
-                      </Link>
-                    ) : (
-                      <span className="font-[family-name:var(--font-roboto)] text-[15px] text-white">
-                        {ex.name}
-                      </span>
-                    )}
-                  </div>
-                  <span className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70 text-center">
-                    {ex.sets}
-                  </span>
-                  <span className="font-[family-name:var(--font-roboto)] text-[14px] text-white/70 text-center">
-                    {ex.reps}
-                  </span>
-                  <span className="font-[family-name:var(--font-roboto)] text-[14px] text-white/40 text-center">
-                    {ex.restSeconds}s
-                  </span>
-                </div>
-              ))}
-            </div>
-          </>
+          <ExerciseTable exercises={day.exercises} locale={locale} />
         )}
       </div>
     </div>

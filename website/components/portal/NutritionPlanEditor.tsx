@@ -133,7 +133,7 @@ export default function NutritionPlanEditor({ clientId, plans, onRefresh }: Prop
       await createNutritionPlanMeal({
         plan_id: planId,
         meal_number: mealNumber,
-        name: newMeal.name || `Obrok ${mealNumber}`,
+        name: newMeal.name || t("mealDefault", {n: mealNumber}),
         time_suggestion: newMeal.time_suggestion || undefined,
         calories: newMeal.calories || undefined,
         protein_g: newMeal.protein_g || undefined,

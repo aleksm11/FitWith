@@ -500,7 +500,11 @@
     "foodNamePlaceholder": "Название продукта",
     "daysCount": "дней",
     "mealsCount": "приёмов пищи",
-    "mealDefault": "Приём пищи",
+    "mealDefault": "Приём пищи {n}",
+    "calories": "Калории",
+    "foodItem": "Продукт",
+    "amount": "Количество",
+    "noNutritionForDay": "Нет плана питания на {day}",
     "dayDefault": "День",
     "noDataAvailable": "Нет данных",
     "itemsCount": "элементов"

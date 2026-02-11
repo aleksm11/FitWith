@@ -72,7 +72,7 @@ export default function NutritionContent() {
     const meals = plan.nutrition_plan_meals
       .sort((a, b) => a.sort_order - b.sort_order)
       .map((meal) => ({
-        name: meal.name || `Obrok ${meal.meal_number}`,
+        name: meal.name || t("mealDefault", {n: meal.meal_number}),
         foods: (meal.foods || []).map((f) => ({
           name: f.name,
           amount: f.unit ? `${f.amount}${f.unit}` : String(f.amount || ""),

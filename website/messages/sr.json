@@ -500,7 +500,11 @@
     "foodNamePlaceholder": "Naziv namirnice",
     "daysCount": "dana",
     "mealsCount": "obroka",
-    "mealDefault": "Obrok",
+    "mealDefault": "Obrok {n}",
+    "calories": "Kalorije",
+    "foodItem": "Namirnica",
+    "amount": "Količina",
+    "noNutritionForDay": "Nema plana ishrane za {day}",
     "dayDefault": "Dan",
     "noDataAvailable": "Nema podataka",
     "itemsCount": "stavki"
